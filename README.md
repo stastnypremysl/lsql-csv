@@ -1,5 +1,41 @@
 # lsql-csv
-Lapidary Structured Query Language implementation for csv files.
+Lapidary Structured Query Language implementation for csv files. The tool for fast text data manipulation.
+
+The project is now under development and the syntax can be futher changed. 
+
+## Installation
+It is necessary, you had GHC (>8) and Parsec (>3) installed. Run then
+
+    make
+    sudo make install
+    
+Now should be lcsv installed in `/usr/local/bin`.
+
+## Usage
+
+    lcsv [OPTIONS] COMMAND
+
+### Options
+
+    -n
+    --named
+
+Enables first line naming convension in csv files.
+    
+    -d CHAR
+    --delimiter CHAR
+
+Changes default primary delimiter. The default value is ';'.
+
+    -s CHAR
+    --secondary-delimiter CHAR
+    
+Changes default secondary delimiter. The default value is ','. It is used for arrays in csv files.
+
+    -q CHAR
+    --quote CHAR
+    
+This changes default quote char. The default value is '"'.
 
 ## LSQL - quick introduction 
 SQL is really pleonastic language. It can be fine to use it for critical mission projects, because your code will be easy to read. But when you are trying to use it as write-only scripting language for your daily life, you will find yourself writting a lot of useless pieces of code. And here comes LSQL.
@@ -41,6 +77,8 @@ Each column have number and may have name. If the source of column is stdio, the
 
 Each command is made from blocks separated by comma. There are these types of blocks.
 
+If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`
+
 #### Select blocks
 These blocks determine output. They are similar to bash expressions. They are made by statements separeted by whitespaces. These statements are expanded, evaluated, matched to column name and printed in delimitered format.
 
@@ -81,6 +119,11 @@ You can also add custom attributes to files in formats `FILE -a "xyz" --attribut
 
 It means that csv file have first line with names of columns
 
+    -N
+    --not-named
+
+You can also set the exact opposite. This can be useful, if you changed the default behavior.
+
     -d CHAR
     --delimiter CHAR
     
@@ -100,7 +143,7 @@ This block always begins with if. The statement uses classical awk logic. You ca
 
 There are also new nonstandard keywords:
 * `A in B` - means that A is substring of B
-* `A.X =>= B.Y` - means that `A` is left outer joined on `B` with condition `A.X == B.Y`
+* `A.X =>= B.Y` - means that `A` is left outer joined on `B` with condition `A.X == B.Y` - *It can't be negated.*
 
 You can imagine if statement as where clausule in SQL.
 
