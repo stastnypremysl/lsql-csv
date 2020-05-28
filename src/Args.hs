@@ -1,5 +1,6 @@
+module Args (Program, parseArgs) where
+
 import Text.ParserCombinators.Parsec
-import System.Environment
 import Data.List
 import Options
 
@@ -37,8 +38,8 @@ argP = do
   ret <- (try argOptionP) <|> argCmdP
   return ret
 
-parse_args :: [String] -> Program
-parse_args args = 
+parseArgs :: [String] -> Program
+parseArgs args = 
   let input = unwords args in
   case parse (many argP) "arguments" input of
     Left err -> error $ show err
