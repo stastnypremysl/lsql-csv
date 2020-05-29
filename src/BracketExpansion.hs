@@ -67,4 +67,3 @@ bracketExpand input =
     recOne :: String -> [String]
     recOne [x] = [[x]]
     recOne (i:inp) = map (\x -> i:x) (bracketExpand inp)
-
