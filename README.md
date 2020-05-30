@@ -4,7 +4,7 @@ Lapidary Structured Query Language implementation for csv files. The tool for fa
 The project is now under development and the syntax can be futher changed. 
 
 ## Installation
-It is necessary, you had GHC (>8) and Parsec (>3) installed. Run then
+It is necessary, you had GHC (>8), Parsec (>3) and Glob (Haskell package) installed. Run then
 
     make
     sudo make install
