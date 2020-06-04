@@ -1,4 +1,4 @@
-module Args (Program, parseArgs) where
+module Args (Program(Program), parseArgs, reloadOpts) where
 
 import Text.ParserCombinators.Parsec
 import Data.List
@@ -9,19 +9,23 @@ data Program = Program String Char Char Bool deriving (Show)
 
 data Arg = Opt Option| Cmd String
 
+load_ag :: Program -> [Arg] -> Program
+
+load_ag p [] = p
+load_ag (Program a1 a2 a3 a4) (Cmd c : rest) = load_ag (Program c a2 a3 a4) rest
+load_ag (Program a1 a2 a3 a4) (Opt (Delimiter c) : rest) = load_ag (Program a1 c a3 a4) rest
+load_ag (Program a1 a2 a3 a4) (Opt (SecondaryDelimiter c) : rest) = load_ag (Program a1 a2 c a4) rest
+load_ag (Program a1 a2 a3 a4) (Opt (Named c) : rest) = load_ag (Program a1 a2 a3 c) rest
+
+
 load_args :: [Arg] -> Program
 load_args args = 
   load_ag (Program "" ';' ',' False) args
 
-  where
-    load_ag :: Program -> [Arg] -> Program
+reloadOpts :: Program -> [Option] -> Program
+reloadOpts pg ops = load_ag pg$ map (Opt) ops
 
-    load_ag p [] = p
-    load_ag (Program a1 a2 a3 a4) (Cmd c : rest) = load_ag (Program c a2 a3 a4) rest
-    load_ag (Program a1 a2 a3 a4) (Opt (Delimiter c) : rest) = load_ag (Program a1 c a3 a4) rest
-    load_ag (Program a1 a2 a3 a4) (Opt (SecondaryDelimiter c) : rest) = load_ag (Program a1 a2 c a4) rest
-    load_ag (Program a1 a2 a3 a4) (Opt (Named c) : rest) = load_ag (Program a1 a2 a3 c) rest
-
+   
 argOptionP :: Parser Arg
 argOptionP = do
   op <- optionParser
