@@ -16,6 +16,24 @@ data Row = Row [Cell]
 
 data Table = Table [Row] [Column] deriving (Show)
 
+
+readValue :: String -> Value
+readValue val
+  | isInteger val = IntValue (read val)
+  | isDouble val = DoubleValue (read val)
+  | otherwise = StringValue val
+  
+  where
+    isInteger s = case reads s :: [(Integer, String)] of
+      [(_, "")] -> True
+      _         -> False
+ 
+    isDouble s = case reads s :: [(Double, String)] of
+      [(_, "")] -> True
+      _         -> False
+
+ 
+
 --buildTable :: [[String]] -> Table
 
 --joinTable :: Column -> Column -> Table
