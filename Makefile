@@ -1,13 +1,10 @@
-all: build/Main.o
+all: build
+	ghc -j`nproc` -i./src --make -O3 -o ./build/lsql-csv ./src/Main.hs
 
+build:
+	mkdir -p build
 
-build/%.o: src/%.hs
-	ghc -i ./build/* -c -O3 -o $@ $<
-
-
-build/Main.o: build/Args.o
-build/Args.o: build/Options.o
 
 .PHONY: clean
 clean:
-	rm build/*
+	git clean -Xf; rm -r ./build
