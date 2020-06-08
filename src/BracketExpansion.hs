@@ -1,6 +1,7 @@
 module BracketExpansion (bracketExpand) where
 
 import Data.List
+
 import Text.ParserCombinators.Parsec
 
 cumulatorComma :: Parser [String]

@@ -1,4 +1,4 @@
-module FileParser() where
+module FileParser(Assignment (CoreCsv, NamedCsv), parseFile) where
 
 import Tables
 import Args

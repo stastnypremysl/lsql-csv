@@ -1,12 +1,14 @@
-module Symbols(Symbol, getSymbolsFromInputTable) where
+module Symbols(Symbol, SymbolMap (SymbolMap), (+++), (-->), emptySymbolMap, getSymbolsFromInputTable) where
 
 import Tables
 import qualified Data.Map as M
 import Data.List
 
 data Symbol = NamedTable Table String | NamedColumn Column String 
-
 data SymbolMap = SymbolMap (M.Map String Symbol)
+
+emptySymbolMap :: SymbolMap
+emptySymbolMap = SymbolMap M.empty
 
 getSymbolName :: Symbol -> String
 getSymbolName (NamedTable _ name) = name

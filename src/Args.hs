@@ -1,8 +1,15 @@
 module Args (Program(Program), parseArgs, reloadOpts) where
 
-import Text.ParserCombinators.Parsec
-import Data.List
 import Options
+
+import Text.Parsec
+import Text.Parsec.Prim
+import Text.Parsec.Combinator
+import Text.Parsec.Text
+import Text.Parsec.Char
+
+import Data.List
+import qualified Data.Text as T
 
 -- command, first, second, name_line
 data Program = Program String Char Char Bool deriving (Show)
@@ -45,6 +52,6 @@ argP = do
 parseArgs :: [String] -> Program
 parseArgs args = 
   let input = unwords args in
-  case parse (many argP) "arguments" input of
+  case parse (many argP) "arguments" (T.pack input) of
     Left err -> error $ show err
     Right val -> load_args val
