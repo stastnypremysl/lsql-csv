@@ -11,6 +11,12 @@ It is necessary, you had GHC (>8), Parsec (>3) and Glob (Haskell package) instal
     
 Now should be lcsv installed in `/usr/local/bin`.
 
+If you have installed `cabal`, you can alternativaly run
+
+    cabal install
+   
+It will install the dependecies for you.    
+
 ## Usage
 
     lcsv [OPTIONS] COMMAND
@@ -43,11 +49,11 @@ SQL is really pleonastic language. It can be fine to use it for critical mission
 ### Examples
 We will show a few interesting examples of usage of the language in this implementation. If you have installed lsql-csv, you can try this yourself in your shell.
 
-    lcsv '-, @2 @1'
+    lcsv '-, &1.2 &1.1'
 
 This will print second and first column of csv file on stdin. You can read it like `from stdio S select S.second, S.first`
 
-    lcsv -d: '-, *, if @3>=1000' < /etc/passwd
+    lcsv -d: '-, *, if &1.3>=1000' < /etc/passwd
     
 This will print lines of users whose UID >=1000. It can be also written as
   
@@ -63,11 +69,11 @@ Let's see more complicated examples.
     
 This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.4 where P.1 in G.4`. But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
 
-    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, group p.1'
+    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1'
     
 This will cat all groups in one line delimeted by ",". But I want there also default groups! How can it be done? Really easily.
 
-    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, group p.1' | 
+    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1' | 
       lcsv -d: '- /etc/passwd, &1.1 cat(&1.2 &2.5), if &1.1 == &2.1'
     
 What a nice oneliner (twoliner)!
@@ -85,16 +91,16 @@ These blocks determine output. They are similar to bash expressions. They are ma
 Each statement can consist
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
 * Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
-* (Not only) aritmetic expression in `$(expr)` format
-* Quotes "anything" to prevent wildcards, expansions and matching
-* Overnaming (alias) in format `NAME=stmt`
+* Aritmetic expression in `$(expr)` format
+* Quotes "anything" to prevent wildcards, expansions and matching (NOT SUPPORTED YET)
+* Overnaming (alias) in format `NAME=stmt` (NOT SUPPORTED YET)
 * Call of aggregate function `FUNCTION(next select block)` - there can't be any space after FUNCTION
 
 Examples of select blocks:
 
-    @[3-6]
+    &1.[3-6]
 
-This will print column 3, 4, 5 and 6 from IO.
+This will print column 3, 4, 5 and 6 from first file.
 
     ax*.{6..4} 
     
@@ -143,16 +149,16 @@ This block always begins with if. The statement uses classical awk logic. You ca
 
 There are also new nonstandard keywords:
 * `A in B` - means that A is substring of B
-* `A.X =>= B.Y` - means that `A` is left outer joined on `B` with condition `A.X == B.Y` - *It can't be negated.*
+* `A.X =>= B.Y` - means that `A` is left outer joined on `B` with condition `A.X == B.Y` - *It can't be negated. Not supported yet.*
 
 You can imagine if statement as where clausule in SQL.
 
 ### By block
-This statement always begins with by and the rest of statement follows the same syntax as Select block. 
+This statement always begins with `by` and the rest of statement follows the same syntax as Select block. There can be only one By block in the whole command.
 
 You can imagine by block as the group by clausule in SQL.
 
 ### Sort
-This statement can be at the end of the command. It begins with `sort` keyword and the rest is almost the same as select block.
+This block can be at the end of the command. It begins with `sort` keyword and the rest is almost the same as the select block.
 
-If you want numeric sorting instead of alphabetical sorting, you can add `-n` attribute after sort. If you want descendent sort, use `-D` attribute after sort.
+IN FUTURE: If you want numeric sorting instead of alphabetical sorting, you can add `-n` attribute after sort. If you want descendent sort, use `-D` attribute after sort.
