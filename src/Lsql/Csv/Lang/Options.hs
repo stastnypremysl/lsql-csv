@@ -1,4 +1,4 @@
-module Options (optionParser, 
+module Lsql.Csv.Lang.Options (optionParser, 
   Option(Delimiter, SecondaryDelimiter, Quote, Named)) where
 
 import System.Environment

@@ -1,10 +1,13 @@
-module FileParser(Assignment (CoreCsv, NamedCsv), parseFile) where
+module Lsql.Csv.Lang.From.CsvParser
+  (Assignment (CoreCsv, NamedCsv), parseFile) where
 
-import Tables
-import Args
-import Options
-import Symbols
-import Args
+import Lsql.Csv.Core.Tables
+import Lsql.Csv.Core.Symbols
+
+import Lsql.Csv.Lang.Args
+import Lsql.Csv.Lang.Options
+
+import Lsql.Csv.Utils.BracketExpansion
 
 import Data.List
 import Data.Char
@@ -89,12 +92,16 @@ readValue val
       _         -> False
 
  
---buildTable first_line_names ...
-buildTableFromIn :: Bool -> [[String]] -> Table
-buildTableFromIn named in_str =
-  buildTable names in_data  
+buildTableFromIn :: [String] -> Bool -> [[String]] -> Table
+buildTableFromIn table_names named in_str =
+  buildTable table_names expanded_names in_data  
 
   where
+    expanded_names :: [[String]]
+    expanded_names = [[ table_name ++ "." ++ col_name
+      | col_name <- col_names, table_name <- table_names] 
+      | col_names <- names]
+
     names :: [[String]]
     names
       |named = map (\(x,y) -> [x,y]) (zip (head in_str)$ map show [1..])
@@ -109,7 +116,7 @@ buildTableFromIn named in_str =
 parseFile :: Assignment -> IO [Symbol]
 parseFile assignment = do
   file_content <- load_input
-  return$ getSymbolsFromInputTable tableNames$ parseTable file_content
+  return$ getSymbolsFromTable$ parseTable file_content
 
   where    
     load_input :: IO String
@@ -139,7 +146,7 @@ parseFile assignment = do
     parseTable content =
       case parse (tableP delimiter second_delimiter) file_name$ T.pack content of
         Left err -> error$ show err
-        Right parsed -> buildTableFromIn first_line_names parsed
+        Right parsed -> buildTableFromIn tableNames first_line_names parsed
     
 
 

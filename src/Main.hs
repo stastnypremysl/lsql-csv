@@ -1,7 +1,9 @@
-import Args
+import Lsql.Csv.Lang.Args
+import Lsql.Csv.Lang.BlockSeparator
+import Lsql.Csv.Lang.From.Block
+import Lsql.Csv.Lang.BlockChain
+
 import System.Environment
-import BlockParser
-import FromBlock
 
 run :: Program -> IO Int
 run prog =

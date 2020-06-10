@@ -1,4 +1,4 @@
-module BracketExpansion (bracketExpand) where
+module Lsql.Csv.Utils.BracketExpansion (bracketExpand) where
 
 import Data.List
 

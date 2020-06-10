@@ -1,6 +1,6 @@
-module Args (Program(Program), parseArgs, reloadOpts) where
+module Lsql.Csv.Lang.Args (Program(Program), parseArgs, reloadOpts) where
 
-import Options
+import Lsql.Csv.Lang.Options
 
 import Text.Parsec
 import Text.Parsec.Prim

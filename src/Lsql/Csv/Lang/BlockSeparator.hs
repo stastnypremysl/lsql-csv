@@ -1,4 +1,4 @@
-module BlockParser (parseBlocks) where
+module Lsql.Csv.Lang.BlockSeparator (parseBlocks) where
 
 import Text.Parsec
 import Text.Parsec.Prim

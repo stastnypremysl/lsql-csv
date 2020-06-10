@@ -1,11 +1,13 @@
-module FromBlock(getFromSymbols) where 
+module Lsql.Csv.Lang.From.Block(getFromSymbols) where 
 
-import Tables
-import FileParser
-import Options
-import Args
-import BracketExpansion
-import Symbols
+import Lsql.Csv.Core.Tables
+import Lsql.Csv.Core.Symbols
+
+import Lsql.Csv.Lang.From.CsvParser
+import Lsql.Csv.Lang.Options
+import Lsql.Csv.Lang.Args
+
+import Lsql.Csv.Utils.BracketExpansion
 
 import System.IO
 import System.Environment

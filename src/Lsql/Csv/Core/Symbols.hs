@@ -1,18 +1,24 @@
-module Symbols(Symbol, SymbolMap (SymbolMap), (+++), (-->), emptySymbolMap, getSymbolsFromInputTable) where
+module Lsql.Csv.Core.Symbols
+  (Symbol, SymbolMap (SymbolMap), (+++), (-->), 
+  emptySymbolMap, getSymbolsFromTable) where
 
-import Tables
+import Lsql.Csv.Core.Tables
 import qualified Data.Map as M
 import Data.List
 
-data Symbol = NamedTable Table String | NamedColumn Column String 
+--id column alias
+data Symbol = NamedColumn String Column String
+
 data SymbolMap = SymbolMap (M.Map String Symbol)
 
 emptySymbolMap :: SymbolMap
 emptySymbolMap = SymbolMap M.empty
 
 getSymbolName :: Symbol -> String
-getSymbolName (NamedTable _ name) = name
-getSymbolName (NamedColumn _ name) = name
+getSymbolName (NamedColumn _ _ name) = name
+
+symbolList :: SymbolMap -> [String]
+symbolList (SymbolMap t_map) = map (fst) (M.toList t_map)
 
 (+++) :: SymbolMap -> [Symbol] -> SymbolMap
 (SymbolMap s_map) +++ [] = SymbolMap s_map
@@ -29,11 +35,9 @@ getSymbolName (NamedColumn _ name) = name
     Nothing -> error$ "Symbol " ++ name ++ " not found" 
     Just s -> s
 
-getSymbolsFromInputTable :: [String] -> Table -> [Symbol]
-getSymbolsFromInputTable table_names table = 
-  (map (NamedTable table) table_names) ++ 
-
-  [NamedColumn col name | (col_names, col) <- columnNames table, col_name <- col_names,
-    table_name <- table_names, let name = table_name ++ "." ++ col_name]
+getSymbolsFromTable :: Table -> [Symbol]
+getSymbolsFromTable table = 
+  let c_names = columnNames table in
+  [NamedColumn (head names) col name | (names, col) <- c_names, name <- names]
 
 

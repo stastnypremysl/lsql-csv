@@ -1,6 +1,6 @@
-module Tables
+module Lsql.Csv.Core.Tables
   (Table, Row, Column, Cell, 
-    Value(IntValue, StringValue, DoubleValue), 
+    Value(IntValue, StringValue, DoubleValue, BoolValue), 
     buildTable, columnNames) 
 
 where
@@ -8,7 +8,7 @@ where
 import Data.List
 import Data.Array
 
-data Value = IntValue Int | StringValue String | DoubleValue Double 
+data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
   deriving (Show, Eq, Ord)
 
 data Cell = Cell Row Column Value 
@@ -22,10 +22,10 @@ data Column = Column [String] [Cell]
 
 data Row = Row [Cell] 
 
-data Table = Table [Row] [Column]
+data Table = Table [String] [Row] [Column]
 
 columnNames :: Table -> [([String], Column)]
-columnNames (Table _ cols) =
+columnNames (Table _ _ cols) =
   let names = map columnName cols in
   zip names cols
 
@@ -34,9 +34,9 @@ columnNames (Table _ cols) =
     columnName (Column names _ ) = names
 
 
-buildTable :: [[String]] -> [[Value]] -> Table
-buildTable names in_data =
-  Table rows columns
+buildTable :: [String] -> [[String]] -> [[Value]] -> Table
+buildTable table_names names in_data =
+  Table table_names rows columns
 
   where
     trans_data = transpose $ in_data 
@@ -54,7 +54,8 @@ buildTable names in_data =
       where
         tieColumn :: (Int, [String], [Value]) -> Column
         tieColumn (index, names, vals) = Column names 
-          [Cell (array_rows ! j ) (array_columns ! index) val | (j, val) <- zip [1..] vals ]
+          [Cell (array_rows ! j ) (array_columns ! index) val | 
+            (j, val) <- zip [1..] vals ]
 
     array_rows = array (1, n)$ zip [1..] rows
 
