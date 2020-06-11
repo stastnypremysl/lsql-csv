@@ -50,7 +50,7 @@ instance Num Value where
   (DoubleValue a) * (DoubleValue b) = DoubleValue$ a * b
   (IntValue a) * (DoubleValue b) = DoubleValue$ fromIntegral a * b
   (DoubleValue a) * (IntValue b) = DoubleValue$ a * fromIntegral b
-  _ - _ = error "- operation on non-numbers is not supported."
+  _ * _ = error "- operation on non-numbers is not supported."
 
   abs (IntValue a) = IntValue$ abs a
   abs (DoubleValue a) = DoubleValue$ abs a

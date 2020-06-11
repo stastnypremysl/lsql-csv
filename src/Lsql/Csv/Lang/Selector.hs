@@ -161,6 +161,7 @@ bracketAritmeticExprP symbol_list = do
   char '('
   ret <- aritmeticExprP symbol_list
   char ')'
+  skipMany space
   return$ ret
 
 dolarAritmeticExprP :: [String] -> Parser Arg
@@ -226,7 +227,7 @@ exoticAtomP = do
   char '`'
   return$ Symbol ret
 
-nonAtomChars = "\n `\",'$"
+nonAtomChars = "\n `\",'$()"
 
 oneRegularAtomP :: Parser Arg
 oneRegularAtomP = do
@@ -246,9 +247,12 @@ oneAtomP = do
 
 selectAtomP :: [String] -> Parser [Arg]
 selectAtomP symbol_list = do 
+  skipMany space
+
   expr <- many1$ noneOf nonAtomChars
   let symbols = concat$ map (globMatching symbol_list)$ bracketExpand expr
 
+  skipMany space
   return$ map Symbol symbols
 
 minusIntConstantP :: Parser Arg
@@ -313,6 +317,7 @@ selectorP :: [String] -> Parser [Arg]
 selectorP symbol_list = do
   skipMany space
   ret <- many$ atomP symbol_list
+  skipMany space
   return$ concat ret
 
 
