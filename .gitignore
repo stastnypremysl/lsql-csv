@@ -15,6 +15,7 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
+*.hx
 *.eventlog
 .stack-work/
 cabal.project.local
@@ -22,3 +23,7 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 build/
+**/Hat/*
+**/Hat
+.depend*
+*.hat

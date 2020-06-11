@@ -1,4 +1,4 @@
-module Lsql.Csv.Lang.BlockChain () where
+module Lsql.Csv.Lang.BlockChain (parseBlocks) where
 
 import Text.Parsec
 import Text.Parsec.Prim
@@ -21,23 +21,23 @@ selectBP symbol_list = do
 
 ifBP :: [String] -> Parser Block
 ifBP symbol_list = do
-  skipMany spaces
+  skipMany space
   string "if"
-  skipMany spaces
+  skipMany space
   ret <- aritmeticExprP symbol_list
   return$ If ret
 
 sortBP :: [String] -> Parser Block
 sortBP symbol_list = do
-  skipMany spaces
+  skipMany space
   string "sort"
-  skipMany spaces
+  skipMany space
   ret <- selectorP symbol_list
   return$ Sort ret
 
 byBP :: [String] -> Parser Block
 byBP symbol_list = do
-  skipMany spaces
+  skipMany space
   string "by"
   skipMany spaces
   ret <- selectorP symbol_list

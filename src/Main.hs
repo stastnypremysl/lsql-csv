@@ -3,23 +3,33 @@ import Lsql.Csv.Lang.BlockSeparator
 import Lsql.Csv.Lang.From.Block
 import Lsql.Csv.Lang.BlockChain
 
+import Lsql.Csv.Core.BlockOps
+import Lsql.Csv.Core.Symbols
+import Lsql.Csv.Core.Evaluator
+
+import Lsql.Csv.Utils.CsvGenerator
+
 import System.Environment
 
-run :: Program -> IO Int
-run prog =
-  return 0 
+run :: Program -> IO String
+run prog = do
+  symbol_map <- getFromSymbols prog from_block
+
+  let blocks = parseBlocks rest_blocks$ symbolList symbol_map
+  let evaluated = evaluate symbol_map blocks
+  
+  return$ csvGenerate sep sec_sep evaluated
 
   where
-    Program command _ _ _ = prog
+    Program command sep sec_sep _ = prog
     
-    blocks :: [String]
-    blocks = parseBlocks command
+    blocks_split :: [String]
+    blocks_split = splitBlocks command
 
-    from_block : _ = blocks
+    from_block : rest_blocks = blocks_split
 
-    symbol_map = getFromSymbols prog from_block
 
 main = do
   args <- getArgs
-  ret <- run$ parseArgs args 
-  return ret
+  out <- run$ parseArgs args 
+  putStr$ out

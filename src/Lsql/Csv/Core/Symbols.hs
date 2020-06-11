@@ -1,6 +1,10 @@
 module Lsql.Csv.Core.Symbols
-  (Symbol, SymbolMap (SymbolMap), (+++), (-->), 
-  emptySymbolMap, getSymbolsFromTable) where
+  (
+    Symbol, SymbolMap (SymbolMap), (+++), (-->), (==>),
+    emptySymbolMap, getSymbolsFromTable,
+    symbolList
+  )
+where
 
 import Lsql.Csv.Core.Tables
 import qualified Data.Map as M
@@ -26,7 +30,7 @@ symbolList (SymbolMap t_map) = map (fst) (M.toList t_map)
   let name = getSymbolName a in
 
   case M.lookup name s_map of
-    Nothing -> SymbolMap$ M.insert name a s_map
+    Nothing -> (SymbolMap$ M.insert name a s_map) +++ s_array
     _ -> error$ "Symbol " ++ name ++ "is duplicite."
 
 (-->) :: SymbolMap -> String -> Symbol
@@ -34,6 +38,12 @@ symbolList (SymbolMap t_map) = map (fst) (M.toList t_map)
   case M.lookup name s_map of
     Nothing -> error$ "Symbol " ++ name ++ " not found" 
     Just s -> s
+
+(==>) :: SymbolMap -> String -> Column
+s_map ==> name =
+  let (NamedColumn _ ret _) = s_map --> name in
+  ret
+
 
 getSymbolsFromTable :: Table -> [Symbol]
 getSymbolsFromTable table = 

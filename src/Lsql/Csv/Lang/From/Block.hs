@@ -24,7 +24,7 @@ import qualified Data.Text as T
 
 assignP :: Parser String
 assignP = do
-  ret <- many$ noneOf "= \n"
+  ret <- many1$ noneOf "= \n"
   char '='
   return ret
 
@@ -33,20 +33,20 @@ data FileName = ExoticFileName String | WildCards [String]
 exoticFileName :: Parser FileName
 exoticFileName = do
   char '`'
-  ret <- many$ noneOf "`"
+  ret <- many1$ noneOf "`"
   char '`'
   return$ ExoticFileName ret
 
 wildCards :: Parser FileName
 wildCards = do
-  file_n <- many$ noneOf " \n"
+  file_n <- many1$ noneOf " \n"
   return$ WildCards$ bracketExpand file_n
 
 data FileAssignment = FileAssignment FileName [Option] | NamedFileAssignment String FileAssignment
 
 unnamedFileP :: Parser FileAssignment
 unnamedFileP = do
-  file_name <- (try exoticFileName) <|> wildCards
+  file_name <- exoticFileName <|> wildCards
   options <- many$ (try optionParser)
   return$ FileAssignment file_name options
 
@@ -58,14 +58,14 @@ namedFileP = do
 
 fileP :: Parser FileAssignment
 fileP = do
-  skipMany spaces
+  skipMany space
   ret <- (try namedFileP) <|> unnamedFileP
   return ret
 
 filesP :: Parser [FileAssignment]
 filesP = do
   ret <- many fileP
-  skipMany spaces
+  skipMany space
   return ret
 
 parseFromBlock :: String -> [FileAssignment]

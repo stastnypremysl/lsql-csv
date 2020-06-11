@@ -1,15 +1,23 @@
 module Lsql.Csv.Core.Tables
-  (Table, Row, Column, Cell, 
+  (
+    Table, Row, Column, Cell, 
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
-    buildTable, columnNames) 
-
+    buildTable, columnNames, showColumn
+  )
 where
 
 import Data.List
 import Data.Array
 
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
+
+instance Show Value where
+  show (IntValue v) = show v
+  show (StringValue v) = v
+  show (DoubleValue v) = show v
+  show (BoolValue True) = "true"
+  show (BoolValue False) = "false"
 
 data Cell = Cell Row Column Value 
 instance Eq Cell where
@@ -18,11 +26,18 @@ instance Eq Cell where
 instance Ord Cell where
   (Cell _ _ a) <= (Cell _ _ b) = a <= b
 
+instance Show Cell where
+  show (Cell _ _ a) = show a
+
 data Column = Column [String] [Cell] 
 
 data Row = Row [Cell] 
 
 data Table = Table [String] [Row] [Column]
+
+showColumn :: Column -> [String]
+showColumn (Column _ col) =
+  map show col
 
 columnNames :: Table -> [([String], Column)]
 columnNames (Table _ _ cols) =
@@ -53,7 +68,7 @@ buildTable table_names names in_data =
 
       where
         tieColumn :: (Int, [String], [Value]) -> Column
-        tieColumn (index, names, vals) = Column names 
+        tieColumn (index, c_names, vals) = Column c_names 
           [Cell (array_rows ! j ) (array_columns ! index) val | 
             (j, val) <- zip [1..] vals ]
 
@@ -64,7 +79,8 @@ buildTable table_names names in_data =
       where
         tieRow :: (Int, [Value]) -> Row
         tieRow (index, vals) = Row
-          [Cell (array_rows ! index) (array_columns ! j) val | (j, val) <- zip [1..] vals ]
+          [Cell (array_rows ! index) (array_columns ! j) val |
+            (j, val) <- zip [1..] vals ]
       
 
 

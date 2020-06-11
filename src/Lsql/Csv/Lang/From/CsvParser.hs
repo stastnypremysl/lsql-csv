@@ -47,8 +47,9 @@ cellP delimiter sec_delimiter = (try$ quoteP sec_delimiter) <|> (normalCellP del
 
 rowP :: Char -> Char -> Parser [String]
 rowP delimiter sec_delimiter = do
-  ret_non_term <- many$ not_term_p 
+  ret_non_term <- many$ try not_term_p 
   ret_term <- term_p
+  skipMany$ oneOf " \t\n"
 
   return$ ret_non_term ++ [ret_term]
 
@@ -64,17 +65,12 @@ rowP delimiter sec_delimiter = do
     term_p :: Parser String
     term_p = do 
       ret <- cell_p
-      (char '\n') <|> (sugar_eof)
+      char '\n'
       return ret
 
-      where
-        sugar_eof :: Parser Char
-        sugar_eof = do
-          eof
-          return '\n'
 
 tableP :: Char -> Char -> Parser [[String]]
-tableP delimiter sec_delimiter = many$ rowP delimiter sec_delimiter
+tableP delimiter sec_delimiter = many1$ rowP delimiter sec_delimiter
 
 readValue :: String -> Value
 readValue val
@@ -116,7 +112,7 @@ buildTableFromIn table_names named in_str =
 parseFile :: Assignment -> IO [Symbol]
 parseFile assignment = do
   file_content <- load_input
-  return$ getSymbolsFromTable$ parseTable file_content
+  return$ getSymbolsFromTable$ parseTable (file_content ++ ['\n'])
 
   where    
     load_input :: IO String

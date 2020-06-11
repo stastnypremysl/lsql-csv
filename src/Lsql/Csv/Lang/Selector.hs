@@ -63,14 +63,14 @@ oneArgFunctionsP symbol_list =
 notP :: [String] -> Parser Arg
 notP symbol_list = do
   char '!'
-  skipMany spaces
+  skipMany space
   ret <- aritmeticExprP symbol_list
   return$ Function$ LogicF$ Not ret
 
 minusSP :: [String] -> Parser Arg
 minusSP symbol_list = do
   char '-'
-  skipMany spaces
+  skipMany space
   ret <- aritmeticExprP symbol_list
   return$ Function$ AritmeticF$ MinusS ret
 
@@ -84,7 +84,7 @@ logicF2Gen fun arg1 arg2 = Function$ LogicF$ fun arg1 arg2
 twoArgInFP :: (Arg -> Arg -> Arg) -> String -> [String] -> Parser Arg
 twoArgInFP constructor op_name symbol_list = do
   arg1 <- aritmeticExprP symbol_list
-  skipMany spaces
+  skipMany space
   string op_name
   arg2 <- aritmeticExprP symbol_list
 
@@ -172,7 +172,7 @@ oneRegularAtomP = do
 
 oneAtomP :: Parser Arg
 oneAtomP = do
-  skipMany spaces
+  skipMany space
   ret <- exoticAtomP <|>stringConstantP <|>
     (try$ trueConstantP) <|> (try$ falseConstantP) <|>
     (try$ intConstantP) <|> (try$ doubleConstantP) <|>
@@ -219,7 +219,7 @@ falseConstantP = do
  
 atomP :: [String] -> Parser [Arg]
 atomP symbol_list = do
-  skipMany spaces
+  skipMany space
   ret <- (many1$ stringConstantP) <|> (many1$ exoticAtomP) <|>
     (try$ many1$ dolarAritmeticExprP symbol_list) <|>
     (try$ many1$ trueConstantP) <|> (try$ many1$ falseConstantP) <|>
@@ -230,6 +230,7 @@ atomP symbol_list = do
 
 selectorP :: [String] -> Parser [Arg]
 selectorP symbol_list = do
+  skipMany space
   ret <- many$ atomP symbol_list
   return$ concat ret
 

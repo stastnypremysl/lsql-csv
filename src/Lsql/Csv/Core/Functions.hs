@@ -9,7 +9,9 @@ module Lsql.Csv.Core.Functions
       Equal, LeftOuterJoin, In),
 
     LogicF(And, Or, Not),
-    AggregateF(Cat, Sum)
+    AggregateF(Cat, Sum),
+
+    eval
 
   ) where
 
@@ -35,5 +37,8 @@ data LogicF = And Arg Arg | Or Arg Arg | Not Arg
 
 data AggregateF = Cat [Arg] | Sum [Arg]
 
---eval :: SymbolMap -> AritmeticF -> Column
+eval :: SymbolMap -> Arg -> Column
+eval symbol_map (Symbol name) = symbol_map ==> name
+
+
 --groupEval :: SymbolMap -> Grouping -> [AggregateF] -> (SymbolMap, [Column])

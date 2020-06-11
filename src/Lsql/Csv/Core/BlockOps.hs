@@ -1,6 +1,7 @@
 module Lsql.Csv.Core.BlockOps 
   (
-    Block(Select, If, Sort, By)
+    Block(Select, If, Sort, By),
+    getSelects
   ) 
 where
 
@@ -8,8 +9,8 @@ import Lsql.Csv.Core.Functions
 
 data Block = Select [Arg] | If Arg | Sort [Arg] | By [Arg]
 
-getSelects :: [Block] -> [Block]
+getSelects :: [Block] -> [[Arg]]
 getSelects [] = []
-getSelects ((Select a) : rest) = Select a : getSelects rest
+getSelects ((Select a) : rest) = a : getSelects rest
 getSelects (_ : rest) = getSelects rest
 
