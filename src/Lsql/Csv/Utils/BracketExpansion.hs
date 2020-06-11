@@ -1,7 +1,13 @@
-module BracketExpansion (bracketExpand) where
+module Lsql.Csv.Utils.BracketExpansion (bracketExpand) where
 
 import Data.List
-import Text.ParserCombinators.Parsec
+import qualified Data.Text as T
+
+import Text.Parsec
+import Text.Parsec.Prim
+import Text.Parsec.Combinator
+import Text.Parsec.Text
+import Text.Parsec.Char
 
 cumulatorComma :: Parser [String]
 cumulatorComma = do
@@ -55,12 +61,12 @@ bracketExpand input =
 
   where
     parseOne :: String -> [String]
-    parseOne inp = case parse bracketP "bracket expanstion" inp of
+    parseOne inp = case parse bracketP "bracket expanstion"$ T.pack inp of
       Left _ -> [inp]
       Right ret -> map (++after_bracket) ret
 
       where
-        after_bracket = case parse afterBracketP "bracket expansion" inp of
+        after_bracket = case parse afterBracketP "bracket expansion"$ T.pack inp of
           Left err -> error$ show err
           Right ret -> ret
 

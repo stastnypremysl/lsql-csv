@@ -1,9 +1,13 @@
-module Options (optionParser, 
+module Lsql.Csv.Lang.Options (optionParser, 
   Option(Delimiter, SecondaryDelimiter, Quote, Named)) where
 
-import Text.ParserCombinators.Parsec
 import System.Environment
 
+import Text.Parsec
+import Text.Parsec.Prim
+import Text.Parsec.Combinator
+import Text.Parsec.Text
+import Text.Parsec.Char
 
 char_option_p :: Parser Char
 char_option_p = do
