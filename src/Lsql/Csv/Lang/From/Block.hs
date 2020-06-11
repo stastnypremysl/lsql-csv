@@ -42,11 +42,17 @@ wildCards = do
   file_n <- many1$ noneOf " \n"
   return$ WildCards$ bracketExpand file_n
 
-data FileAssignment = FileAssignment FileName [Option] | NamedFileAssignment String FileAssignment
+data FileAssignment = 
+  FileAssignment FileName [Option] | NamedFileAssignment String FileAssignment
+
+stdinFileP :: Parser FileName
+stdinFileP = do
+  char '-'
+  return$ ExoticFileName "-"
 
 unnamedFileP :: Parser FileAssignment
 unnamedFileP = do
-  file_name <- exoticFileName <|> wildCards
+  file_name <- stdinFileP <|> exoticFileName <|> wildCards
   options <- many$ (try optionParser)
   return$ FileAssignment file_name options
 
@@ -60,12 +66,12 @@ fileP :: Parser FileAssignment
 fileP = do
   skipMany space
   ret <- (try namedFileP) <|> unnamedFileP
+  skipMany space
   return ret
 
 filesP :: Parser [FileAssignment]
 filesP = do
   ret <- many fileP
-  skipMany space
   return ret
 
 parseFromBlock :: String -> [FileAssignment]
@@ -114,7 +120,8 @@ getFromSymbols prog from_block = do
       distribute (idx + pth_length) rest
 
     getAssignment :: (Int, [String], String, [Option]) -> Assignment
-    getAssignment (idx, name : rest, path, options) = NamedCsv name $ getAssignment (idx, rest, path, options)
+    getAssignment (idx, name : rest, path, options) = 
+      NamedCsv name $ getAssignment (idx, rest, path, options)
 
     getAssignment (idx, [], path, options) = CoreCsv idx path prog options
 
