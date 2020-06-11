@@ -53,11 +53,11 @@ We will show a few interesting examples of usage of the language in this impleme
 
 This will print second and first column of csv file on stdin. You can read it like `from stdio S select S.second, S.first`
 
-    lsql-csv -d: '-, *, if &1.3>=1000' < /etc/passwd
+    lsql-csv -d: '-, &1.*, if &1.3>=1000' < /etc/passwd
     
 This will print lines of users whose UID >=1000. It can be also written as
   
-    lsql-csv -d: 'p=/etc/passwd, *, if p.3 >= 1000'
+    lsql-csv -d: 'p=/etc/passwd, p.*, if p.3 >= 1000'
     lsql-csv -d: '/etc/passwd, *, if &1.3 >= 1000'
     lsql-csv '/etc/passwd -d:, *, if &1.3 >= 1000'
     
