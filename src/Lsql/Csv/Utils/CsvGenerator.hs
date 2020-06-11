@@ -1,16 +1,24 @@
 module Lsql.Csv.Utils.CsvGenerator(csvGenerate) where
 
 import Lsql.Csv.Core.Tables
+import Lsql.Csv.Core.Functions
 
 import Data.List
 
-csvGenerate :: Char -> Char -> [Column] -> String
+
+csvGenerate :: Char -> Char -> [Printable] -> String
 csvGenerate sep sec_sep cols =
   concat$ map genLine rows
 
   where
+    n = getPrintableLength cols
+    
     str_cols :: [[String]]
-    str_cols = map showColumn cols
+    str_cols = map pShow cols
+      where
+        pShow :: Printable -> [String]
+        pShow (ValueP v) = take n$ repeat$ show v 
+        pShow (ColumnP c) = showColumn c
 
     rows :: [[String]]
     rows = transpose str_cols

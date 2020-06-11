@@ -7,7 +7,7 @@ import Lsql.Csv.Core.Tables
 
 import Data.List
 
-evaluate :: SymbolMap -> [Block] -> [Column]
+evaluate :: SymbolMap -> [Block] -> [Printable]
 evaluate symbol_map blocks =
   map (eval symbol_map) selects
 

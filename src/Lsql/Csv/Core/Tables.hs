@@ -1,16 +1,131 @@
 module Lsql.Csv.Core.Tables
   (
-    Table, Row, Column, Cell, 
+    Table, Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
-    buildTable, columnNames, showColumn
+    buildTable, columnNames, showColumn,
+    applyOp, applyInOp
   )
 where
 
 import Data.List
-import Data.Array
+
+class Boolable a where
+  getBool :: a -> Bool
+
 
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
-  deriving (Eq, Ord)
+
+instance Boolable Value where
+  getBool (IntValue v) = v > 0
+  getBool (DoubleValue _) = error "Double can't be converted to bool."
+  getBool (BoolValue b) = b
+  getBool (StringValue _) = error "String can't be converted to bool."
+
+instance Ord Value where
+  (IntValue a) <= (IntValue b) = a <= b
+  (DoubleValue a) <= (IntValue b) = a <= fromIntegral b
+  (IntValue a) <= (DoubleValue b) = fromIntegral a <= b
+  (DoubleValue a) <= (DoubleValue b) = a <= b
+  a <= b = (show a) <= (show b)
+
+instance Eq Value where
+  (IntValue a) == (BoolValue b) = b == (a > 0)
+  (StringValue a) == (BoolValue b) = a == show b
+
+  (IntValue a) == (IntValue b) = a == b
+  (StringValue a) == (StringValue b) = a == b
+  (BoolValue a) == (BoolValue b) = a == b
+  (DoubleValue a) == (DoubleValue b) = a == b
+
+  _ == _ = False
+
+instance Num Value where
+  (IntValue a) + (IntValue b) = IntValue$ a + b
+  (DoubleValue a) + (DoubleValue b) = DoubleValue$ a + b
+  (IntValue a) + (DoubleValue b) = DoubleValue$ fromIntegral a + b
+  (DoubleValue a) + (IntValue b) = DoubleValue$ a + fromIntegral b
+  _ + _ = error "+ operation on non-numbers is not supported."
+
+  (IntValue a) * (IntValue b) = IntValue$ a * b
+  (DoubleValue a) * (DoubleValue b) = DoubleValue$ a * b
+  (IntValue a) * (DoubleValue b) = DoubleValue$ fromIntegral a * b
+  (DoubleValue a) * (IntValue b) = DoubleValue$ a * fromIntegral b
+  _ - _ = error "- operation on non-numbers is not supported."
+
+  abs (IntValue a) = IntValue$ abs a
+  abs (DoubleValue a) = DoubleValue$ abs a
+  abs _ = error "abs operation on non-numbers is not supported."
+
+  signum (IntValue a) = IntValue$ signum a
+  signum (DoubleValue a) = DoubleValue$ signum a
+  signum _ = error "signum operation on non-numbers is not supported."
+
+  fromInteger a = IntValue$ fromInteger a
+
+  negate (IntValue a) = IntValue$ -a
+  negate (DoubleValue a) = DoubleValue$ -a
+  negate _ = error "negate operation on non-numbers is not supported."
+
+instance Fractional Value where
+  (IntValue a) / (IntValue b) = DoubleValue$
+    (fromIntegral a :: Double) / (fromIntegral b :: Double)
+
+  (DoubleValue a) / (IntValue b) = DoubleValue$ a / (fromIntegral b :: Double)
+  (IntValue a) / (DoubleValue b) = DoubleValue$ (fromIntegral a :: Double) / b
+  (DoubleValue a) / (DoubleValue b) = DoubleValue$ a/b
+
+  fromRational a = DoubleValue$ fromRational a
+
+instance Floating Value where
+  pi = DoubleValue$ pi
+
+  exp (DoubleValue a) = DoubleValue$ exp a
+  exp (IntValue a) = DoubleValue$ exp$ fromIntegral a
+  exp _ = error "exp operation on non-numbes is not supported."
+
+  log (DoubleValue a) = DoubleValue$ log a
+  log (IntValue a) = DoubleValue$ log$ fromIntegral a
+  log _ = error "log operation on non-numbes is not supported."
+
+  sin (DoubleValue a) = DoubleValue$ a
+  sin (IntValue a) = DoubleValue$ sin$ fromIntegral a
+  sin _ = error "sin operation on non-numbes is not supported."
+
+  cos (DoubleValue a) = DoubleValue$ cos a
+  cos (IntValue a) = DoubleValue$ cos$ fromIntegral a
+  cos _ = error "cos operation on non-numbes is not supported."
+
+  asin (DoubleValue a) = DoubleValue$ asin a
+  asin (IntValue a) = DoubleValue$ asin$ fromIntegral a
+  asin _ = error "asin operation on non-numbes is not supported."
+
+  acos (DoubleValue a) = DoubleValue$ acos a
+  acos (IntValue a) = DoubleValue$ acos$ fromIntegral a
+  acos _ = error "acos operation on non-numbes is not supported."
+
+  atan (DoubleValue a) = DoubleValue$ atan a
+  atan (IntValue a) = DoubleValue$ atan$ fromIntegral a
+  atan _ = error "atan operation on non-numbes is not supported."
+
+  sinh (DoubleValue a) = DoubleValue$ sinh a
+  sinh (IntValue a) = DoubleValue$ sinh$ fromIntegral a
+  sinh _ = error "sinh operation on non-numbes is not supported."
+
+  asinh (DoubleValue a) = DoubleValue$ asinh a
+  asinh (IntValue a) = DoubleValue$ asinh$ fromIntegral a
+  asinh _ = error "asinh operation on non-numbes is not supported."
+
+  cosh (DoubleValue a) = DoubleValue$ cosh a
+  cosh (IntValue a) = DoubleValue$ cosh$ fromIntegral a
+  cosh _ = error "cosh operation on non-numbes is not supported."
+
+  acosh (DoubleValue a) = DoubleValue$ acosh a
+  acosh (IntValue a) = DoubleValue$ acosh$ fromIntegral a
+  acosh _ = error "acosh operation on non-numbes is not supported."
+  
+  atanh (DoubleValue a) = DoubleValue$ atanh a
+  atanh (IntValue a) = DoubleValue$ atanh$ fromIntegral a
+  atanh _ = error "atanh operation on non-numbes is not supported."
 
 instance Show Value where
   show (IntValue v) = show v
@@ -19,28 +134,26 @@ instance Show Value where
   show (BoolValue True) = "true"
   show (BoolValue False) = "false"
 
-data Cell = Cell Row Column Value 
-instance Eq Cell where
-  (Cell _ _ a) == (Cell _ _ b) = a == b
 
-instance Ord Cell where
-  (Cell _ _ a) <= (Cell _ _ b) = a <= b
+data Column = Column [String] [Value]
 
-instance Show Cell where
-  show (Cell _ _ a) = show a
+instance Eq Column where
+  (Column _ a) == (Column _ b) = a == b
 
-data Column = Column [String] [Cell] 
+applyInOp:: (Value -> Value -> Value) -> Column -> Column -> Column
+applyInOp op (Column _ a) (Column _ b) = (Column ["comp"] (map (\(x,y) -> op x y)$ zip a b))
 
-data Row = Row [Cell] 
+applyOp:: (Value -> Value) -> Column -> Column
+applyOp op (Column _ a) = (Column ["comp"] (map op a))
 
-data Table = Table [String] [Row] [Column]
+data Table = Table [String] [Column]
 
 showColumn :: Column -> [String]
 showColumn (Column _ col) =
   map show col
 
 columnNames :: Table -> [([String], Column)]
-columnNames (Table _ _ cols) =
+columnNames (Table _ cols) =
   let names = map columnName cols in
   zip names cols
 
@@ -51,7 +164,7 @@ columnNames (Table _ _ cols) =
 
 buildTable :: [String] -> [[String]] -> [[Value]] -> Table
 buildTable table_names names in_data =
-  Table table_names rows columns
+  Table table_names columns
 
   where
     trans_data = transpose $ in_data 
@@ -59,29 +172,15 @@ buildTable table_names names in_data =
     n = length in_data
     m = length trans_data
 
-    array_columns = array (1, m)$ zip [1..] columns
-    
     columns :: [Column]
     columns = 
-      let named_col_data = zip3 [1..] names trans_data in
+      let named_col_data = zip names trans_data in
       map tieColumn named_col_data
 
       where
-        tieColumn :: (Int, [String], [Value]) -> Column
-        tieColumn (index, c_names, vals) = Column c_names 
-          [Cell (array_rows ! j ) (array_columns ! index) val | 
-            (j, val) <- zip [1..] vals ]
+        tieColumn :: ([String], [Value]) -> Column
+        tieColumn (c_names, vals) = Column c_names vals
 
-    array_rows = array (1, n)$ zip [1..] rows
-
-    rows :: [Row]
-    rows = map tieRow$ zip [1..] in_data
-      where
-        tieRow :: (Int, [Value]) -> Row
-        tieRow (index, vals) = Row
-          [Cell (array_rows ! index) (array_columns ! j) val |
-            (j, val) <- zip [1..] vals ]
-      
 
 
 --joinTable :: Column -> Column -> Table
