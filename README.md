@@ -49,32 +49,32 @@ SQL is really pleonastic language. It can be fine to use it for critical mission
 ### Examples
 We will show a few interesting examples of usage of the language in this implementation. If you have installed lsql-csv, you can try this yourself in your shell.
 
-    lcsv '-, &1.2 &1.1'
+    lsql-csv '-, &1.2 &1.1'
 
 This will print second and first column of csv file on stdin. You can read it like `from stdio S select S.second, S.first`
 
-    lcsv -d: '-, *, if &1.3>=1000' < /etc/passwd
+    lsql-csv -d: '-, *, if &1.3>=1000' < /etc/passwd
     
 This will print lines of users whose UID >=1000. It can be also written as
   
-    lcsv -d: 'p=/etc/passwd, *, if p.3 >= 1000'
-    lcsv -d: '/etc/passwd, *, if &1.3 >= 1000'
-    lcsv '/etc/passwd -d:, *, if &1.3 >= 1000'
+    lsql-csv -d: 'p=/etc/passwd, *, if p.3 >= 1000'
+    lsql-csv -d: '/etc/passwd, *, if &1.3 >= 1000'
+    lsql-csv '/etc/passwd -d:, *, if &1.3 >= 1000'
     
 You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
 
 Let's see more complicated examples.
 
-    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 g.4, if p.1 in g.4'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.4, if p.1 in g.4'
     
 This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.4 where P.1 in G.4`. But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
 
-    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1'
     
 This will cat all groups in one line delimeted by ",". But I want there also default groups! How can it be done? Really easily.
 
-    lcsv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1' | 
-      lcsv -d: '- /etc/passwd, &1.1 cat(&1.2 &2.5), if &1.1 == &2.1'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1' | 
+    lsql-csv -d: '- /etc/passwd, &1.1 cat(&1.2 &2.5), if &1.1 == &2.1'
     
 What a nice oneliner (twoliner)!
 
