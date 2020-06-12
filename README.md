@@ -19,7 +19,7 @@ It will install the dependecies for you.
 
 ## Usage
 
-    lcsv [OPTIONS] COMMAND
+    lsql-csv [OPTIONS] COMMAND
 
 ### Options
 
