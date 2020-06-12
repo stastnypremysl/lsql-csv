@@ -122,7 +122,7 @@ inP symbol_list arg =
   try$ twoArgInFP 3 (aritmeticF2Gen In) "in" symbol_list arg
 
 powerP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen Power) "^" symbol_list arg
+  try$ twoArgInFP 3 (aritmeticF2Gen Power) "**" symbol_list arg
 
 multiplyP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen Multiply) "*" symbol_list arg
