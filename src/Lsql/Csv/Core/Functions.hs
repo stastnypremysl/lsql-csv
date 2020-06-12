@@ -8,7 +8,7 @@ module Lsql.Csv.Core.Functions
       Sinh, Cosh, Tanh, Asinh, Acosh, Atanh,
 
       MinusS, Plus, Minus, Multiply, Divide, Power, Append,
-      Count, Less, LessOrEqual, More, MoreOrEqual,
+      Less, LessOrEqual, More, MoreOrEqual,
       Equal, LeftOuterJoin, In),
 
     LogicF(And, Or, Not),
@@ -54,9 +54,22 @@ data AritmeticF =
   Sin Arg | Cos Arg | Tan Arg | Asin Arg | Acos Arg | Atan Arg|
   Sinh Arg | Cosh Arg | Tanh Arg | Asinh Arg | Acosh Arg | Atanh Arg|
   Exp Arg | Sqrt Arg |
+
+  Size Arg |
+
+  Round Arg | Truncate Arg | Ceiling Arg | Floor Arg |
+
   MinusS Arg | Abs Arg | Signum Arg | Negate Arg |
-  Plus Arg Arg | Minus Arg Arg | Multiply Arg Arg | Divide Arg Arg | Power Arg Arg |
-  Append Arg Arg | Count Arg |
+  Plus Arg Arg | Minus Arg Arg | Multiply Arg Arg | Divide Arg Arg | 
+  Power Arg Arg |
+  
+  Even Arg | Odd Arg | 
+
+  NaturalPower Arg Arg | Div Arg Arg | Quot Arg Arg | Rem Arg Arg |
+  Mod Arg Arg | Gcd Arg Arg | Lcm Arg Arg |
+
+  Append Arg Arg | 
+
   Less Arg Arg | LessOrEqual Arg Arg | More Arg Arg | MoreOrEqual Arg Arg |
   Equal Arg Arg| LeftOuterJoin Arg Arg |
   In Arg Arg
@@ -64,7 +77,7 @@ data AritmeticF =
 data LogicF = And Arg Arg | Or Arg Arg | Not Arg
   
 
-data AggregateF = Cat [Arg] | Sum [Arg]
+data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg]
 
 getPrintableLength :: [Printable] -> Int
 getPrintableLength [] = 1

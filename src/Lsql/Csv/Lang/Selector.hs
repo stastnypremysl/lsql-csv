@@ -306,6 +306,7 @@ atomP symbol_list = do
   skipMany space
   ret <- (many1$ stringConstantP) <|> (many1$ exoticAtomP) <|>
     (many1$ dolarAritmeticExprP symbol_list) <|>
+    (try$ many1$ oneArgFunctionsP symbol_list) <|>
     (try$ many1$ trueConstantP) <|> (try$ many1$ falseConstantP) <|>
     (try$ many1$ intConstantP) <|> (try$ many1$ doubleConstantP) <|>
     (try$ many1$ minusIntConstantP) <|> (try$ many1$ minusDoubleConstantP) <|>
