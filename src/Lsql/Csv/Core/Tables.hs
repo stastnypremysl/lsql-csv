@@ -3,7 +3,8 @@ module Lsql.Csv.Core.Tables
     Table, Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
 
-    buildTable, crossJoinTable,
+    buildTable, crossJoinTable, filterTable,
+    emptyTable,
 
     columnNames, showColumn,
     applyOp, applyInOp,
@@ -219,6 +220,9 @@ buildTable table_names names in_data =
         tieColumn :: ([String], [Value]) -> Column
         tieColumn (c_names, vals) = Column c_names vals
 
+getRows :: [Column] -> [[Value]]
+getRows cols =
+  transpose$ map columnValue cols
 
 crossJoinTable :: Table -> Table -> Table
 crossJoinTable (Table names1 cols1) (Table names2 cols2) =
@@ -233,17 +237,36 @@ crossJoinTable (Table names1 cols1) (Table names2 cols2) =
     colsNames = map columnName cols1 ++ map columnName cols2
 
     rows1 :: [[Value]]
-    rows1 = transpose$ map columnValue cols1
+    rows1 = getRows cols1
 
     rows2 :: [[Value]]
-    rows2 = transpose$ map columnValue cols2
+    rows2 = getRows cols2
 
+
+filterTable :: Column -> Table -> Table
+filterTable (Column _ if_cols) (Table t_name cols) =
+  buildTable t_name cols_name$
+    filterRows (map getBool if_cols) rows
+
+  where
+    rows :: [[Value]]
+    rows = getRows cols
+
+    cols_name = map columnName cols
+
+    filterRows :: [Bool] -> [[Value]] -> [[Value]]
+    filterRows [] [] = []
+    filterRows (False : r_bool) (_ : r_rows) = filterRows r_bool r_rows
+    filterRows (True : r_bool) (row : r_rows) = row : (filterRows r_bool r_rows)
+
+emptyTable :: Table -> Table
+emptyTable (Table t_name cols) = Table t_name 
+  [Column (columnName col) [] | col <- cols]
 
 --joinTable :: Column -> Column -> Table
 --leftJoinTable :: Column -> Column -> Table
 --multiplyTable :: Table -> Table -> Table
 
---filterTable :: (Value -> Bool) -> Column -> Table
 --crossFilterTable :: (Value -> Value -> Bool) -> Column -> Column -> Table
 --sortTable :: Column -> Table
 

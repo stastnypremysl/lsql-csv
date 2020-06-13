@@ -90,7 +90,6 @@ data AritmeticF =
 
 data LogicF = And Arg Arg | Or Arg Arg | Not Arg
   
-
 data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg]
 
 catterate :: [Arg] -> Arg
