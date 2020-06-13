@@ -45,7 +45,7 @@ oneArgFP constructor name symbol_list = do
 
 aritmeticFGen :: (Arg -> AritmeticF) -> Arg -> Arg
 aritmeticFGen fun arg = Function$ AritmeticF$ fun arg
- 
+
 sinP symbol_list = try$ oneArgFP (aritmeticFGen Sin) "sin" symbol_list
 cosP symbol_list = try$ oneArgFP (aritmeticFGen Cos) "cos" symbol_list
 tanP symbol_list = try$ oneArgFP (aritmeticFGen Tan) "tan" symbol_list
@@ -181,8 +181,8 @@ moreP symbol_list arg =
 notEqualP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen More) "!=" symbol_list arg
 
-orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "or" symbol_list arg
-andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "and" symbol_list arg
+orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "||" symbol_list arg
+andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "&&" symbol_list arg
 
 
 twoArgInFunctions1P :: [String] -> Arg -> Parser Arg

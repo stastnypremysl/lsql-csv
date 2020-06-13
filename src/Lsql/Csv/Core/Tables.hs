@@ -5,7 +5,7 @@ module Lsql.Csv.Core.Tables
     buildTable, columnNames, showColumn,
     applyOp, applyInOp,
 
-    Boolable
+    Boolable(getBool)
   )
 where
 
@@ -18,7 +18,7 @@ class Boolable a where
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
 
 instance Boolable Value where
-  getBool (IntValue v) = v > 0
+  getBool (IntValue v) = v == 0
   getBool (DoubleValue _) = error "Double can't be converted to bool."
   getBool (BoolValue b) = b
   getBool (StringValue _) = error "String can't be converted to bool."

@@ -150,6 +150,19 @@ evalFunction sm (AritmeticF (Even arg)) =
 evalFunction sm (AritmeticF (Odd arg)) = 
   applyOpP (BoolValue. odd)$ eval sm arg
 
+
+evalFunction sm (LogicF (Not arg)) = 
+  applyOpP (BoolValue. not. getBool) $ eval sm arg
+
+evalFunction sm (LogicF (And arg1 arg2)) = 
+  applyInOpP (\x y -> BoolValue$ getBool x && getBool y) 
+    (eval sm arg1) (eval sm arg2)
+
+evalFunction sm (LogicF (Or arg1 arg2)) = 
+  applyInOpP (\x y -> BoolValue$ getBool x || getBool y) 
+    (eval sm arg1) (eval sm arg2)
+
+
 evalFunction sm (AritmeticF (Plus arg1 arg2)) = 
   applyInOpP (+) (eval sm arg1) (eval sm arg2)
 
