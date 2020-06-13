@@ -3,7 +3,9 @@ module Lsql.Csv.Core.Tables
     Table, Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
     buildTable, columnNames, showColumn,
-    applyOp, applyInOp
+    applyOp, applyInOp,
+
+    Boolable(getBool)
   )
 where
 
@@ -16,7 +18,7 @@ class Boolable a where
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
 
 instance Boolable Value where
-  getBool (IntValue v) = v > 0
+  getBool (IntValue v) = v == 0
   getBool (DoubleValue _) = error "Double can't be converted to bool."
   getBool (BoolValue b) = b
   getBool (StringValue _) = error "String can't be converted to bool."
@@ -38,6 +40,36 @@ instance Eq Value where
   (DoubleValue a) == (DoubleValue b) = a == b
 
   _ == _ = False
+
+instance Real Value where
+  toRational (IntValue a) = toRational a
+  toRational (DoubleValue a) = toRational a
+  toRational _ = error "Aritmetic operations with non-numbers are not supported."
+
+instance RealFrac Value where
+  properFraction (IntValue a) = (fromIntegral a, IntValue$ 0)
+  properFraction (DoubleValue a) = 
+    let (n,f) = properFraction a in
+    (n, DoubleValue$ f)
+
+  properFraction _ = error "Aritmetic operations with non-numbers are not supported."
+
+instance Enum Value where
+  toEnum a = IntValue$ toEnum a
+
+  fromEnum (IntValue a) = fromEnum a
+  fromEnum _ = error "Aritmetic operations with non-integers are not supported."
+
+
+instance Integral Value where
+  toInteger (IntValue a) = toInteger a
+  toInteger _ = error "Integer operations on non-integers are not supported."
+
+  quotRem (IntValue a) (IntValue b) =
+    let (x,y) = quotRem a b in
+    (IntValue x, IntValue y)
+
+  quotRem _ _ = error "Integer operations on non-integers are not supported."
 
 instance Num Value where
   (IntValue a) + (IntValue b) = IntValue$ a + b

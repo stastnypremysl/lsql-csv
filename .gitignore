@@ -23,6 +23,7 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 build/
+build/*
 **/Hat/*
 **/Hat
 .depend*
