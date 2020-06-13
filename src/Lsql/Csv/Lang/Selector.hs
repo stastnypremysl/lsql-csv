@@ -60,7 +60,24 @@ asinhP symbol_list = try$ oneArgFP (aritmeticFGen Asinh) "asinh" symbol_list
 acoshP symbol_list = try$ oneArgFP (aritmeticFGen Acosh) "acosh" symbol_list
 atanhP symbol_list = try$ oneArgFP (aritmeticFGen Atanh) "atanh" symbol_list
 
-lengthP symbol_list = try$ oneArgFP (aritmeticFGen Atanh) "length" symbol_list
+expP symbol_list = try$ oneArgFP (aritmeticFGen Exp) "exp" symbol_list
+sqrtP symbol_list = try$ oneArgFP (aritmeticFGen Sqrt) "sqrt" symbol_list
+
+sizeP symbol_list = try$ oneArgFP (aritmeticFGen Size) "size" symbol_list
+toStringP symbol_list = try$ oneArgFP (aritmeticFGen ToString) "to_string" symbol_list
+
+negateP symbol_list = try$ oneArgFP (aritmeticFGen Negate) "negate" symbol_list
+absP symbol_list = try$ oneArgFP (aritmeticFGen Abs) "abs" symbol_list
+signumP symbol_list = try$ oneArgFP (aritmeticFGen Signum) "signum" symbol_list
+
+roundP symbol_list = try$ oneArgFP (aritmeticFGen Round) "round" symbol_list
+truncateP symbol_list = try$ oneArgFP (aritmeticFGen Truncate) "truncate" symbol_list
+ceilingP symbol_list = try$ oneArgFP (aritmeticFGen Ceiling) "ceiling" symbol_list
+floorP symbol_list = try$ oneArgFP (aritmeticFGen Floor) "floor" symbol_list
+
+evenP symbol_list = try$ oneArgFP (aritmeticFGen Even) "even" symbol_list
+oddP symbol_list = try$ oneArgFP (aritmeticFGen Odd) "odd" symbol_list
+
 
 oneArgFunctionsP :: [String] -> Parser Arg
 oneArgFunctionsP symbol_list = 
@@ -70,7 +87,15 @@ oneArgFunctionsP symbol_list =
   (sinhP symbol_list) <|> (coshP symbol_list) <|> (tanhP symbol_list) <|>
   (asinhP symbol_list) <|> (acoshP symbol_list) <|> (atanhP symbol_list) <|>
 
-  (lengthP symbol_list)
+  (sizeP symbol_list) <|> (toStringP symbol_list) <|> 
+
+  (negateP symbol_list) <|> (absP symbol_list) <|> (signumP symbol_list) <|>
+
+  (roundP symbol_list) <|> (truncateP symbol_list) <|> (ceilingP symbol_list) <|>
+  (floorP symbol_list) <|>
+
+  (evenP symbol_list) <|> (oddP symbol_list)
+
 
 notP :: [String] -> Parser Arg
 notP symbol_list = do
@@ -101,60 +126,93 @@ twoArgInFP level constructor op_name symbol_list arg1 = do
 
   return$ constructor arg1 arg2
 
-orP symbol_list arg = try$ twoArgInFP 1 (logicF2Gen Or) "or" symbol_list arg
-andP symbol_list arg = try$ twoArgInFP 1 (logicF2Gen And) "and" symbol_list arg
-
-leftOuterJoinP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen LeftOuterJoin) "=>=" symbol_list arg
-
-lessOrEqualP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen LessOrEqual) "<=" symbol_list arg
-
-moreOrEqualP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen MoreOrEqual) ">=" symbol_list arg
-
-lessP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Less) "<" symbol_list arg
-moreP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen More) ">" symbol_list arg
-
 inP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen In) "in" symbol_list arg
+  try$ twoArgInFP 1 (aritmeticF2Gen In) "in" symbol_list arg
 
 powerP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen Power) "**" symbol_list arg
+  try$ twoArgInFP 1 (aritmeticF2Gen Power) "**" symbol_list arg
+
+naturalPowerP symbol_list arg = 
+  try$ twoArgInFP 1 (aritmeticF2Gen NaturalPower) "^" symbol_list arg
 
 multiplyP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen Multiply) "*" symbol_list arg
+  try$ twoArgInFP 2 (aritmeticF2Gen Multiply) "*" symbol_list arg
 divideP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen Divide) "/" symbol_list arg
+  try$ twoArgInFP 2 (aritmeticF2Gen Divide) "/" symbol_list arg
 
+divP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Div) "div" symbol_list arg
+
+quotP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Quot) "quot" symbol_list arg
+
+remP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Rem) "rem" symbol_list arg
+
+modP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Mod) "mod" symbol_list arg
+
+gcdP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Gcd) "gcd" symbol_list arg
+
+lcmP symbol_list arg = 
+  try$ twoArgInFP 2 (aritmeticF2Gen Lcm) "lcm" symbol_list arg
+
+appendP symbol_list arg = 
+  try$ twoArgInFP 3 (aritmeticF2Gen Append) "++" symbol_list arg
 plusP symbol_list arg = 
-  try$ twoArgInFP 5 (aritmeticF2Gen Plus) "+" symbol_list arg
+  try$ twoArgInFP 3 (aritmeticF2Gen Plus) "+" symbol_list arg
 minusP symbol_list arg = 
-  try$ twoArgInFP 5 (aritmeticF2Gen Minus) "-" symbol_list arg
+  try$ twoArgInFP 3 (aritmeticF2Gen Minus) "-" symbol_list arg
+
+leftOuterJoinP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen LeftOuterJoin) "=>=" symbol_list arg
+
+lessOrEqualP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen LessOrEqual) "<=" symbol_list arg
+
+moreOrEqualP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen MoreOrEqual) ">=" symbol_list arg
+
+lessP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen Less) "<" symbol_list arg
+moreP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen More) ">" symbol_list arg
+notEqualP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen More) "!=" symbol_list arg
+
+orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "or" symbol_list arg
+andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "and" symbol_list arg
+
 
 twoArgInFunctions1P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions1P symbol_list arg = 
-  (orP symbol_list arg) <|> (andP symbol_list arg) 
+  (inP symbol_list arg) <|> (powerP symbol_list arg) <|> 
+    (naturalPowerP symbol_list arg)
 
 twoArgInFunctions2P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions2P symbol_list arg = 
-  (leftOuterJoinP symbol_list arg) <|>
-  (lessOrEqualP symbol_list arg) <|> (moreOrEqualP symbol_list arg) <|>
-  (lessP symbol_list arg) <|> (moreP symbol_list arg) 
+  (multiplyP symbol_list arg) <|> (divideP symbol_list arg) <|>
+    (divP symbol_list arg) <|> (quotP symbol_list arg) <|>
+    (remP symbol_list arg) <|> (modP symbol_list arg) <|>
+    (gcdP symbol_list arg) <|> (lcmP symbol_list arg)
+
 
 twoArgInFunctions3P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions3P symbol_list arg = 
-  (inP symbol_list arg) <|> (powerP symbol_list arg)
+  (appendP symbol_list arg) <|>
+    (plusP symbol_list arg) <|> (minusP symbol_list arg)
 
 twoArgInFunctions4P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions4P symbol_list arg = 
-  (multiplyP symbol_list arg) <|> (divideP symbol_list arg)
+  (leftOuterJoinP symbol_list arg) <|>
+    (lessOrEqualP symbol_list arg) <|> (moreOrEqualP symbol_list arg) <|>
+    (lessP symbol_list arg) <|> (moreP symbol_list arg) <|>
+    (notEqualP symbol_list arg)
 
 twoArgInFunctions5P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions5P symbol_list arg = 
-  (plusP symbol_list arg) <|> (minusP symbol_list arg)
+  (orP symbol_list arg) <|> (andP symbol_list arg) 
 
 bracketAritmeticExprP :: [String] -> Parser Arg
 bracketAritmeticExprP symbol_list = do
@@ -231,24 +289,22 @@ nonAtomChars = "\n `\",'$()"
 
 oneRegularAtomP :: Parser Arg
 oneRegularAtomP = do
-  skipMany space
   atom <- many1$ noneOf nonAtomChars
   return$ Symbol atom
 
+constantP :: Parser Arg
+constantP = stringConstantP <|>
+  (try$ trueConstantP) <|> (try$ falseConstantP) <|>
+  (try$ intConstantP) <|> (try$ doubleConstantP) <|>
+  (try$ minusIntConstantP) <|> (try$ minusDoubleConstantP)
+
 oneAtomP :: Parser Arg
 oneAtomP = do
-  skipMany space
-  ret <- exoticAtomP <|>stringConstantP <|>
-    (try$ trueConstantP) <|> (try$ falseConstantP) <|>
-    (try$ intConstantP) <|> (try$ doubleConstantP) <|>
-    (try$ minusIntConstantP) <|> (try$ minusDoubleConstantP) <|>
-     oneRegularAtomP
+  ret <- exoticAtomP <|> constantP <|> oneRegularAtomP
   return ret
 
 selectAtomP :: [String] -> Parser [Arg]
 selectAtomP symbol_list = do 
-  skipMany space
-
   expr <- many1$ noneOf nonAtomChars
   let symbols = concat$ map (globMatching symbol_list)$ bracketExpand expr
 
@@ -304,14 +360,44 @@ falseConstantP = do
 atomP :: [String] -> Parser [Arg]
 atomP symbol_list = do
   skipMany space
-  ret <- (many1$ stringConstantP) <|> (many1$ exoticAtomP) <|>
-    (many1$ dolarAritmeticExprP symbol_list) <|>
-    (try$ many1$ oneArgFunctionsP symbol_list) <|>
-    (try$ many1$ trueConstantP) <|> (try$ many1$ falseConstantP) <|>
-    (try$ many1$ intConstantP) <|> (try$ many1$ doubleConstantP) <|>
-    (try$ many1$ minusIntConstantP) <|> (try$ many1$ minusDoubleConstantP) <|>
-    (selectAtomP symbol_list)
+  ret <- (try neutronP) <|> protonP
   return ret
+
+  where
+    nucleonP :: Parser [Arg]
+    nucleonP = do
+      nucM <- optionMaybe$ (try neutronP) <|> (try protonP)
+
+      return$ case nucM of
+        Just args -> args
+        Nothing -> []
+
+    protonP :: Parser [Arg]
+    protonP = do
+      selected <- selectAtomP symbol_list
+      next <- nucleonP
+      
+      return$ case next of
+        [] -> selected
+
+        otherwise -> 
+          [in_sel `appendArg` suffix | 
+            in_sel <- selected, suffix <- next]
+   
+    neutronP :: Parser [Arg]
+    neutronP = do
+      selected <- constantP <|> exoticAtomP <|>
+        dolarAritmeticExprP symbol_list <|>
+        oneArgFunctionsP symbol_list
+
+      next <- nucleonP
+
+      return$ case next of
+        [] -> [selected]
+
+        otherwise -> do 
+          [selected `appendArg` suffix | suffix <- next]
+      
   
 
 selectorP :: [String] -> Parser [Arg]
