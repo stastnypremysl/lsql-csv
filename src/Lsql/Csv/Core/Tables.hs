@@ -2,7 +2,10 @@ module Lsql.Csv.Core.Tables
   (
     Table, Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
-    buildTable, columnNames, showColumn,
+
+    buildTable, crossJoinTable,
+
+    columnNames, showColumn,
     applyOp, applyInOp,
 
     Boolable(getBool)
@@ -184,14 +187,17 @@ showColumn :: Column -> [String]
 showColumn (Column _ col) =
   map show col
 
+
+columnName :: Column -> [String]
+columnName (Column names _ ) = names
+
+columnValue :: Column -> [Value]
+columnValue (Column _ values ) = values
+
 columnNames :: Table -> [([String], Column)]
 columnNames (Table _ cols) =
   let names = map columnName cols in
   zip names cols
-
-  where
-    columnName :: Column -> [String]
-    columnName (Column names _ ) = names
 
 
 buildTable :: [String] -> [[String]] -> [[Value]] -> Table
@@ -214,7 +220,23 @@ buildTable table_names names in_data =
         tieColumn (c_names, vals) = Column c_names vals
 
 
+crossJoinTable :: Table -> Table -> Table
+crossJoinTable (Table names1 cols1) (Table names2 cols2) =
+  buildTable tableName colsNames$
+    [row1 ++ row2 | row1 <- rows1, row2 <- rows2]
 
+  where
+    tableName :: [String]
+    tableName = names1 ++ names2
+   
+    colsNames :: [[String]]
+    colsNames = map columnName cols1 ++ map columnName cols2
+
+    rows1 :: [[Value]]
+    rows1 = transpose$ map columnValue cols1
+
+    rows2 :: [[Value]]
+    rows2 = transpose$ map columnValue cols2
 
 
 --joinTable :: Column -> Column -> Table
