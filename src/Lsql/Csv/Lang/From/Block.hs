@@ -53,6 +53,7 @@ stdinFileP = do
 unnamedFileP :: Parser FileAssignment
 unnamedFileP = do
   file_name <- stdinFileP <|> exoticFileName <|> wildCards
+  many space
   options <- many$ (try optionParser)
   return$ FileAssignment file_name options
 
