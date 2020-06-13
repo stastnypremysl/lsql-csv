@@ -9,7 +9,6 @@ import Text.Parsec.Char
 import Data.List
 
 import Lsql.Csv.Utils.BracketExpansion
-import Lsql.Csv.Utils.Errors
 
 import Lsql.Csv.Core.Functions
 import Lsql.Csv.Core.Tables

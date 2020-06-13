@@ -1,7 +1,8 @@
 module Lsql.Csv.Core.Symbols
   (
     Symbol, SymbolMap, (-->), (==>),
-    getSymbolMap, symbolList
+    getSymbolMap, symbolList,
+    getTables
   )
 where
 
@@ -54,4 +55,5 @@ getSymbolMap tables =
     map getSymbolsFromTable tables
 
 
-
+getTables :: SymbolMap -> [Table]
+getTables (SymbolMap _ tables) = tables
