@@ -65,15 +65,15 @@ You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can
 
 Let's see more complicated examples.
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.4, if p.1 in g.4'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
-This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.4 where P.1 in G.4`. But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
+This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`. But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1'
     
-This will cat all groups in one line delimeted by ",". But I want there also default groups! How can it be done? Really easily.
+This will cat all groups in one line delimeted by ", ". But I want there also default groups! How can it be done? Really easily.
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.4), if p.1 in g.4, by p.1' | 
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1), if p.1 in g.4, by p.1' | 
     lsql-csv -d: '- /etc/passwd, &1.1 cat(&1.2 &2.5), if &1.1 == &2.1'
     
 What a nice oneliner (twoliner)!
