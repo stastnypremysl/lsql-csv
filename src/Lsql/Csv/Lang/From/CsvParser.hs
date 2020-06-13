@@ -109,10 +109,10 @@ buildTableFromIn table_names named in_str =
       |otherwise = map (map readValue)$ in_str
 
 
-parseFile :: Assignment -> IO [Symbol]
+parseFile :: Assignment -> IO Table
 parseFile assignment = do
   file_content <- load_input
-  return$ getSymbolsFromTable$ parseTable (file_content ++ ['\n'])
+  return$ parseTable (file_content ++ ['\n'])
 
   where    
     load_input :: IO String

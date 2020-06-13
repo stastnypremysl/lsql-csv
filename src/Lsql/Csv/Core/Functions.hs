@@ -106,7 +106,7 @@ getPrintableLength ((ColumnP c) : _ ) = length$ showColumn c
 
 eval :: SymbolMap -> Arg -> Printable
 eval symbol_map (Symbol name) = ColumnP$ symbol_map ==> name
-eval symbol_map (Value val) = ValueP$ val
+eval _ (Value val) = ValueP$ val
 eval symbol_map (Function f) = evalFunction symbol_map f
 
 evalFunction :: SymbolMap -> Function -> Printable

@@ -106,9 +106,9 @@ getFromSymbols prog from_block = do
   let no_expanded = zip3 expanded (map getNames file_assignments) (map getOptions file_assignments)
 
   let assignments = map getAssignment$ distribute 1 no_expanded
-  symbols <- mapM parseFile assignments
+  tables <- mapM parseFile assignments
 
-  return$ foldl (+++) emptySymbolMap symbols
+  return$ getSymbolMap tables
 
   where
     distribute :: Int -> [([String], [String], [Option])] -> [(Int, [String], String, [Option])]
