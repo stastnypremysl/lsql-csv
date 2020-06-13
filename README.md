@@ -65,7 +65,7 @@ You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can
 
 Let's see more complicated examples.
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.4, if p.1 in g.4'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
 This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.4 where P.1 in G.4`. But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
 
