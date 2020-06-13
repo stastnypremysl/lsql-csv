@@ -8,6 +8,9 @@ debug: build
 build:
 	mkdir -p build
 
+.PHONY: install
+install: all
+	cp build/lsql-csv /usr/local/bin
 
 .PHONY: clean
 clean:
