@@ -237,6 +237,8 @@ evalFunction sm (AritmeticF (In arg1 arg2)) =
       | otherwise = False
 
     is_in :: String -> String -> Bool
+    is_in _ [] = False
+    is_in [] _ = False
     is_in a b 
       | cq_in a b == True = True
       | otherwise = 

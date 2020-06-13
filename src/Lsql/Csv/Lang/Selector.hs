@@ -218,7 +218,6 @@ bracketAritmeticExprP symbol_list = do
   char '('
   ret <- aritmeticExprP symbol_list
   char ')'
-  skipMany space
   return$ ret
 
 dolarAritmeticExprP :: [String] -> Parser Arg
@@ -307,7 +306,6 @@ selectAtomP symbol_list = do
   expr <- many1$ noneOf nonAtomChars
   let symbols = concat$ map (globMatching symbol_list)$ bracketExpand expr
 
-  skipMany space
   return$ map Symbol symbols
 
 minusIntConstantP :: Parser Arg
