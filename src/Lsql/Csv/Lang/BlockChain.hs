@@ -25,6 +25,7 @@ ifBP symbol_list = do
   string "if"
   skipMany space
   ret <- aritmeticExprP symbol_list
+  skipMany space
   return$ If ret
 
 sortBP :: [String] -> Parser Block
@@ -33,14 +34,16 @@ sortBP symbol_list = do
   string "sort"
   skipMany space
   ret <- selectorP symbol_list
+  skipMany space
   return$ Sort ret
 
 byBP :: [String] -> Parser Block
 byBP symbol_list = do
   skipMany space
   string "by"
-  skipMany spaces
+  skipMany space
   ret <- selectorP symbol_list
+  skipMany space
   return$ By ret
 
 blockP :: [String] -> Parser Block

@@ -25,14 +25,14 @@ module Lsql.Csv.Core.Functions
       ),
 
     LogicF(And, Or, Not),
-    AggregateF(Cat, Sum),
+    AggregateF(Cat, Sum, Avg, Count, Min, Max),
 
     Printable (ColumnP, ValueP),
     getPrintableLength,
 
     appendArg, catterate,
 
-    eval
+    eval, evalAggregateFunctions
 
   ) where
 
@@ -62,9 +62,6 @@ applyOpP :: (Value -> Value) -> Printable -> Printable
 applyOpP op (ColumnP c) = ColumnP$ applyOp op c
 applyOpP op (ValueP c) = ValueP$ op c
 
-
-data Grouping = By [Arg]
-
 data AritmeticF = 
   Sin Arg | Cos Arg | Tan Arg | Asin Arg | Acos Arg | Atan Arg|
   Sinh Arg | Cosh Arg | Tanh Arg | Asinh Arg | Acosh Arg | Atanh Arg|
@@ -90,7 +87,8 @@ data AritmeticF =
 
 data LogicF = And Arg Arg | Or Arg Arg | Not Arg
   
-data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg]
+data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg] | 
+  Min [Arg] | Max [Arg]
 
 catterate :: [Arg] -> Arg
 catterate args = foldl1 appendArg args
@@ -225,7 +223,7 @@ evalFunction sm (AritmeticF (Equal arg1 arg2)) =
 evalFunction sm (AritmeticF (In arg1 arg2)) = 
   applyInOpP (\x y -> BoolValue$ (show x) `is_in` (show y)) 
     (eval sm arg1) (eval sm arg2)
-  
+
   where
     cq_in :: String -> String -> Bool
     cq_in [] [] = True
@@ -247,8 +245,215 @@ evalFunction sm (AritmeticF (In arg1 arg2)) =
           is_in rest_a rest_b
 
 
---getBool :: SymbolMap -> Function -> Column
+evalFunction sm (AggregateF _) =
+  error$ "Aggregate functions can't be evaluated before grouping. " ++
+    "This usually happens, when you call aggregate function from condition."
+  
+
+evalAggregateFunctions :: SymbolMap -> Arg -> Arg
+
+evalAggregateFunctions symbol_map (Value val) =
+  Value val
+
+evalAggregateFunctions symbol_map (Symbol val) =
+  Symbol val
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Sin arg))) =
+  Function (AritmeticF (Sin$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Cos arg))) =
+  Function (AritmeticF (Cos$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Tan arg))) =
+  Function (AritmeticF (Tan$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Asin arg))) =
+  Function (AritmeticF (Asin$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Acos arg))) =
+  Function (AritmeticF (Acos$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Atan arg))) =
+  Function (AritmeticF (Atan$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Sinh arg))) =
+  Function (AritmeticF (Sinh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Cosh arg))) =
+  Function (AritmeticF (Cosh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Tanh arg))) =
+  Function (AritmeticF (Tanh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Asinh arg))) =
+  Function (AritmeticF (Asinh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Acosh arg))) =
+  Function (AritmeticF (Acosh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Atanh arg))) =
+  Function (AritmeticF (Atanh$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Exp arg))) =
+  Function (AritmeticF (Exp$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Sqrt arg))) =
+  Function (AritmeticF (Sqrt$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Size arg))) =
+  Function (AritmeticF (Size$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (ToString arg))) =
+  Function (AritmeticF (ToString$ evalAggregateFunctions symbol_map arg))
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Append arg1 arg2))) =
+  Function (AritmeticF (Append 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Round arg))) =
+  Function (AritmeticF (Round$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Truncate arg))) =
+  Function (AritmeticF (Truncate$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Ceiling arg))) =
+  Function (AritmeticF (Ceiling$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Floor arg))) =
+  Function (AritmeticF (Floor$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (MinusS arg))) =
+  Function (AritmeticF (MinusS$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Abs arg))) =
+  Function (AritmeticF (Abs$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Signum arg))) =
+  Function (AritmeticF (Signum$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Negate arg))) =
+  Function (AritmeticF (Negate$ evalAggregateFunctions symbol_map arg))
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Plus arg1 arg2))) =
+  Function (AritmeticF (Plus 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Minus arg1 arg2))) =
+  Function (AritmeticF (Minus 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Multiply arg1 arg2))) =
+  Function (AritmeticF (Multiply 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Divide arg1 arg2))) =
+  Function (AritmeticF (Divide 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Power arg1 arg2))) =
+  Function (AritmeticF (Power 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Even arg))) =
+  Function (AritmeticF (Even$ evalAggregateFunctions symbol_map arg))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Odd arg))) =
+  Function (AritmeticF (Odd$ evalAggregateFunctions symbol_map arg))
+
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (NaturalPower arg1 arg2))) =
+  Function (AritmeticF (NaturalPower 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Div arg1 arg2))) =
+  Function (AritmeticF (Div 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Quot arg1 arg2))) =
+  Function (AritmeticF (Quot 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Rem arg1 arg2))) =
+  Function (AritmeticF (Rem 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Mod arg1 arg2))) =
+  Function (AritmeticF (Mod 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Gcd arg1 arg2))) =
+  Function (AritmeticF (Gcd 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Lcm arg1 arg2))) =
+  Function (AritmeticF (Lcm 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Less arg1 arg2))) =
+  Function (AritmeticF (Less 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (LessOrEqual arg1 arg2))) =
+  Function (AritmeticF (LessOrEqual 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (More arg1 arg2))) =
+  Function (AritmeticF (More 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (MoreOrEqual arg1 arg2))) =
+  Function (AritmeticF (MoreOrEqual 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (Equal arg1 arg2))) =
+  Function (AritmeticF (Equal 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (NotEqual arg1 arg2))) =
+  Function (AritmeticF (NotEqual 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (LeftOuterJoin arg1 arg2))) =
+  Function (AritmeticF (LeftOuterJoin 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (AritmeticF (In arg1 arg2))) =
+  Function (AritmeticF (In 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
 
 
 
---groupEval :: SymbolMap -> Grouping -> [AggregateF] -> (SymbolMap, [Column])
+evalAggregateFunctions symbol_map (Function (LogicF (And arg1 arg2))) =
+  Function (LogicF (And 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (LogicF (Or arg1 arg2))) =
+  Function (LogicF (Or 
+    (evalAggregateFunctions symbol_map arg1) (evalAggregateFunctions symbol_map arg2)))
+
+evalAggregateFunctions symbol_map (Function (LogicF (Not arg))) =
+  Function (LogicF (Not$ evalAggregateFunctions symbol_map arg))
+
+
+
+
+evalAggregateFunctions symbol_map (Function (AggregateF (Cat args))) =
+  Value$ doCat evaled
+
+  where 
+    evaled :: Printable
+    evaled = eval symbol_map (catterate args)
+
+    doCat :: Printable -> Value
+    doCat (ValueP value) = value
+    doCat (ColumnP (Column _ vals)) = StringValue$ concat$ map show vals
+
+
+    
+
+evalAggregateFunctions _ x = x

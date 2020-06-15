@@ -1,7 +1,7 @@
 module Lsql.Csv.Core.BlockOps 
   (
     Block(Select, If, Sort, By),
-    getSelects, getIf
+    getSelects, getIf, getSort, getBy
   ) 
 where
 
@@ -24,6 +24,23 @@ getIf blocks =
 
   where
     getIfBlocks :: [Block] -> [Arg]
-    getIfBlocks [] =[]
+    getIfBlocks [] = []
     getIfBlocks ((If a) : rest) = a : getIfBlocks rest
     getIfBlocks (_ : rest) = getIfBlocks rest
+
+getSort :: [Block] -> [Arg]
+getSort [] = []
+getSort ((Sort a) : rest) 
+  | null$ getSort rest = a
+  | otherwise = error "There can be only one sort statement."
+
+getSort (_ : rest) = getSort rest
+
+getBy :: [Block] -> [Arg]
+getBy [] = []
+getBy ((By a) : rest)
+  | null$ getBy rest = a
+  | otherwise = error "There can be only one by statement."
+
+getBy (_ : rest) = getBy rest
+

@@ -3,10 +3,10 @@ module Lsql.Csv.Core.Tables
     Table, Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
 
-    buildTable, crossJoinTable, filterTable,
-    emptyTable,
+    buildTable, crossJoinTable, filterTable, sortTable, byTable, unionTables,
+    emptyTable, oneValTable,
 
-    columnNames, showColumn,
+    columnNames, columnValue, showColumn,
     applyOp, applyInOp,
 
     Boolable(getBool)
@@ -263,11 +263,67 @@ emptyTable :: Table -> Table
 emptyTable (Table t_name cols) = Table t_name 
   [Column (columnName col) [] | col <- cols]
 
---joinTable :: Column -> Column -> Table
---leftJoinTable :: Column -> Column -> Table
---multiplyTable :: Table -> Table -> Table
 
---crossFilterTable :: (Value -> Value -> Bool) -> Column -> Column -> Table
---sortTable :: Column -> Table
+oneValTable :: Table -> Table
+oneValTable (Table t_name cols) = Table t_name 
+  [Column (columnName col) [head$ columnValue col] | col <- cols]
 
---columnToTable :: Column -> Table
+
+sortTable :: [Column] -> Table -> Table
+sortTable s_cols (Table name cols) =
+  buildTable name (map columnName cols)$
+    sorted_rows
+  
+  where
+    s_rows :: [[Value]]
+    s_rows = getRows s_cols
+
+    rows :: [[Value]]
+    rows = getRows cols
+
+    sorted_p :: [([Value], [Value])]
+    sorted_p = sort$ zip s_rows rows
+
+    sorted_rows :: [[Value]]
+    sorted_rows = map snd sorted_p
+
+
+byTable :: [Column] -> Table -> [Table]
+byTable s_cols orig_table =
+  map (buildTable name (map columnName orig_cols))
+    new_rows
+
+  where
+    Table name orig_cols = orig_table
+
+    s_rows :: [[Value]]
+    s_rows = getRows s_cols
+
+    rows :: [[Value]]
+    rows = getRows orig_cols
+
+    sorted_p :: [([Value], [Value])]
+    sorted_p = sort$ zip s_rows rows
+
+    groupF :: ([Value], [Value]) -> ([Value], [Value]) -> Bool
+    groupF (a, _) (b, _) = a == b
+
+    grouped_p :: [[([Value], [Value])]]
+    grouped_p = groupBy groupF sorted_p
+
+    new_rows :: [[[Value]]]
+    new_rows = map (map snd) grouped_p
+
+
+unionTables :: Table -> [Table] -> Table
+unionTables (Table name orig_cols) tables =
+  buildTable name (map columnName orig_cols)$
+    concat vals
+
+  where
+    getColumn :: Table -> [Column]
+    getColumn (Table _ cols) = cols
+
+    vals :: [[[Value]]]
+    vals = map getRows$ map getColumn tables
+  
