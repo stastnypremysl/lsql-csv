@@ -76,6 +76,9 @@ This will cat all groups in one line delimeted by ", ". But I want there also de
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' | 
     lsql-csv -d: '- /etc/passwd, &1.1 cat(&1.2", "&2.5", "), if &1.1 == &2.1'
     
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' |  
+    lsql-csv -d: '- /etc/passwd, &1.1 &1.2""&2.5), if &1.1 == &2.1'
+    
 What a nice oneliner (twoliner)!
 
 ### Documantion of language
