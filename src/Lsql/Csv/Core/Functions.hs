@@ -453,6 +453,17 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Cat args))) =
     doCat (ValueP value) = value
     doCat (ColumnP (Column _ vals)) = StringValue$ concat$ map show vals
 
+evalAggregateFunctions symbol_map (Function (AggregateF (Sum args))) =
+  Value$ doSum evaled
+
+  where 
+    evaled :: Printable
+    evaled = eval symbol_map$ foldl1 
+      (\x y -> Function$ AritmeticF$ Plus x y)$ args
+
+    doSum :: Printable -> Value
+    doSum (ValueP value) = error "You cannot sum constant."
+    doSum (ColumnP (Column _ vals)) = foldl1 (+) vals
 
     
 
