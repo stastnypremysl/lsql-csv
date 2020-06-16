@@ -74,11 +74,16 @@ tableP delimiter sec_delimiter = many1$ rowP delimiter sec_delimiter
 
 readValue :: String -> Value
 readValue val
+  | isTrue val = BoolValue True
+  | isFalse val = BoolValue False
   | isInteger val = IntValue (read val)
   | isDouble val = DoubleValue (read val)
   | otherwise = StringValue val
   
   where
+    isTrue s = s == "true"
+    isFalse s = s == "false"
+
     isInteger s = case reads s :: [(Integer, String)] of
       [(_, "")] -> True
       _         -> False

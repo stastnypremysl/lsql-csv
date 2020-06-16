@@ -28,10 +28,16 @@ aggregateFP constructor name symbol_list = do
 
 catP symbol_list = try$ aggregateFP (aggregateFGen Cat) "cat" symbol_list
 sumP symbol_list = try$ aggregateFP (aggregateFGen Sum) "sum" symbol_list
+avgP symbol_list = try$ aggregateFP (aggregateFGen Avg) "avg" symbol_list
+countP symbol_list = try$ aggregateFP (aggregateFGen Count) "count" symbol_list
+minP symbol_list = try$ aggregateFP (aggregateFGen Min) "min" symbol_list
+maxP symbol_list = try$ aggregateFP (aggregateFGen Max) "max" symbol_list
 
 aggregateFunctionsP :: [String] -> Parser Arg
 aggregateFunctionsP symbol_list =
-  (catP symbol_list) <|> (sumP symbol_list)
+  (catP symbol_list) <|> (sumP symbol_list) <|>
+  (avgP symbol_list) <|> (countP symbol_list) <|>
+  (minP symbol_list) <|> (maxP symbol_list)
 
 oneArgFP :: (Arg -> Arg) -> String -> [String] -> Parser Arg
 oneArgFP constructor name symbol_list = do
@@ -179,6 +185,8 @@ moreP symbol_list arg =
   try$ twoArgInFP 4 (aritmeticF2Gen More) ">" symbol_list arg
 notEqualP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen More) "!=" symbol_list arg
+equalP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen Equal) "==" symbol_list arg
 
 orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "||" symbol_list arg
 andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "&&" symbol_list arg
@@ -207,7 +215,7 @@ twoArgInFunctions4P symbol_list arg =
   (leftOuterJoinP symbol_list arg) <|>
     (lessOrEqualP symbol_list arg) <|> (moreOrEqualP symbol_list arg) <|>
     (lessP symbol_list arg) <|> (moreP symbol_list arg) <|>
-    (notEqualP symbol_list arg)
+    (notEqualP symbol_list arg) <|> (equalP symbol_list arg)
 
 twoArgInFunctions5P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions5P symbol_list arg = 
@@ -274,7 +282,12 @@ aritmeticExprP symbol_list = aritmeticExprGenP 5 symbol_list
 globMatching :: [String] -> String -> [String]
 globMatching symbols expr = 
   let p = compile expr in
-  filter (match p) symbols
+  let ret = filter (match p) symbols in
+
+  if null ret then
+    [expr]
+  else 
+    ret
 
 exoticAtomP :: Parser Arg
 exoticAtomP = do
@@ -385,7 +398,8 @@ atomP symbol_list = do
     neutronP = do
       selected <- constantP <|> exoticAtomP <|>
         dolarAritmeticExprP symbol_list <|>
-        oneArgFunctionsP symbol_list
+        oneArgFunctionsP symbol_list <|>
+        aggregateFunctionsP symbol_list
 
       next <- nucleonP
 
@@ -400,7 +414,7 @@ atomP symbol_list = do
 selectorP :: [String] -> Parser [Arg]
 selectorP symbol_list = do
   skipMany space
-  ret <- many$ atomP symbol_list
+  ret <- many$ try$ atomP symbol_list
   skipMany space
   return$ concat ret
 
