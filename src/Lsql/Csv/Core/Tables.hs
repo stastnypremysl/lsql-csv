@@ -25,7 +25,10 @@ instance Boolable Value where
   getBool (IntValue v) = v == 0
   getBool (DoubleValue _) = error "Double can't be converted to bool."
   getBool (BoolValue b) = b
-  getBool (StringValue _) = error "String can't be converted to bool."
+  getBool (StringValue s)
+   | s == "true" = True
+   | s == "false" = False
+   | otherwise = error "String can't be converted to bool."
 
 instance Ord Value where
   (IntValue a) <= (IntValue b) = a <= b

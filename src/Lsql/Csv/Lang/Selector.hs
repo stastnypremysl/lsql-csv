@@ -185,6 +185,8 @@ moreP symbol_list arg =
   try$ twoArgInFP 4 (aritmeticF2Gen More) ">" symbol_list arg
 notEqualP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen More) "!=" symbol_list arg
+equalP symbol_list arg = 
+  try$ twoArgInFP 4 (aritmeticF2Gen Equal) "==" symbol_list arg
 
 orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "||" symbol_list arg
 andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "&&" symbol_list arg
@@ -213,7 +215,7 @@ twoArgInFunctions4P symbol_list arg =
   (leftOuterJoinP symbol_list arg) <|>
     (lessOrEqualP symbol_list arg) <|> (moreOrEqualP symbol_list arg) <|>
     (lessP symbol_list arg) <|> (moreP symbol_list arg) <|>
-    (notEqualP symbol_list arg)
+    (notEqualP symbol_list arg) <|> (equalP symbol_list arg)
 
 twoArgInFunctions5P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions5P symbol_list arg = 

@@ -215,10 +215,10 @@ evalFunction sm (AritmeticF (MoreOrEqual arg1 arg2)) =
   applyInOpP (\x y -> BoolValue$ x >= y) (eval sm arg1) (eval sm arg2)
 
 evalFunction sm (AritmeticF (NotEqual arg1 arg2)) = 
-  applyInOpP (\x y -> BoolValue$ x == y) (eval sm arg1) (eval sm arg2)
+  applyInOpP (\x y -> BoolValue$ x /= y) (eval sm arg1) (eval sm arg2)
 
 evalFunction sm (AritmeticF (Equal arg1 arg2)) = 
-  applyInOpP (\x y -> BoolValue$ x /= y) (eval sm arg1) (eval sm arg2)
+  applyInOpP (\x y -> BoolValue$ x == y) (eval sm arg1) (eval sm arg2)
 
 evalFunction sm (AritmeticF (In arg1 arg2)) = 
   applyInOpP (\x y -> BoolValue$ (show x) `is_in` (show y)) 
