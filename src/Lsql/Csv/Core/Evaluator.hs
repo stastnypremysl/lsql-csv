@@ -16,8 +16,7 @@ filterCols (ColumnP col : rest) = col : filterCols rest
 
 evaluate :: SymbolMap -> [Block] -> [Printable]
 evaluate symbol_map blocks =
-
-  map (eval sorted_symbol_map) aggregated_selects
+  printTable sorted
 
   where 
     selects :: [Arg]
@@ -46,34 +45,53 @@ evaluate symbol_map blocks =
 
     filtered_symbol_map = getSymbolMap [filtered_table]
 
-    by_stmt :: [Arg]
-    by_stmt = getBy blocks
+    
+    aggregated_tables :: [Table]
+    aggregated_tables
+      | null by_stmt = [filtered_table]
+      | otherwise = byTable (by_col$ map (eval filtered_symbol_map) by_stmt) 
+          filtered_table
+    
+      where
+        by_stmt :: [Arg]
+        by_stmt = getBy blocks
 
-    by_tables :: [Table]
-    by_tables = byTable 
-      (filterCols$ map (eval filtered_symbol_map) by_stmt) filtered_table
+        by_printable :: [Printable]
+        by_printable = map (eval filtered_symbol_map) by_stmt
 
-    by_evaled_table :: Table
-    by_evaled_table 
-      | null by_stmt = filtered_table
-      | otherwise = unionTables filtered_table$ map oneValTable$ by_tables
+        by_col :: [Printable] -> [Column]
+        by_col [] = []
+        by_col ((ColumnP col) : rest) = col : (by_col rest)
+        by_col (_ : rest) = by_col rest
 
-    aggregated_selects
-      | null by_stmt = selects
-      | otherwise = map (evalAggregateFunctions filtered_symbol_map) selects
+     
+    aggregated :: Bool
+    aggregated = foldl1 (||)$ map containsAggregateF selects
 
-    by_symbol_table :: SymbolMap
-    by_symbol_table = getSymbolMap [by_evaled_table]
-      
+    sort_by :: [Arg]
+    sort_by = getSort blocks
 
-    sort_stmt :: [Arg]
-    sort_stmt = getSort blocks
+    post_aggregated :: ([Column], Table)
+    post_aggregated
+     | not aggregated = 
+         let evaluator = map (eval filtered_symbol_map) in
+         ((getCols$ evaluator sort_by), (getTable []$ evaluator selects))
 
-    sorted_table :: Table
-    sorted_table 
-      | null sort_stmt = by_evaled_table
-      | otherwise = sortTable 
-        (filterCols$ map (eval by_symbol_table) sort_stmt) by_evaled_table
+     | otherwise = 
+        let evaluator x = (unionAggCols$ map (aggEval x) aggregated_tables) in
+        ((getCols$ evaluator sort_by), (getTable []$ evaluator selects))
 
-    sorted_symbol_map = getSymbolMap [sorted_table]
+     where
+       aggEval :: [Arg] -> Table -> [Printable]
+       aggEval to_eval table =
+         let symbols = getSymbolMap [table] in
+         map (eval symbols)$ map (evalAggregateFunctions symbols) to_eval
 
+    sorted :: Table
+    sorted = sortTable (fst post_aggregated) (snd post_aggregated)
+
+
+
+
+    
+    

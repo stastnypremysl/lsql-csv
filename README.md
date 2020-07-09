@@ -73,11 +73,8 @@ This will print all all pairs user <-> group excluding the default group. You ca
     
 This will cat all groups in one line delimeted by ", ". But I want there also default groups! How can it be done? Really easily.
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' | 
-    lsql-csv -d: '- /etc/passwd, &1.1 cat(&1.2", "&2.5", "), if &1.1 == &2.1'
-    
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' |  
-    lsql-csv -d: '- /etc/passwd, &1.1 &1.2""&2.5), if &1.1 == &2.1'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' |
+    lsql-csv -d: '- /etc/passwd /etc/group, &1.1 &1.2""&3.1, if &1.1 == &2.1 && &2.4 == &3.3'
     
 What a nice oneliner (twoliner)!
 

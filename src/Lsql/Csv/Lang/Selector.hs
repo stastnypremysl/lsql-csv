@@ -414,7 +414,7 @@ atomP symbol_list = do
 selectorP :: [String] -> Parser [Arg]
 selectorP symbol_list = do
   skipMany space
-  ret <- many$ try$ atomP symbol_list
+  ret <- many1$ try$ atomP symbol_list
   skipMany space
   return$ concat ret
 

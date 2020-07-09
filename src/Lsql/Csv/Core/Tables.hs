@@ -1,10 +1,10 @@
 module Lsql.Csv.Core.Tables
   (
-    Table, Column(Column),
+    Table(Table), Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
 
     buildTable, crossJoinTable, filterTable, sortTable, byTable, unionTables,
-    emptyTable, oneValTable,
+    emptyTable, 
 
     columnNames, columnValue, showColumn,
     applyOp, applyInOp,
@@ -179,6 +179,12 @@ data Column = Column [String] [Value]
 instance Eq Column where
   (Column _ a) == (Column _ b) = a == b
 
+instance Ord Column where
+  (Column _ a) <= (Column _ b) = a <= b
+
+instance Show Column where
+  show (Column _ a) = show a
+
 applyInOp:: (Value -> Value -> Value) -> Column -> Column -> Column
 applyInOp op (Column _ a) (Column _ b) = (Column ["comp"] (map (\(x,y) -> op x y)$ zip a b))
 
@@ -186,6 +192,9 @@ applyOp:: (Value -> Value) -> Column -> Column
 applyOp op (Column _ a) = (Column ["comp"] (map op a))
 
 data Table = Table [String] [Column]
+
+instance Show Table where
+  show (Table _ a) = show a
 
 showColumn :: Column -> [String]
 showColumn (Column _ col) =
@@ -267,12 +276,9 @@ emptyTable (Table t_name cols) = Table t_name
   [Column (columnName col) [] | col <- cols]
 
 
-oneValTable :: Table -> Table
-oneValTable (Table t_name cols) = Table t_name 
-  [Column (columnName col) [head$ columnValue col] | col <- cols]
-
-
 sortTable :: [Column] -> Table -> Table
+sortTable [] table = table
+
 sortTable s_cols (Table name cols) =
   buildTable name (map columnName cols)$
     sorted_rows
