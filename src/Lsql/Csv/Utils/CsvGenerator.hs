@@ -11,17 +11,9 @@ csvGenerate sep sec_sep cols =
   concat$ map genLine rows
 
   where
-    n = getPrintableLength cols
     
-    str_cols :: [[String]]
-    str_cols = map pShow cols
-      where
-        pShow :: Printable -> [String]
-        pShow (ValueP v) = take n$ repeat$ show v 
-        pShow (ColumnP c) = showColumn c
-
     rows :: [[String]]
-    rows = transpose str_cols
+    rows = transpose$ genStrCols cols
 
     genLine :: [String] -> String
     genLine (a : b : rest) = genCell a ++ [sep] ++ genLine (b : rest)

@@ -28,11 +28,11 @@ module Lsql.Csv.Core.Functions
     AggregateF(Cat, Sum, Avg, Count, Min, Max),
 
     Printable (ColumnP, ValueP),
-    getPrintableLength,
+    genStrCols, getCols, getTable, printTable, unionAggCols,
 
     appendArg, catterate,
 
-    eval, evalAggregateFunctions
+    eval, evalAggregateFunctions, containsAggregateF
 
   ) where
 
@@ -45,22 +45,7 @@ data Function = AritmeticF AritmeticF | AggregateF AggregateF | LogicF LogicF
 data Arg = Function Function | Symbol String | Value Value 
 
 data Printable = ColumnP Column | ValueP Value
-
-applyInOpP :: (Value -> Value -> Value) -> Printable -> Printable -> Printable
-applyInOpP op (ColumnP c1) (ColumnP c2) = 
-  ColumnP$ applyInOp op c1 c2
-
-applyInOpP op (ColumnP c1) (ValueP c2) = 
-  ColumnP$ applyInOp op c1 (Column ["gen"]$ repeat c2)
-
-applyInOpP op (ValueP c1) (ColumnP c2) =
-  ColumnP$ applyInOp op (Column ["gen"]$ repeat c1) c2
-
-applyInOpP op (ValueP c1) (ValueP c2) = ValueP$ op c1 c2
-
-applyOpP :: (Value -> Value) -> Printable -> Printable
-applyOpP op (ColumnP c) = ColumnP$ applyOp op c
-applyOpP op (ValueP c) = ValueP$ op c
+  deriving (Eq, Ord, Show)
 
 data AritmeticF = 
   Sin Arg | Cos Arg | Tan Arg | Asin Arg | Acos Arg | Atan Arg|
@@ -89,6 +74,90 @@ data LogicF = And Arg Arg | Or Arg Arg | Not Arg
   
 data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg] | 
   Min [Arg] | Max [Arg]
+
+pShow :: Int -> Printable -> [String]
+pShow n (ValueP v) = take n$ repeat$ show v 
+pShow n (ColumnP c) = take n$ showColumn c
+
+genStrCols :: [Printable] -> [[String]]
+genStrCols cols = map (pShow n) cols
+  where
+    n = getPrintableLength cols
+
+
+getCols :: [Printable] -> [Column]
+getCols printables =
+  toCols printables
+
+  where
+    n = getPrintableLength printables
+    
+    toCols :: [Printable] -> [Column]
+    toCols [] = []
+    toCols ((ColumnP c) : rest) = c : (toCols rest)
+    toCols ((ValueP v) : rest) = (Column [] (take n$ repeat v)) : (toCols rest)
+
+getTable :: [String] -> [Printable] -> Table
+getTable names printables = Table names (getCols printables)
+
+printTable :: Table -> [Printable]
+printTable (Table _ cols) = map ColumnP cols
+
+genOnelineCols :: [Printable] -> [Printable]
+genOnelineCols [] = []
+
+genOnelineCols (ColumnP (Column _ (val : _)) : rest) = 
+  (ValueP val) : (genOnelineCols rest)
+
+genOnelineCols ((ValueP val) : rest) = (ValueP val) : (genOnelineCols rest)
+
+printableColumnnide :: Printable -> Printable
+printableColumnnide (ValueP p) = ColumnP$ Column [] [p]
+printableColumnnide p = p
+
+appendPrintable :: Printable -> Printable -> Printable
+appendPrintable a0 b0 =
+  let a = printableColumnnide a0 in
+  let b = printableColumnnide b0 in
+
+  doAppend a b
+
+  where
+    doAppend :: Printable -> Printable -> Printable
+    doAppend (ColumnP (Column ns a)) (ColumnP (Column _ b)) =
+      ColumnP (Column ns (a ++ b))
+
+
+unionCols :: [[Printable]] -> [Printable]
+unionCols cols = 
+  foldl1 col2union cols
+
+  where 
+    col2union :: [Printable] -> [Printable] -> [Printable]
+    col2union (a : rest_a) (b : rest_b) = 
+      (a `appendPrintable` b) : (col2union rest_a rest_b)
+
+unionAggCols :: [[Printable]] -> [Printable]
+unionAggCols cols =
+  unionCols$ map genOnelineCols cols
+
+
+applyInOpP :: (Value -> Value -> Value) -> Printable -> Printable -> Printable
+applyInOpP op (ColumnP c1) (ColumnP c2) = 
+  ColumnP$ applyInOp op c1 c2
+
+applyInOpP op (ColumnP c1) (ValueP c2) = 
+  ColumnP$ applyInOp op c1 (Column ["gen"]$ repeat c2)
+
+applyInOpP op (ValueP c1) (ColumnP c2) =
+  ColumnP$ applyInOp op (Column ["gen"]$ repeat c1) c2
+
+applyInOpP op (ValueP c1) (ValueP c2) = ValueP$ op c1 c2
+
+applyOpP :: (Value -> Value) -> Printable -> Printable
+applyOpP op (ColumnP c) = ColumnP$ applyOp op c
+applyOpP op (ValueP c) = ValueP$ op c
+
 
 catterate :: [Arg] -> Arg
 catterate args = foldl1 appendArg args
@@ -440,8 +509,6 @@ evalAggregateFunctions symbol_map (Function (LogicF (Not arg))) =
   Function (LogicF (Not$ evalAggregateFunctions symbol_map arg))
 
 
-
-
 evalAggregateFunctions symbol_map (Function (AggregateF (Cat args))) =
   Value$ doCat evaled
 
@@ -468,3 +535,70 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Sum args))) =
     
 
 evalAggregateFunctions _ x = x
+
+
+containsAggregateF :: Arg -> Bool
+containsAggregateF (Function (AritmeticF (Sin arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Cos arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Tan arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Asin arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Acos arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Atan arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (Sinh arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Cosh arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Tanh arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Asinh arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Acosh arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Atanh arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (Exp arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Sqrt arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (Size arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (ToString arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Append arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+
+containsAggregateF (Function (AritmeticF (Round arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Truncate arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Ceiling arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Floor arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (MinusS arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Abs arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Signum arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Negate arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (Plus arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Minus arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Multiply arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Divide arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Power arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+
+containsAggregateF (Function (AritmeticF (Even arg))) = containsAggregateF arg
+containsAggregateF (Function (AritmeticF (Odd arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AritmeticF (NaturalPower arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Div arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Quot arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Rem arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Mod arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Gcd arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Lcm arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+
+containsAggregateF (Function (AritmeticF (Less arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (LessOrEqual arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (More arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (MoreOrEqual arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (Equal arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (NotEqual arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (LeftOuterJoin arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (AritmeticF (In arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+
+containsAggregateF (Function (LogicF (And arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (LogicF (Or arg1 arg2))) = containsAggregateF arg1 || containsAggregateF arg2
+containsAggregateF (Function (LogicF (Not arg))) = containsAggregateF arg
+
+containsAggregateF (Function (AggregateF _)) = True
+
+containsAggregateF _ = False
