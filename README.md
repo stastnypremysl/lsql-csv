@@ -135,6 +135,32 @@ The output might look like
     -rw-r--r-- 1 root root 6 Feb 21 21:17 gimp
     -rw-r--r-- 1 root root 12 Feb 21 02:19 sysctl.d
     
+#### About nice outputs
+There is a utterly sick trick, how to concat two values in select expression. Write them without space. No, we are not joking. Never.
+
+But how the interpreter know the interpreter knows the ends of the value name or value expression? You must hint it!
+There are many ways how to do it using the exotic chars, but the most easy one is just write "".
+
+Let's try it!
+
+    lsql-csv '/dev/null, "I did not steal it...""I just borrowed it"'
+    
+The output is, as you might expect
+   
+    I did not steal it...I just borrowed it
+
+#### About the engineering way of theorem proving
+
+Let's say you want to build a new bridge, but you aren't sure whether `sin(x)^2 + cos(x)^2` is really 1.
+To verify this theorem, we need to make, let's say, 10 experiments. Then we compute the average and if it is 1 plus minus 0.1, the theorem is true.
+
+The naive solution is just to write
+
+    lsql-csv -d: '/etc/passwd, $(sin(&1.3)^2 + cos(&1.3)^2)'
+    
+Don't miss the new syntax here `$(...)`. This is the way, how you can insert arithmetic expression into the select expression. But you are too lazy to use your calculator, so you need to improve this program.
+
+TODO
 
 #### More complicated join
 
