@@ -193,6 +193,9 @@ applyOp op (Column _ a) = (Column ["comp"] (map op a))
 
 data Table = Table [String] [Column]
 
+instance Show Table where
+  show (Table _ a) = show a
+
 showColumn :: Column -> [String]
 showColumn (Column _ col) =
   map show col

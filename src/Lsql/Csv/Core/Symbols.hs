@@ -28,15 +28,16 @@ symbolList (SymbolMap t_map _) = map (fst) (M.toList t_map)
 (SymbolMap s_map tables) +++ [] = SymbolMap s_map tables
 (SymbolMap s_map tables) +++ (a : s_array) =  
   let name = getSymbolName a in
+  (SymbolMap (M.insert name a s_map) tables) +++ s_array
 
-  case M.lookup name s_map of
-    Nothing -> (SymbolMap (M.insert name a s_map) tables) +++ s_array
-    _ -> error$ "Symbol " ++ name ++ "is duplicite."
+  --case M.lookup name s_map of
+    --Nothing -> (SymbolMap (M.insert name a s_map) tables) +++ s_array
+    --_ -> (SymbolMap s_map tables) +++ s_array
 
 (-->) :: SymbolMap -> String -> Symbol
 (SymbolMap s_map _) --> name = 
   case M.lookup name s_map of
-    Nothing -> error$ "Symbol " ++ name ++ " not found" 
+    Nothing -> error$ "Symbol " ++ name ++ " not found. (It could be caused by empty output.)" 
     Just s -> s
 
 (==>) :: SymbolMap -> String -> Column

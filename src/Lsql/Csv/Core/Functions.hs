@@ -134,6 +134,7 @@ unionCols cols =
 
   where 
     col2union :: [Printable] -> [Printable] -> [Printable]
+    col2union [] [] = []
     col2union (a : rest_a) (b : rest_b) = 
       (a `appendPrintable` b) : (col2union rest_a rest_b)
 
