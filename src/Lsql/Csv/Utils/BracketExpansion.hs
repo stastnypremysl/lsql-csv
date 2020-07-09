@@ -61,7 +61,7 @@ bracketExpand input =
 
   where
     parseOne :: String -> [String]
-    parseOne inp = case parse bracketP "bracket expanstion"$ T.pack inp of
+    parseOne inp = case parse bracketP "bracket expansion"$ T.pack inp of
       Left _ -> [inp]
       Right ret -> map (++after_bracket) ret
 
