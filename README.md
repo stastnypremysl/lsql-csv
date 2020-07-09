@@ -79,7 +79,7 @@ This will cat all groups in one line delimeted by ", ". But I want there also de
 What a nice oneliner (twoliner)!
 
 ### Documantion of language
-Each column have number and may have name. If the source of column is stdio, then they can be addressed by @N or @NAME syntax. If the source is file and have been given a name XXX by a user and can be addressed by XXX.N or XXX.NAME. It can be also addressed using &M.N syntax, where M is m-th input file.
+Each column have number and may have name. If the source is file and have been given a name XXX by a user and can be addressed by XXX.N or XXX.NAME. It can be also addressed using &M.N syntax, where M is m-th input file or stdio.
 
 Each command is made from blocks separated by comma. There are these types of blocks.
 
