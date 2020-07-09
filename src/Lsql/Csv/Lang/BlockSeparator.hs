@@ -30,12 +30,20 @@ quote3 = do
   char '`'
   return$ "`" ++ ret ++ "`"
 
+quote4 :: Parser String
+quote4 = do
+  char '{'
+  ret <- many$ noneOf "}"
+  char '}'
+  return$ "{" ++ ret ++ "}"
+
+
 normal :: Parser String
-normal = many1$ noneOf "\"`',"
+normal = many1$ noneOf "\"`',{"
 
 block :: Parser String
 block = do
-  cret <- many1$ (quote1 <|> quote2 <|> quote3 <|> normal)
+  cret <- many1$ (quote1 <|> quote2 <|> quote3 <|> quote4 <|> normal)
   return$ concat cret
 
 nonTerminalBlock :: Parser String
@@ -46,7 +54,7 @@ nonTerminalBlock = do
 
 blocks :: Parser [String]
 blocks = do
-  rets <- many1$ try nonTerminalBlock
+  rets <- many$ try nonTerminalBlock
   last <- block
   return$ rets ++ [last]
   
