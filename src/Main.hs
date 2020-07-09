@@ -31,5 +31,9 @@ run prog = do
 
 main = do
   args <- getArgs
-  out <- run$ parseArgs args 
-  putStr$ out
+  if args == [] then do
+    putStr$ "Usage: lsql-csv [OPTIONS] COMMAND\n \
+            \ Details can be found in the documentation.\n"
+  else do
+    out <- run$ parseArgs args 
+    putStr$ out
