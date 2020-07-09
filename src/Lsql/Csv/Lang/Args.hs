@@ -45,13 +45,18 @@ argCmdP = do
 
 argP :: Parser Arg
 argP = do
-  skipMany space
-  ret <- (try argOptionP) <|> argCmdP
+  ret <- (try argOptionP)
   return ret
+
+fullP :: Parser [Arg]
+fullP = do
+  ags <- many argP
+  cmd <- argCmdP
+  return$ ags ++ [cmd]
 
 parseArgs :: [String] -> Program
 parseArgs args = 
   let input = unwords args in
-  case parse (many argP) "arguments" (T.pack input) of
+  case parse fullP "arguments" (T.pack input) of
     Left err -> error $ show err
     Right val -> load_args val

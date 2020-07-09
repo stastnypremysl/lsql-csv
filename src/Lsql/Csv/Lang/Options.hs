@@ -35,22 +35,21 @@ char_option_p = do
 delOp :: String -> Parser Char
 delOp opt = do
   string opt
-  skipMany space
   c <- char_option_p
   return c
 
 data Option = Delimiter Char | SecondaryDelimiter Char | Quote Char | Named Bool
 
 primaryDelOp = do
-  r <- (try$ delOp "-d") <|> delOp "--delimiter"
+  r <- (try$ delOp "-d") <|> delOp "--delimiter="
   return $ Delimiter r
 
 secondaryDelOp = do
-  r <- (try$ delOp "-s") <|> delOp "--secondary-delimiter"
+  r <- (try$ delOp "-s") <|> delOp "--secondary-delimiter="
   return $ SecondaryDelimiter r
 
 quoteOp = do
-  r <- (try$ delOp "-q") <|> delOp "--quote"
+  r <- (try$ delOp "-q") <|> delOp "--quote="
   return $ Quote r
 
 notNamedOp = do

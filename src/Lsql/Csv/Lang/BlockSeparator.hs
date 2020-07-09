@@ -54,7 +54,7 @@ nonTerminalBlock = do
 
 blocks :: Parser [String]
 blocks = do
-  rets <- many1$ try nonTerminalBlock
+  rets <- many$ try nonTerminalBlock
   last <- block
   return$ rets ++ [last]
   

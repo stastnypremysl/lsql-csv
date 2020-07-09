@@ -306,8 +306,8 @@ oneRegularAtomP = do
 constantP :: Parser Arg
 constantP = stringConstantP <|>
   (try$ trueConstantP) <|> (try$ falseConstantP) <|>
-  (try$ intConstantP) <|> (try$ doubleConstantP) <|>
-  (try$ minusIntConstantP) <|> (try$ minusDoubleConstantP)
+  (try$ doubleConstantP) <|> (try$ intConstantP) <|> 
+ (try$ minusDoubleConstantP) <|> (try$ minusIntConstantP) 
 
 oneAtomP :: Parser Arg
 oneAtomP = do

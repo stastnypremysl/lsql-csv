@@ -120,51 +120,51 @@ instance Floating Value where
 
   exp (DoubleValue a) = DoubleValue$ exp a
   exp (IntValue a) = DoubleValue$ exp$ fromIntegral a
-  exp _ = error "exp operation on non-numbes is not supported."
+  exp _ = error "exp operation on non-numbers is not supported."
 
   log (DoubleValue a) = DoubleValue$ log a
   log (IntValue a) = DoubleValue$ log$ fromIntegral a
-  log _ = error "log operation on non-numbes is not supported."
+  log _ = error "log operation on non-numbers is not supported."
 
   sin (DoubleValue a) = DoubleValue$ a
   sin (IntValue a) = DoubleValue$ sin$ fromIntegral a
-  sin _ = error "sin operation on non-numbes is not supported."
+  sin _ = error "sin operation on non-numbers is not supported."
 
   cos (DoubleValue a) = DoubleValue$ cos a
   cos (IntValue a) = DoubleValue$ cos$ fromIntegral a
-  cos _ = error "cos operation on non-numbes is not supported."
+  cos _ = error "cos operation on non-numbers is not supported."
 
   asin (DoubleValue a) = DoubleValue$ asin a
   asin (IntValue a) = DoubleValue$ asin$ fromIntegral a
-  asin _ = error "asin operation on non-numbes is not supported."
+  asin _ = error "asin operation on non-numbers is not supported."
 
   acos (DoubleValue a) = DoubleValue$ acos a
   acos (IntValue a) = DoubleValue$ acos$ fromIntegral a
-  acos _ = error "acos operation on non-numbes is not supported."
+  acos _ = error "acos operation on non-numbers is not supported."
 
   atan (DoubleValue a) = DoubleValue$ atan a
   atan (IntValue a) = DoubleValue$ atan$ fromIntegral a
-  atan _ = error "atan operation on non-numbes is not supported."
+  atan _ = error "atan operation on non-numbers is not supported."
 
   sinh (DoubleValue a) = DoubleValue$ sinh a
   sinh (IntValue a) = DoubleValue$ sinh$ fromIntegral a
-  sinh _ = error "sinh operation on non-numbes is not supported."
+  sinh _ = error "sinh operation on non-numbers is not supported."
 
   asinh (DoubleValue a) = DoubleValue$ asinh a
   asinh (IntValue a) = DoubleValue$ asinh$ fromIntegral a
-  asinh _ = error "asinh operation on non-numbes is not supported."
+  asinh _ = error "asinh operation on non-numbers is not supported."
 
   cosh (DoubleValue a) = DoubleValue$ cosh a
   cosh (IntValue a) = DoubleValue$ cosh$ fromIntegral a
-  cosh _ = error "cosh operation on non-numbes is not supported."
+  cosh _ = error "cosh operation on non-numbers is not supported."
 
   acosh (DoubleValue a) = DoubleValue$ acosh a
   acosh (IntValue a) = DoubleValue$ acosh$ fromIntegral a
-  acosh _ = error "acosh operation on non-numbes is not supported."
+  acosh _ = error "acosh operation on non-numbers is not supported."
   
   atanh (DoubleValue a) = DoubleValue$ atanh a
   atanh (IntValue a) = DoubleValue$ atanh$ fromIntegral a
-  atanh _ = error "atanh operation on non-numbes is not supported."
+  atanh _ = error "atanh operation on non-numbers is not supported."
 
 instance Show Value where
   show (IntValue v) = show v

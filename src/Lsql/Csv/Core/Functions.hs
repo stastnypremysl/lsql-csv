@@ -533,9 +533,54 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Sum args))) =
     doSum (ValueP value) = error "You cannot sum constant."
     doSum (ColumnP (Column _ vals)) = foldl1 (+) vals
 
-    
+evalAggregateFunctions symbol_map (Function (AggregateF (Count args))) =
+  Value$ foldl1 (+)$ map doCount evaled
 
-evalAggregateFunctions _ x = x
+  where 
+    evaled :: [Printable]
+    evaled = map (eval symbol_map) args
+
+    doCount :: Printable -> Value
+    doCount (ValueP value) = error "You cannot count constant"
+    doCount (ColumnP (Column _ vals)) = IntValue$ length vals
+
+evalAggregateFunctions symbol_map (Function (AggregateF (Avg args))) =
+  Value$ doAvg evaled
+
+  where 
+    evaled :: Printable
+    evaled = eval symbol_map$
+      evalAggregateFunctions symbol_map$ Function$ AritmeticF$ 
+      Div (Function$ AggregateF$ Sum$ args) (Function$ AggregateF$ Count$ args)
+
+    doAvg :: Printable -> Value
+    doAvg (ValueP value) = value
+
+evalAggregateFunctions symbol_map (Function (AggregateF (Min args))) =
+  Value$ minimum$ map doMin evaled
+
+  where 
+    evaled :: [Printable]
+    evaled = map (eval symbol_map) args
+
+    doMin :: Printable -> Value
+    doMin (ValueP value) = value
+    doMin (ColumnP (Column _ vals)) = minimum vals
+
+
+evalAggregateFunctions symbol_map (Function (AggregateF (Max args))) =
+  Value$ maximum$ map doMax evaled
+
+  where 
+    evaled :: [Printable]
+    evaled = map (eval symbol_map) args
+
+    doMax :: Printable -> Value
+    doMax (ValueP value) = value
+    doMax (ColumnP (Column _ vals)) = maximum vals
+   
+
+--evalAggregateFunctions _ x = x
 
 
 containsAggregateF :: Arg -> Bool
