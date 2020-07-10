@@ -161,7 +161,11 @@ The naive solution is just to write
     
 Don't miss the new syntax here `$(...)`. This is the way, how you can insert arithmetic expression into the select expression. But you are too lazy to use your calculator, so you need to improve this program.
 
-TODO
+    lsql-csv -d: '/etc/passwd, "sin(x)^2 + cos(x)^2 = "avg($(sin(&1.3)^2 + cos(&1.3)^2))'
+    
+And the output is, suprisingly
+
+    sin(x)^2 + cos(x)^2 = 1.0
 
 #### More complicated join
 
