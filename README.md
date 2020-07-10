@@ -130,10 +130,11 @@ So, let's say, I want do sort the files in a folder from the largest to the smal
     
 The output might look like
   
-    drwxr-xr-x 1 root root 0 Jun 13 20:38 subgid
-    drwxr-xr-x 1 root root 3 Feb 21 09:48 papersize
-    -rw-r--r-- 1 root root 6 Feb 21 21:17 gimp
     -rw-r--r-- 1 root root 12 Feb 21 02:19 sysctl.d
+    -rw-r--r-- 1 root root 6 Feb 21 21:17 gimp
+    drwxr-xr-x 1 root root 3 Feb 21 09:48 papersize
+    drwxr-xr-x 1 root root 0 Jun 13 20:38 subgid
+    
     
 #### About nice outputs
 There is a utterly sick trick, how to concat two values in select expression. Write them without space. No, we are not joking. Never.
