@@ -55,45 +55,76 @@ It will install the dependecies for you.
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
       ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
       
-      AGGREGATE_FUNCTION -> SUM
-      AGGREGATE_FUNCTION -> COUNT
-      AGGREGATE_FUNCTION -> MAX
-      AGGREGATE_FUNCTION -> MIN
-      AGGREGATE_FUNCTION -> AVG
+      AGGREGATE_FUNCTION -> sum
+      AGGREGATE_FUNCTION -> count
+      AGGREGATE_FUNCTION -> man
+      AGGREGATE_FUNCTION -> min
+      AGGREGATE_FUNCTION -> avg
       
-      ONEARG_FUNCTION -> SIN
-      ONEARG_FUNCTION -> COS
-      ONEARG_FUNCTION -> TAN
+      ONEARG_FUNCTION -> sin
+      ONEARG_FUNCTION -> cos
+      ONEARG_FUNCTION -> tan
       
-      ONEARG_FUNCTION -> ASIN
-      ONEARG_FUNCTION -> ACOS
-      ONEARG_FUNCTION -> ATAN
+      ONEARG_FUNCTION -> asin
+      ONEARG_FUNCTION -> acos
+      ONEARG_FUNCTION -> atan
       
-      ONEARG_FUNCTION -> SINH
-      ONEARG_FUNCTION -> COSH
-      ONEARG_FUNCTION -> TANH
+      ONEARG_FUNCTION -> sinh
+      ONEARG_FUNCTION -> cosh
+      ONEARG_FUNCTION -> tanh
       
-      ONEARG_FUNCTION -> ASINH
-      ONEARG_FUNCTION -> ACOSH
-      ONEARG_FUNCTION -> ATANH
+      ONEARG_FUNCTION -> asinh
+      ONEARG_FUNCTION -> acosh
+      ONEARG_FUNCTION -> atanh
       
-      ONEARG_FUNCTION -> EXP
-      ONEARG_FUNCTION -> SQRT
+      ONEARG_FUNCTION -> exp
+      ONEARG_FUNCTION -> sqrt
       
-      ONEARG_FUNCTION -> SIZE
-      ONEARG_FUNCTION -> TO_STRING
+      ONEARG_FUNCTION -> size
+      ONEARG_FUNCTION -> to_string
       
-      ONEARG_FUNCTION -> NEGATE
-      ONEARG_FUNCTION -> ABS
-      ONEARG_FUNCTION -> SIGNUM
+      ONEARG_FUNCTION -> negate
+      ONEARG_FUNCTION -> abs
+      ONEARG_FUNCTION -> signum
       
-      ONEARG_FUNCTION -> ROUND
-      ONEARG_FUNCTION -> TRUNCATE
-      ONEARG_FUNCTION -> CEILING
-      ONEARG_FUNCTION -> FLOOR
+      ONEARG_FUNCTION -> round
+      ONEARG_FUNCTION -> truncate
+      ONEARG_FUNCTION -> ceiling
+      ONEARG_FUNCTION -> floor
       
-      ONEARG_FUNCTION -> EVEN
-      ONEARG_FUNCTION -> ODD
+      ONEARG_FUNCTION -> even
+      ONEARG_FUNCTION -> odd
+      
+      TWOARG_FUNCTION -> in
+      
+      TWOARG_FUNCTION -> *
+      TWOARG_FUNCTION -> **    //general power
+      TWOARG_FUNCTION -> ^     //natural power
+      TWOARG_FUNCTION -> /
+      
+      TWOARG_FUNCTION -> div
+      TWOARG_FUNCTION -> quot
+      TWOARG_FUNCTION -> rem
+      TWOARG_FUNCTION -> mod
+      TWOARG_FUNCTION -> gcd
+      TWOARG_FUNCTION -> lcm
+      
+      TWOARG_FUNCTION -> ++    //append
+      
+      TWOARG_FUNCTION -> +
+      TWOARG_FUNCTION -> -
+      
+      TWOARG_FUNCTION -> =>=   //left outer join - not working yet
+      
+      TWOARG_FUNCTION -> <=
+      TWOARG_FUNCTION -> >=
+      TWOARG_FUNCTION -> <
+      TWOARG_FUNCTION -> >
+      TWOARG_FUNCTION -> !=
+      TWOARG_FUNCTION -> ==
+      
+      TWOARG_FUNCTION -> ||
+      TWOARG_FUNCTION -> &&
       
 
 
