@@ -551,7 +551,7 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Avg args))) =
     evaled :: Printable
     evaled = eval symbol_map$
       evalAggregateFunctions symbol_map$ Function$ AritmeticF$ 
-      Div (Function$ AggregateF$ Sum$ args) (Function$ AggregateF$ Count$ args)
+      Divide (Function$ AggregateF$ Sum$ args) (Function$ AggregateF$ Count$ args)
 
     doAvg :: Printable -> Value
     doAvg (ValueP value) = value
