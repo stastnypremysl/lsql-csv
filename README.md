@@ -315,7 +315,7 @@ Each column have number and may have name. If the source is file and have been g
 
 Each command is made from blocks separated by comma. There are these types of blocks.
 
-If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`
+If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 #### Exotic chars
 There are some chars which can't be in symbol names (column names). For simplicity, you can suppose, they are everything but alphanumerical chars excluding `-` and `_`.
