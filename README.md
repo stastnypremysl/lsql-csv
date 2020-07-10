@@ -55,6 +55,7 @@ It will install the dependecies for you.
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
       ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
       
+      AGGREGATE_FUNCTION -> cat
       AGGREGATE_FUNCTION -> sum
       AGGREGATE_FUNCTION -> count
       AGGREGATE_FUNCTION -> man
@@ -308,11 +309,18 @@ This will cat all groups in one line delimeted by ", ". But I want there also de
 What a nice oneliner (twoliner)! Try it yourself!
 
 ### Documantion of language
+We suppose, you have already read everything before this section and you understood it.
+
 Each column have number and may have name. If the source is file and have been given a name XXX by a user and can be addressed by XXX.N or XXX.NAME. It can be also addressed using &M.N syntax, where M is m-th input file or stdio.
 
 Each command is made from blocks separated by comma. There are these types of blocks.
 
 If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`
+
+#### Exotic chars
+There are some chars which can't be in symbol names (column names). For simplicity, you can suppose, they are everything but alphanumerical chars excluding `-` and `_`.
+
+These chars can be used for fast appending. If two atoms are written without space and can be separated by compiler using the exotic chars, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
 
 #### Select blocks
 These blocks determine output. They are similar to bash expressions. They are made by statements separeted by whitespaces. These statements are expanded, evaluated, matched to column name and printed in delimitered format.
@@ -321,9 +329,9 @@ Each statement can consist
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
 * Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
 * Aritmetic expression in `$(expr)` format
-* Quotes "anything" to prevent wildcards, expansions and matching (NOT SUPPORTED YET)
+* Quotes "anything" to prevent wildcards, expansions and matching
 * Overnaming (alias) in format `NAME=stmt` (NOT SUPPORTED YET)
-* Call of aggregate function `FUNCTION(next select block)` - there can't be any space after FUNCTION
+* Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there can't be any space after FUNCTION
 
 Examples of select blocks:
 
@@ -336,6 +344,7 @@ This will print column 3, 4, 5 and 6 from first file.
 This will print 6th, 5th, 4th of all files which name begins with ax.
 
 If you want to concatenate strings without cat, you can write `a.1","a.2`.
+
 #### From blocks
 There must be exactly one from block (possibly empty) in the beginning of the command. The block can contain any files (and stdio in `-` format). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
 
@@ -374,7 +383,7 @@ Example:
     /etc/passwd -d:
     
 ### If block
-This block always begins with if. The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /, div, %. You must also quote all string, or they can be behaved as numbers.
+This block always begins with if. The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /, div, mod,... You must also quote all string, or they can be behaved as numbers.
 
 There are also new nonstandard keywords:
 * `A in B` - means that A is substring of B
@@ -389,5 +398,3 @@ You can imagine by block as the group by clausule in SQL.
 
 ### Sort
 This block can be at the end of the command. It begins with `sort` keyword and the rest is almost the same as the select block.
-
-IN FUTURE: If you want numeric sorting instead of alphabetical sorting, you can add `-n` attribute after sort. If you want descendent sort, use `-D` attribute after sort.
