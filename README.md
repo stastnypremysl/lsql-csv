@@ -20,6 +20,82 @@ It will install the dependecies for you.
 ## Usage
 
     lsql-csv [OPTIONS] COMMAND
+    
+    Approximate scatch of the grammar
+    
+      COMMAND -> FROM_BLOCK, REST
+    
+      REST -> SELECT_BLOCK, REST
+      REST -> BY_BLOCK, REST
+      REST -> SORT_BLOCK, REST
+      REST -> IF_BLOCK, REST
+      REST ->
+    
+      FROM_BLOCK ~~> SELECT_EXPR  //not really, but similar princips
+      
+      SELECT_BLOCK -> SELECT_EXPR
+      BY_BLOCK -> by SELECT_EXPR
+      SORT_BLOCK -> sort SELECT_EXPR
+      IF_BLOCK -> if ARITMETIC_EXPR
+    
+ 
+      ARITMETIC_EXPR -> ATOM
+      ARITMETIC_EXPR -> ONEARG_FUNCTION(ARITMETIC_EXPR)
+      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_FUNCTION
+      ARITMETIC_EXPR -> (ARITMETIC_EXPR)
+      
+      SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
+      SELECT_EXPR ->
+      
+      ATOM_SELECTOR ~~> ATOM ... ATOM   //Wildcard and expansion magic
+      
+      ATOM -> CONSTANT
+      ATOM -> COL_SYMBOL
+      ATOM -> $(ARITMETIC_EXPR)
+      ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
+      ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
+      
+      AGGREGATE_FUNCTION -> SUM
+      AGGREGATE_FUNCTION -> COUNT
+      AGGREGATE_FUNCTION -> MAX
+      AGGREGATE_FUNCTION -> MIN
+      AGGREGATE_FUNCTION -> AVG
+      
+      ONEARG_FUNCTION -> SIN
+      ONEARG_FUNCTION -> COS
+      ONEARG_FUNCTION -> TAN
+      
+      ONEARG_FUNCTION -> ASIN
+      ONEARG_FUNCTION -> ACOS
+      ONEARG_FUNCTION -> ATAN
+      
+      ONEARG_FUNCTION -> SINH
+      ONEARG_FUNCTION -> COSH
+      ONEARG_FUNCTION -> TANH
+      
+      ONEARG_FUNCTION -> ASINH
+      ONEARG_FUNCTION -> ACOSH
+      ONEARG_FUNCTION -> ATANH
+      
+      ONEARG_FUNCTION -> EXP
+      ONEARG_FUNCTION -> SQRT
+      
+      ONEARG_FUNCTION -> SIZE
+      ONEARG_FUNCTION -> TO_STRING
+      
+      ONEARG_FUNCTION -> NEGATE
+      ONEARG_FUNCTION -> ABS
+      ONEARG_FUNCTION -> SIGNUM
+      
+      ONEARG_FUNCTION -> ROUND
+      ONEARG_FUNCTION -> TRUNCATE
+      ONEARG_FUNCTION -> CEILING
+      ONEARG_FUNCTION -> FLOOR
+      
+      ONEARG_FUNCTION -> EVEN
+      ONEARG_FUNCTION -> ODD
+      
+
 
 ### Options
 
