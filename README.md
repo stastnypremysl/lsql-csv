@@ -136,18 +136,18 @@ It will install the dependecies for you.
 
 Enables first line naming convension in csv files.
     
-    -d CHAR
-    --delimiter CHAR
+    -dCHAR
+    --delimiter=CHAR
 
 Changes default primary delimiter. The default value is ';'.
 
-    -s CHAR
-    --secondary-delimiter CHAR
+    -sCHAR
+    --secondary-delimiter=CHAR
     
 Changes default secondary delimiter. The default value is ','. It is used for arrays in csv files.
 
-    -q CHAR
-    --quote CHAR
+    -qCHAR
+    --quote=CHAR
     
 This changes default quote char. The default value is '"'.
 
