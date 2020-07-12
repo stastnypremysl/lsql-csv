@@ -65,6 +65,7 @@ rowP delimiter sec_delimiter = do
     term_p :: Parser String
     term_p = do 
       ret <- cell_p
+      skipMany$ oneOf " \t"
       char '\n'
       return ret
 

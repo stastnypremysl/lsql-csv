@@ -27,5 +27,6 @@ csvGenerate sep sec_sep cols =
       where 
         doubleSecSep :: String -> String
         doubleSecSep [] = []
-        doubleSecSep (sec_sep : rest) = sec_sep : sec_sep : doubleSecSep rest
-        double (a : rest) = a : doubleSecSep rest
+        doubleSecSep (a : rest)
+          | sec_sep == a = sec_sep : sec_sep : doubleSecSep rest
+          | otherwise = a : doubleSecSep rest
