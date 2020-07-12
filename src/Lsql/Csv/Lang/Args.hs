@@ -46,6 +46,7 @@ argCmdP = do
 argP :: Parser Arg
 argP = do
   ret <- (try argOptionP)
+  skipMany space
   return ret
 
 fullP :: Parser [Arg]
