@@ -144,12 +144,7 @@ Changes default primary delimiter. The default value is ';'.
     -sCHAR
     --secondary-delimiter=CHAR
     
-Changes default secondary delimiter. The default value is ','. It is used for arrays in csv files.
-
-    -qCHAR
-    --quote=CHAR
-    
-This changes default quote char. The default value is '"'.
+Changes default default quote char (secondary delimiter). The default value is '"'.
 
 
 ## LSQL - quick introduction 
