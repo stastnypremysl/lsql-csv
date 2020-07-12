@@ -1,4 +1,7 @@
-all: build
+all: compile test
+
+.PHONY: compile
+compile: build
 	ghc -j`nproc` -i./src --make -O3 -o ./build/lsql-csv ./src/Main.hs
 
 .PHONY: debug
@@ -15,3 +18,11 @@ install:
 .PHONY: clean
 clean:
 	git clean -Xf; rm -r ./build
+
+.PHONY: test
+test: compile test-sec-delimiter
+	echo "All tests succedded."
+
+test-sec-delimiter: compile
+	./tests/secondary-delimiter
+		
