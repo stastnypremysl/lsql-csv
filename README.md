@@ -363,8 +363,8 @@ It means that csv file have first line with names of columns
 
 You can also set the exact opposite. This can be useful, if you changed the default behavior.
 
-    -d CHAR
-    --delimiter CHAR
+    -dCHAR
+    --delimiterCHAR
     
 This change the primary delimiter.
 
