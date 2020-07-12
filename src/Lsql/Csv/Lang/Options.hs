@@ -11,25 +11,8 @@ import Text.Parsec.Char
 
 char_option_p :: Parser Char
 char_option_p = do
-  ret <- q1 <|> q2 <|> q3
+  ret <- anyChar
   return ret
-
-  where
-    q1 = do
-      char '"'
-      r <- anyChar
-      char '"'
-      return r
-    
-    q2 = do
-      char '\''
-      r <- anyChar
-      char '\''
-      return r
-
-    q3 = do
-      r <- anyChar
-      return r
 
 
 delOp :: String -> Parser Char
@@ -48,9 +31,6 @@ secondaryDelOp = do
   r <- (try$ delOp "-s") <|> delOp "--secondary-delimiter="
   return $ SecondaryDelimiter r
 
-quoteOp = do
-  r <- (try$ delOp "-q") <|> delOp "--quote="
-  return $ Quote r
 
 notNamedOp = do
   (try$ string "-N") <|> string "--not-named"
@@ -65,4 +45,4 @@ nameOp = do
   return $ Named r
 
 optionParser :: Parser Option
-optionParser = (try primaryDelOp) <|> (try secondaryDelOp) <|> (try quoteOp) <|> nameOp
+optionParser = (try primaryDelOp) <|> (try secondaryDelOp) <|> nameOp
