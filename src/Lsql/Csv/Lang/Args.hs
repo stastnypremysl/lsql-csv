@@ -27,7 +27,7 @@ load_ag (Program a1 a2 a3 a4) (Opt (Named c) : rest) = load_ag (Program a1 a2 a3
 
 load_args :: [Arg] -> Program
 load_args args = 
-  load_ag (Program "" ';' ',' False) args
+  load_ag (Program "" ';' '"' False) args
 
 reloadOpts :: Program -> [Option] -> Program
 reloadOpts pg ops = load_ag pg$ map (Opt) ops
