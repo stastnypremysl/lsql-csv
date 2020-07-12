@@ -20,7 +20,7 @@ clean:
 	git clean -Xf; rm -r ./build
 
 .PHONY: test
-test: compile test-sec-delimiter test-named
+test: compile test-sec-delimiter test-named test-aritmetics test-grouping
 	echo "All tests succedded."
 
 .PHONY: test-sec-delimiter
@@ -31,3 +31,11 @@ test-sec-delimiter: compile
 test-named: compile
 	./tests/named
 		
+.PHONY: test-aritmetics
+test-aritmetics: compile
+	./tests/aritmetics
+
+
+.PHONY: test-grouping
+test-grouping: compile
+	./tests/grouping

@@ -298,7 +298,7 @@ evalFunction sm (AritmeticF (In arg1 arg2)) =
     cq_in :: String -> String -> Bool
     cq_in [] [] = True
     cq_in _ [] = False
-    cq_in [] _ = False
+    cq_in [] _ = True
 
     cq_in (a : rest_a) (b : rest_b)
       | a == b = cq_in rest_a rest_b
@@ -310,9 +310,8 @@ evalFunction sm (AritmeticF (In arg1 arg2)) =
     is_in a b 
       | cq_in a b == True = True
       | otherwise = 
-          let (_ : rest_a) = a in 
           let (_ : rest_b) = b in 
-          is_in rest_a rest_b
+          is_in a rest_b
 
 
 evalFunction sm (AggregateF _) =
