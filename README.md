@@ -368,10 +368,10 @@ You can also set the exact opposite. This can be useful, if you changed the defa
     
 This change the primary delimiter.
 
-    -q CHAR
-    --quote CHAR
+    -sCHAR
+    --secondary-delimiter=CHAR
     
-This change the quote char.
+This change the secondary delimiter char.
 
 Example:
 
