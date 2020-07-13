@@ -58,7 +58,7 @@ It will install the dependecies for you.
       AGGREGATE_FUNCTION -> cat
       AGGREGATE_FUNCTION -> sum
       AGGREGATE_FUNCTION -> count
-      AGGREGATE_FUNCTION -> man
+      AGGREGATE_FUNCTION -> max
       AGGREGATE_FUNCTION -> min
       AGGREGATE_FUNCTION -> avg
       
