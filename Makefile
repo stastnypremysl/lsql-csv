@@ -1,6 +1,10 @@
-DESTDIR=/usr/local/bin
+ifdef DESTDIR
+install_dir=$(DESTDIR)/usr/bin
+else
+install_dir=/usr/local/bin
+endif
 
-all: compile test
+all: compile
 
 .PHONY: compile
 compile: build
@@ -15,7 +19,8 @@ build:
 
 .PHONY: install
 install:
-	cp build/lsql-csv ${DESTDIR}
+	mkdir -p $(install_dir)
+	cp build/lsql-csv $(install_dir)
 
 .PHONY: clean
 clean:
