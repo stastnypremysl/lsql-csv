@@ -1,6 +1,6 @@
 DESTDIR=/usr/local/bin
 
-all: compile test
+all: compile
 
 .PHONY: compile
 compile: build
