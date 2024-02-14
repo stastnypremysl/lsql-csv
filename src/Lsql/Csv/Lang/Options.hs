@@ -41,7 +41,7 @@ namedOp = do
   return True
 
 nameOp = do
-  r <- namedOp <|> notNamedOp
+  r <- (try$ namedOp) <|> notNamedOp
   return $ Named r
 
 optionParser :: Parser Option

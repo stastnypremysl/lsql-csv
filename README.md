@@ -1,181 +1,51 @@
 # lsql-csv
-Lapidary Structured Query Language implementation for csv files. The tool for fast text data manipulation.
+`lsql-csv` is a tool for CSV files data querying from shell with short queries. It makes possible to work with small CSV files like with read-only relational database.
 
-The project is now under development and the syntax can be futher changed. 
+The tool implements a new language LSQL similar to SQL, which is typeless, specifically designed for working with CSV files in shell. 
 
 ## Installation
-It is necessary, you had GHC (>8), Parsec (>3) and Glob (Haskell package) installed. Run then
+It is necessary, you had GHC (>8), Parsec (>3) and Glob (Haskell package >=, <) installed. Run then
 
     make
     sudo make install
     
-Now should be lcsv installed in `/usr/local/bin`.
+Now the lsql-csv is installed in `/usr/local/bin`.
 
 If you have installed `cabal`, you can alternativaly run
 
     cabal install
    
-It will install the dependecies for you.    
-
-## Usage
-
-    lsql-csv [OPTIONS] COMMAND
-    
-    Approximate scatch of the grammar
-    
-      COMMAND -> FROM_BLOCK, REST
-    
-      REST -> SELECT_BLOCK, REST
-      REST -> BY_BLOCK, REST
-      REST -> SORT_BLOCK, REST
-      REST -> IF_BLOCK, REST
-      REST ->
-    
-      FROM_BLOCK ~~> SELECT_EXPR  //not really, but similar princips
-      
-      SELECT_BLOCK -> SELECT_EXPR
-      BY_BLOCK -> by SELECT_EXPR
-      SORT_BLOCK -> sort SELECT_EXPR
-      IF_BLOCK -> if ARITMETIC_EXPR
-    
- 
-      ARITMETIC_EXPR -> ATOM
-      ARITMETIC_EXPR -> ONEARG_FUNCTION(ARITMETIC_EXPR)
-      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_FUNCTION
-      ARITMETIC_EXPR -> (ARITMETIC_EXPR)
-      
-      SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
-      SELECT_EXPR ->
-      
-      ATOM_SELECTOR ~~> ATOM ... ATOM   //Wildcard and expansion magic
-      
-      ATOM -> CONSTANT
-      ATOM -> COL_SYMBOL
-      ATOM -> $(ARITMETIC_EXPR)
-      ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
-      ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
-      
-      AGGREGATE_FUNCTION -> cat
-      AGGREGATE_FUNCTION -> sum
-      AGGREGATE_FUNCTION -> count
-      AGGREGATE_FUNCTION -> max
-      AGGREGATE_FUNCTION -> min
-      AGGREGATE_FUNCTION -> avg
-      
-      ONEARG_FUNCTION -> sin
-      ONEARG_FUNCTION -> cos
-      ONEARG_FUNCTION -> tan
-      
-      ONEARG_FUNCTION -> asin
-      ONEARG_FUNCTION -> acos
-      ONEARG_FUNCTION -> atan
-      
-      ONEARG_FUNCTION -> sinh
-      ONEARG_FUNCTION -> cosh
-      ONEARG_FUNCTION -> tanh
-      
-      ONEARG_FUNCTION -> asinh
-      ONEARG_FUNCTION -> acosh
-      ONEARG_FUNCTION -> atanh
-      
-      ONEARG_FUNCTION -> exp
-      ONEARG_FUNCTION -> sqrt
-      
-      ONEARG_FUNCTION -> size
-      ONEARG_FUNCTION -> to_string
-      
-      ONEARG_FUNCTION -> negate
-      ONEARG_FUNCTION -> abs
-      ONEARG_FUNCTION -> signum
-      
-      ONEARG_FUNCTION -> round
-      ONEARG_FUNCTION -> truncate
-      ONEARG_FUNCTION -> ceiling
-      ONEARG_FUNCTION -> floor
-      
-      ONEARG_FUNCTION -> even
-      ONEARG_FUNCTION -> odd
-      
-      TWOARG_FUNCTION -> in
-      
-      TWOARG_FUNCTION -> *
-      TWOARG_FUNCTION -> **    //general power
-      TWOARG_FUNCTION -> ^     //natural power
-      TWOARG_FUNCTION -> /
-      
-      TWOARG_FUNCTION -> div
-      TWOARG_FUNCTION -> quot
-      TWOARG_FUNCTION -> rem
-      TWOARG_FUNCTION -> mod
-      TWOARG_FUNCTION -> gcd
-      TWOARG_FUNCTION -> lcm
-      
-      TWOARG_FUNCTION -> ++    //append
-      
-      TWOARG_FUNCTION -> +
-      TWOARG_FUNCTION -> -
-      
-      TWOARG_FUNCTION -> =>=   //left outer join - not working yet
-      
-      TWOARG_FUNCTION -> <=
-      TWOARG_FUNCTION -> >=
-      TWOARG_FUNCTION -> <
-      TWOARG_FUNCTION -> >
-      TWOARG_FUNCTION -> !=
-      TWOARG_FUNCTION -> ==
-      
-      TWOARG_FUNCTION -> ||
-      TWOARG_FUNCTION -> &&
-      
+It will also install the dependecies for you.    
 
 
-### Options
+## lsql-csv - quick introduction 
+LSQL, the language of `lsql-csv`, aims to be more lapidary language than SQL. The design purpose of it is to enable it's user to fast write simple queries directly to the terminal - it's design purpose is therefore different from SQL, where readability of queries is more taken in account than in LSQL.
 
-    -n
-    --named
-
-Enables first line naming convension in csv files.
-    
-    -dCHAR
-    --delimiter=CHAR
-
-Changes default primary delimiter. The default value is ';'.
-
-    -sCHAR
-    --secondary-delimiter=CHAR
-    
-Changes default default quote char (secondary delimiter). The default value is '"'.
-
-
-## LSQL - quick introduction 
-SQL is really pleonastic language. It can be fine to use it for critical mission projects, because your code will be easy to read. But when you are trying to use it as write-only scripting language for your daily life, you will find yourself writting a lot of useless pieces of code. And here comes LSQL.
+One of the way, how to learn the new programming language is by understanding many concrete examples of its usage. The following examples are written explicitly for the purpose - to learn a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
 
 ### Examples
-We will show a few interesting examples of usage of the language in this implementation. If you have installed lsql-csv, you can try this yourself in your shell.
 
-#### Hello World...almost
+#### Hello World
 
     lsql-csv '-, &1.2 &1.1'
 
 This will print second and first column of csv file on stdin. You can read it like `from stdio S select S.second, S.first`. 
 
-So, as you can see, the first block is (*and always is*) the from block. There are file names or `-` separated by space. The second block is the select block, also separated by space.
+So, as you can see, the first block is (*and always is*) the from block. There are file names or `-` (stdin) separated by space. The second block is the select block, also separated by space.
 
 For example
 
     lsql-csv '-, &1.2 &1.1' <<- EOF
-    a;b
-    b;c
+    World;Hello
     EOF
     
 Returns
     
-    b;a
-    c;b
+    Hello;World
 
 #### Simple filtering 
     lsql-csv -d: '-, &1.*, if &1.3>=1000' < /etc/passwd
-    
+
 This will print lines of users whose UID >=1000. It can be also written as
   
     lsql-csv -d: 'p=/etc/passwd, p.*, if p.3 >= 1000'
@@ -303,6 +173,137 @@ This will cat all groups in one line delimeted by ", ". But I want there also de
     
 What a nice oneliner (twoliner)! Try it yourself!
 
+
+
+## Usage
+
+    lsql-csv [OPTIONS] COMMAND
+    
+    Approximate scatch of the grammar
+    
+      COMMAND -> FROM_BLOCK, REST
+    
+      REST -> SELECT_BLOCK, REST
+      REST -> BY_BLOCK, REST
+      REST -> SORT_BLOCK, REST
+      REST -> IF_BLOCK, REST
+      REST ->
+    
+      FROM_BLOCK ~~> SELECT_EXPR  //not really, but similar princips
+      
+      SELECT_BLOCK -> SELECT_EXPR
+      BY_BLOCK -> by SELECT_EXPR
+      SORT_BLOCK -> sort SELECT_EXPR
+      IF_BLOCK -> if ARITMETIC_EXPR
+    
+ 
+      ARITMETIC_EXPR -> ATOM
+      ARITMETIC_EXPR -> ONEARG_FUNCTION(ARITMETIC_EXPR)
+      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_FUNCTION
+      ARITMETIC_EXPR -> (ARITMETIC_EXPR)
+      
+      SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
+      SELECT_EXPR ->
+      
+      ATOM_SELECTOR ~~> ATOM ... ATOM   //Wildcard and expansion magic
+      
+      ATOM -> CONSTANT
+      ATOM -> COL_SYMBOL
+      ATOM -> $(ARITMETIC_EXPR)
+      ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
+      ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
+      
+      AGGREGATE_FUNCTION -> cat
+      AGGREGATE_FUNCTION -> sum
+      AGGREGATE_FUNCTION -> count
+      AGGREGATE_FUNCTION -> max
+      AGGREGATE_FUNCTION -> min
+      AGGREGATE_FUNCTION -> avg
+      
+      ONEARG_FUNCTION -> sin
+      ONEARG_FUNCTION -> cos
+      ONEARG_FUNCTION -> tan
+      
+      ONEARG_FUNCTION -> asin
+      ONEARG_FUNCTION -> acos
+      ONEARG_FUNCTION -> atan
+      
+      ONEARG_FUNCTION -> sinh
+      ONEARG_FUNCTION -> cosh
+      ONEARG_FUNCTION -> tanh
+      
+      ONEARG_FUNCTION -> asinh
+      ONEARG_FUNCTION -> acosh
+      ONEARG_FUNCTION -> atanh
+      
+      ONEARG_FUNCTION -> exp
+      ONEARG_FUNCTION -> sqrt
+      
+      ONEARG_FUNCTION -> size
+      ONEARG_FUNCTION -> to_string
+      
+      ONEARG_FUNCTION -> negate
+      ONEARG_FUNCTION -> abs
+      ONEARG_FUNCTION -> signum
+      
+      ONEARG_FUNCTION -> round
+      ONEARG_FUNCTION -> truncate
+      ONEARG_FUNCTION -> ceiling
+      ONEARG_FUNCTION -> floor
+      
+      ONEARG_FUNCTION -> even
+      ONEARG_FUNCTION -> odd
+      
+      TWOARG_FUNCTION -> in
+      
+      TWOARG_FUNCTION -> *
+      TWOARG_FUNCTION -> **    //general power
+      TWOARG_FUNCTION -> ^     //natural power
+      TWOARG_FUNCTION -> /
+      
+      TWOARG_FUNCTION -> div
+      TWOARG_FUNCTION -> quot
+      TWOARG_FUNCTION -> rem
+      TWOARG_FUNCTION -> mod
+      TWOARG_FUNCTION -> gcd
+      TWOARG_FUNCTION -> lcm
+      
+      TWOARG_FUNCTION -> ++    //append
+      
+      TWOARG_FUNCTION -> +
+      TWOARG_FUNCTION -> -
+      
+      TWOARG_FUNCTION -> =>=   //left outer join - not working yet
+      
+      TWOARG_FUNCTION -> <=
+      TWOARG_FUNCTION -> >=
+      TWOARG_FUNCTION -> <
+      TWOARG_FUNCTION -> >
+      TWOARG_FUNCTION -> !=
+      TWOARG_FUNCTION -> ==
+      
+      TWOARG_FUNCTION -> ||
+      TWOARG_FUNCTION -> &&
+      
+
+### Options
+
+    -n
+    --named
+
+Enables first line naming convension in csv files.
+    
+    -dCHAR
+    --delimiter=CHAR
+
+Changes default primary delimiter. The default value is ';'.
+
+    -sCHAR
+    --secondary-delimiter=CHAR
+    
+Changes default default quote char (secondary delimiter). The default value is '"'.
+
+
 ### Documantion of language
 We suppose, you have already read everything before this section and you understood it.
 
@@ -393,3 +394,5 @@ You can imagine by block as the group by clausule in SQL.
 
 ### Sort
 This block can be at the end of the command. It begins with `sort` keyword and the rest is almost the same as the select block.
+
+
