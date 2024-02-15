@@ -22,8 +22,8 @@ selectBP symbol_list = do
 ifBP :: [String] -> Parser Block
 ifBP symbol_list = do
   skipMany space
-  string "if "
-  skipMany space
+  string "if"
+  skipMany1 space
   ret <- aritmeticExprP symbol_list
   skipMany space
   return$ If ret
@@ -31,8 +31,8 @@ ifBP symbol_list = do
 sortBP :: [String] -> Parser Block
 sortBP symbol_list = do
   skipMany space
-  string "sort "
-  skipMany space
+  string "sort"
+  skipMany1 space
   ret <- selectorP symbol_list
   skipMany space
   return$ Sort ret
@@ -40,8 +40,8 @@ sortBP symbol_list = do
 byBP :: [String] -> Parser Block
 byBP symbol_list = do
   skipMany space
-  string "by "
-  skipMany space
+  string "by"
+  skipMany1 space
   ret <- selectorP symbol_list
   skipMany space
   return$ By ret

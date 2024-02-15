@@ -49,7 +49,7 @@ rowP :: Char -> Char -> Parser [String]
 rowP delimiter sec_delimiter = do
   ret_non_term <- many$ try not_term_p 
   ret_term <- term_p
-  skipMany$ oneOf " \t\n"
+  _ <- char '\n'
 
   return$ ret_non_term ++ [ret_term]
 
@@ -65,8 +65,6 @@ rowP delimiter sec_delimiter = do
     term_p :: Parser String
     term_p = do 
       ret <- cell_p
-      skipMany$ oneOf " \t"
-      char '\n'
       return ret
 
 
@@ -118,7 +116,7 @@ buildTableFromIn table_names named in_str =
 parseFile :: Assignment -> IO Table
 parseFile assignment = do
   file_content <- load_input
-  return$ parseTable (file_content ++ ['\n'])
+  return$ parseTable (file_content)
 
   where    
     load_input :: IO String

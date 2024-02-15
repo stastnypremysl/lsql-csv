@@ -24,7 +24,7 @@ import qualified Data.Text as T
 
 assignP :: Parser String
 assignP = do
-  ret <- many1$ noneOf "= \n"
+  ret <- many1$ noneOf "= \n\t"
   char '='
   return ret
 
@@ -39,7 +39,7 @@ exoticFileName = do
 
 wildCards :: Parser FileName
 wildCards = do
-  file_n <- many1$ noneOf " \n"
+  file_n <- many1$ noneOf " \n\t"
   return$ WildCards$ bracketExpand file_n
 
 data FileAssignment = 

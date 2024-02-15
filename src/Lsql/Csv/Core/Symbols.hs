@@ -37,7 +37,7 @@ symbolList (SymbolMap t_map _) = map (fst) (M.toList t_map)
 (-->) :: SymbolMap -> String -> Symbol
 (SymbolMap s_map _) --> name = 
   case M.lookup name s_map of
-    Nothing -> error$ "Symbol " ++ name ++ " not found. (It could be caused by empty output.)" 
+    Nothing -> error$ "Symbol " ++ name ++ " not found. " 
     Just s -> s
 
 (==>) :: SymbolMap -> String -> Column

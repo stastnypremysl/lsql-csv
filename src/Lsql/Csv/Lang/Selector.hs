@@ -92,6 +92,8 @@ oneArgFunctionsP symbol_list =
   (sinhP symbol_list) <|> (coshP symbol_list) <|> (tanhP symbol_list) <|>
   (asinhP symbol_list) <|> (acoshP symbol_list) <|> (atanhP symbol_list) <|>
 
+  (expP symbol_list) <|> (sqrtP symbol_list) <|> 
+
   (sizeP symbol_list) <|> (toStringP symbol_list) <|> 
 
   (negateP symbol_list) <|> (absP symbol_list) <|> (signumP symbol_list) <|>

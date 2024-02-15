@@ -215,7 +215,10 @@ columnNames (Table _ cols) =
 
 buildTable :: [String] -> [[String]] -> [[Value]] -> Table
 buildTable table_names names in_data =
-  Table table_names columns
+  if in_data /= [] then
+    Table table_names columns
+  else
+    Table table_names$ map (\c_names -> Column c_names []) names
 
   where
     trans_data = transpose $ in_data 
