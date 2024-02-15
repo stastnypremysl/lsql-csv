@@ -1,29 +1,38 @@
 # lsql-csv
 `lsql-csv` is a tool for CSV files data querying from shell with short queries. It makes possible to work with small CSV files like with read-only relational database.
 
-The tool implements a new language LSQL similar to SQL, which is typeless, specifically designed for working with CSV files in shell. 
+The tool implements a new language LSQL similar to SQL, which is type-less, specifically designed for working with CSV files in shell. 
 
 ## Installation
-It is necessary, you had GHC (>8), Parsec (>3) and Glob (Haskell package >=, <) installed. Run then
+It is necessary, you had GHC (`>=8 <9.29`), Parsec (`>=3.1 <3.2`) and Glob (`>=0.10, <0.11`) installed. Run then
 
     make
     sudo make install
     
 Now the lsql-csv is installed in `/usr/local/bin`.
 
-If you have installed `cabal`, you can alternativaly run
+If you have installed `cabal`, you can alternatively run
 
     cabal install
    
-It will also install the dependecies for you.    
+It will also install the dependencies for you.    
+
+### Running the unit tests
+If you want to verify, that the package has compiled correctly, it is possible to test it by running
+
+    make test
+
+This will run all unit tests for you.
 
 
 ## lsql-csv - quick introduction 
 LSQL, the language of `lsql-csv`, aims to be more lapidary language than SQL. The design purpose of it is to enable it's user to fast write simple queries directly to the terminal - it's design purpose is therefore different from SQL, where readability of queries is more taken in account than in LSQL.
 
-One of the way, how to learn the new programming language is by understanding many concrete examples of its usage. The following examples are written explicitly for the purpose - to learn a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
 
 ### Examples
+One of the way, how to learn the new programming language is by understanding many concrete examples of its usage. The following examples are written explicitly for the purpose - to learn a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
+
+The following examples might be not enough for reader, who don't know SQL or Unix/Linux scripting enough. If this is the case, please consider learning SQL and/or Unix/Linux scripting first before LSQL.
 
 #### Hello World
 
@@ -50,17 +59,27 @@ This will print lines of users whose UID >=1000. It can be also written as
   
     lsql-csv -d: 'p=/etc/passwd, p.*, if p.3 >= 1000'
     
-    lsql-csv -d: '/etc/passwd, *, if &1.3 >= 1000'
-    
-    lsql-csv '/etc/passwd -d:, *, if &1.3 >= 1000'
-    
-You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
+    lsql-csv -d: 'p=/etc/passwd, &1.*, if &1.3 >= 1000'
 
-The output can be 
+    lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000'
+    
+
+You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
+    
+The output might be 
 
     nobody:x:65534:65534:nobody:/var/empty:/bin/false
-    me:x:1000:1000::/home/p/me:/bin/bash
+    me:x:1000:1000::/home/me:/bin/bash
+
+If you specify delimiter specifically for `/etc/passwd`, the output will be comma delimetered.
     
+    lsql-csv '/etc/passwd -d:, &1.*, if &1.3 >= 1000'
+
+Might return
+
+    nobody;x;65534;65534;nobody;/var/empty;/bin/false
+    me;x;1000;1000;;/home/me;/bin/bash
+
 
 #### Simple join
 
@@ -68,7 +87,7 @@ Lets say, I am interested in the default group names of users. We need to join t
 
     lsql-csv -d: '/etc/{passwd,group}, &1.1 &2.1, if &1.4 == &2.3'
     
-Ogh, what does `/etc/{passwd,group}` mean? Basically, there are two-three types of expressions. Select (and from) expression and aritmethic expression. In all select blocks, you can use expansion and wildcards just like you were in bash.
+What does `/etc/{passwd,group}` mean? Basically, there are two-three types of expressions. Select (and from) expression and arithmetic expression. In all select blocks, you can use expansion and wildcards just like you were in bash.
     
 Finally, the output can be something like this
 
@@ -76,38 +95,39 @@ Finally, the output can be something like this
     bin:bin
     daemon:daemon
     me:me
+
+where first column is name of user and the second column is name of its default group.
     
 #### Basic grouping
-Let's say, I want do sum UIDs of users using the same terminal. /Why? Do I really need a reason?!/
+Let's say, I want do number of users using the same terminal. 
 
-    lsql-csv -d: 'p=/etc/passwd, p.7 sum(p.3), by p.7'
+    lsql-csv -d: 'p=/etc/passwd, p.7 count(p.3), by p.7'
     
 And the output?
 
-    /bin/bash:3003
-    /bin/false:65848
-    /bin/sync:5
-    /sbin/halt:7
-    /sbin/nologin:6536
-    /sbin/shutdown:6
+    /bin/bash:7
+    /bin/false:7
+    /bin/sh:1
+    /bin/sync:1
+    /sbin/halt:1
+    /sbin/nologin:46
+    /sbin/shutdown:1
     
-#### ...and what about using the POSIX...
-You might say: "Why the f\*\*k don't you support DESC sort?" It's easy.
+You can see here the first usage of `by` block, which is equivalent of `group by` in SQL. 
 
-1) We are lazy to implement it.
-2) Every operating system supports POSIX standard and we just love UNIX philosophy. (Windows IS NOT an OPERATING SYSTEM)
+#### Basic sorting
+Let's say, you want to sort your users with UID greater than or equal to 1000 descendingly.
 
-So, let's say, I want do sort the files in a folder from the largest to the smallest. Nothing is easier.
+    lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000, sort &1.3' | tac
 
-    ls -l /etc/ | sed 's/  */ /g' | lsql-csv -d" " '- , &1.* , sort &1.5 '|tac
-    
 The output might look like
   
-    -rw-r--r-- 1 root root 12 Feb 21 02:19 sysctl.d
-    -rw-r--r-- 1 root root 6 Feb 21 21:17 gimp
-    drwxr-xr-x 1 root root 3 Feb 21 09:48 papersize
-    drwxr-xr-x 1 root root 0 Jun 13 20:38 subgid
-    
+    nobody:x:65534:65534:nobody:/var/empty:/bin/false
+    me3:x:1002:1002::/home/me3:/bin/bash
+    me2:x:1001:1001::/home/me2:/bin/bash
+    me1:x:1000:1000::/home/me1:/bin/bash
+
+The sort block is the equivalent of `order by` in SQL. The `tac` command print the lines in reverse order.
     
 #### About nice outputs
 There is a utterly sick trick, how to concat two values in select expression. Write them without space. No, we are not joking. Never.
