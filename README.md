@@ -130,35 +130,59 @@ The output might look like
 The sort block is the equivalent of `order by` in SQL. The `tac` command print the lines in reverse order.
     
 #### About nice outputs
-There is a utterly sick trick, how to concat two values in select expression. Write them without space. No, we are not joking. Never.
+There is a trick, how to concat two values in select expression: Write them without space.
 
-But how the interpreter know the interpreter knows the ends of the value name or value expression? You must hint it!
-There are many ways how to do it using the exotic chars, but the most easy one is just write "".
+But how the interpreter know the interpreter knows the ends of the value name or value expression? You must use quotes for it - quotes itself can't be part of value name.
+As an example, let's try to format our basic grouping example.
 
 Let's try it!
 
-    lsql-csv '/dev/null, "I did not steal it...""I just borrowed it"'
+    lsql-csv -d: 'p=/etc/passwd, "The number of users of "p.7" is "count(p.3)".", by p.7
     
-The output is, as you might expect
+The output might be
+ 
+    The number of users of /bin/bash is 7.
+    The number of users of /bin/false is 7.
+    The number of users of /bin/sh is 1.
+    The number of users of /bin/sync is 1.
+    The number of users of /sbin/halt is 1.
+    The number of users of /sbin/nologin is 46.
+    The number of users of /sbin/shutdown is 1.
    
-    I did not steal it...I just borrowed it
+As you can see, string formatting is sometimes very simple with LSQL.
 
-#### About the engineering way of theorem proving
 
-Let's say you want to build a new bridge, but you aren't sure whether `sin(x)^2 + cos(x)^2` is really 1.
-To verify this theorem, we need to make, let's say, 10 experiments. Then we compute the average and if it is 1 plus minus 0.1, the theorem is true.
+#### Arithmetic expression
 
-The naive solution is just to write
+So far, we just met all kinds of blocks and only if block accepting arithmetic expression and the other accepting select expression. 
+What if we needed to run arithmetic expression inside select expression. There is a special syntax `$(...)` for it.
+
+For example
 
     lsql-csv -d: '/etc/passwd, $(sin(&1.3)^2 + cos(&1.3)^2)'
     
-Don't miss the new syntax here `$(...)`. This is the way, how you can insert arithmetic expression into the select expression. But you are too lazy to use your calculator, so you need to improve this program.
-
-    lsql-csv -d: '/etc/passwd, "sin(x)^2 + cos(x)^2 = "avg($(sin(&1.3)^2 + cos(&1.3)^2))'
+Returns something like
     
-And the output is, suprisingly
+    1.0
+    1.0
+    1.0
+    0.9999999999999999
+    ...
+    1.0
 
-    sin(x)^2 + cos(x)^2 = 1.0
+If we run
+    
+    lsql-csv -d: '/etc/passwd, $(&1.3 >= 1000), sort $(&1.3 >= 1000)'
+
+we get something like
+    false
+    false
+    ...
+    false
+    true
+    true
+    ...
+    true
 
 #### More complicated join
 
@@ -166,7 +190,7 @@ Let's see more complicated examples.
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
-This will print all all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
+This will print all pairs user <-> group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
 
 How does `in` works? It's one the basic string level "consist".
 
@@ -182,20 +206,38 @@ And the output?
 
 #### More complicated...
 
-But this will give not much readable output. We can use `group by` to improve it (shortened as `g`).
+The previos example don't give much readable output. We can use `group by` to improve it (shortened as `g`).
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1'
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1'
+
+The output will be something like
     
-This will cat all groups in one line delimeted by ", ". But I want there also default groups! How can it be done? Really easily.
+    adm:adm,disk,sys,
+    bin:bin,daemon,sys,
+    daemon:adm,bin,daemon,
+    lp:lp,
+    mythtv:audio,cdrom,tty,video,
+    news:news,
+    
+This will cat all groups in one line delimeted by ",". 
 
-    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1", "), if p.1 in g.4, by p.1' |
+How can we add default groups too?
+
+    lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1' |
     lsql-csv -d: '- /etc/passwd /etc/group, &1.1 &1.2""&3.1, if &1.1 == &2.1 && &2.4 == &3.3'
     
-What a nice oneliner (twoliner)! Try it yourself!
+This will output something like
 
+    adm:adm,disk,sys,adm
+    bin:bin,daemon,sys,bin
+    daemon:adm,bin,daemon,daemon
+    lp:lp,lp
+    mythtv:audio,cdrom,tty,video,mythtv
+    news:news,news
 
 
 ## Usage
+Now, if you understood the examples, is the time to move forward to more abstract description of the language and tool usage.
 
     lsql-csv [OPTIONS] COMMAND
     
@@ -225,13 +267,18 @@ What a nice oneliner (twoliner)! Try it yourself!
       SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
       SELECT_EXPR ->
       
-      ATOM_SELECTOR ~~> ATOM ... ATOM   //Wildcard and expansion magic
+      ATOM_SELECTOR ~~> ATOM ... ATOM   // Wildcard and expansion magic
       
       ATOM -> CONSTANT
       ATOM -> COL_SYMBOL
       ATOM -> $(ARITMETIC_EXPR)
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
-      ATOM -> ATOM#ATOM     //# is not really char...two atoms can be written without space and will be appended, if they can be separated by compiler using exotic chars
+
+      // # is not really char:
+      // two atoms can be written without space and will be appended, 
+      // if they can be separated by compiler using exotic chars
+      ATOM -> ATOM#ATOM     
+
       
       AGGREGATE_FUNCTION -> cat
       AGGREGATE_FUNCTION -> sum
@@ -293,8 +340,6 @@ What a nice oneliner (twoliner)! Try it yourself!
       TWOARG_FUNCTION -> +
       TWOARG_FUNCTION -> -
       
-      TWOARG_FUNCTION -> =>=   //left outer join - not working yet
-      
       TWOARG_FUNCTION -> <=
       TWOARG_FUNCTION -> >=
       TWOARG_FUNCTION -> <
@@ -322,6 +367,10 @@ Changes default primary delimiter. The default value is ';'.
     --secondary-delimiter=CHAR
     
 Changes default default quote char (secondary delimiter). The default value is '"'.
+
+### Datatypes
+There are 4 datatypes considered: Bool, Int, Float, String. 
+
 
 
 ### Documantion of language
