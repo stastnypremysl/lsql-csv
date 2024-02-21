@@ -66,7 +66,9 @@ evaluate symbol_map blocks =
 
      
     aggregated :: Bool
-    aggregated = foldl1 (||)$ map containsAggregateF selects
+    aggregated 
+      | null selects = False
+      | otherwise = foldl1 (||)$ map containsAggregateF selects
 
     sort_by :: [Arg]
     sort_by = getSort blocks

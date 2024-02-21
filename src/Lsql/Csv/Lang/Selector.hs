@@ -172,9 +172,6 @@ plusP symbol_list arg =
 minusP symbol_list arg = 
   try$ twoArgInFP 3 (aritmeticF2Gen Minus) "-" symbol_list arg
 
-leftOuterJoinP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen LeftOuterJoin) "=>=" symbol_list arg
-
 lessOrEqualP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen LessOrEqual) "<=" symbol_list arg
 
@@ -214,7 +211,6 @@ twoArgInFunctions3P symbol_list arg =
 
 twoArgInFunctions4P :: [String] -> Arg -> Parser Arg
 twoArgInFunctions4P symbol_list arg = 
-  (leftOuterJoinP symbol_list arg) <|>
     (lessOrEqualP symbol_list arg) <|> (moreOrEqualP symbol_list arg) <|>
     (lessP symbol_list arg) <|> (moreP symbol_list arg) <|>
     (notEqualP symbol_list arg) <|> (equalP symbol_list arg)

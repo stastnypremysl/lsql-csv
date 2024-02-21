@@ -289,6 +289,7 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ATOM -> COL_SYMBOL
       ATOM -> $(ARITMETIC_EXPR)
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
+      ATOM -> ONEARG_FUNCTION(SELECT_EXPR)
 
       // # is not really char:
       // two atoms can be written without space and will be (string) appended, 
@@ -338,6 +339,7 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ONEARG_FUNCTION -> even
       ONEARG_FUNCTION -> odd
       
+      // A in B means A is a substring of B
       TWOARG_FUNCTION -> in
       
       TWOARG_FUNCTION -> *
@@ -416,7 +418,8 @@ If there is collision in naming (two source file have same name or two columns u
 If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 #### Exotic chars
-There are some chars which can't be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. The behavior with referencing names containing exotic chars without queotes is undefined.
+There are some chars which can't be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. 
+The behavior with referencing names containing exotic chars without quotes is undefined.
 
 It is possible to reference columns with name with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of column name from the syntax perspective of language - it must be inside the quotes.
 
@@ -426,18 +429,29 @@ There are 3 quotes (\`, " and ') used in Lsql. " and ' are always quoting a stri
 These chars can be used for fast appending. If two atoms are written without space and are separated using the quotes, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
 
 #### Select expression
+They are similar to bash expressions. They are made by atom selector expressions separated by whitespaces. These expressions are expanded, evaluated and matched to column name, aggregate functions or arithmetic expressions.
 
-#### Arithmetic expression
-
-#### Select blocks
-These blocks determine output. They are similar to bash expressions. They are made by statements separated by whitespaces. These statements are expanded, evaluated, matched to column name and printed in delimitered format.
-
-Each statement can consist
+Every atom selector expression can consist
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
 * Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
-* Aritmetic expression in `$(expr)` format
-* Quotes "anything" to prevent wildcards, expansions and matching
+* Arithmetic expression in `$(expr)` format
+* Quotes \`anything\` to prevent wildcards and expansions
+* Quotes " or ' to insert string
 * Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there can't be any space after FUNCTION
+* Call of single arg function `ONEARG_FUNCTION(arithmetic expression)` - there can't be any space after FUNCTION
+* Reference to a column name
+
+Please, keep in mind, that all integers, floats and booleans constants and nonaggregate functions must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
+
+#### Arithmetic expression
+The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /, div, mod,... You must also quote all string, or they can be behaved as numbers, booleans or matched to column names.
+
+The only significant difference with awk are two args functions, which are called like `5 mod 2`. 
+
+#### Select blocks
+These blocks determine output. They accept select expression and are evaluated and printed in delimitered format. 
+
+Every select block must contain at least one reference to column name, or behavior is undefined.
 
 Examples of select blocks:
 
@@ -452,7 +466,7 @@ This will print 6th, 5th, 4th of all files which name begins with ax.
 If you want to concatenate strings without cat, you can write `a.1","a.2`.
 
 #### From blocks
-There must be exactly one from block (possibly empty) in the beginning of the command. The block can contain any files (and stdio in `-` format). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
+There must be exactly one from block in the beginning of the command. The block can contain any files (and stdio in `-` format). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
 
 Example:
 
@@ -460,7 +474,9 @@ Example:
     
 This will select `/etc/passwd` and `/etc/group` file. They can be addressed ether as `&1` or `/etc/passwd`, and `&2` or `/etc/group`.
 
-You can also add custom attributes to files in formats `FILE -a "xyz" --attribute "z" -a;`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
+If `filename` is put inside \` quotes, no wildcard or expansion logic will apply to it.
+
+You can also add custom attributes to files in formats `FILE -a "xyz" --attribute="z" -a;`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
 
 ##### Possible attributes
     
@@ -475,7 +491,7 @@ It means that csv file have first line with names of columns
 You can also set the exact opposite. This can be useful, if you changed the default behavior.
 
     -dCHAR
-    --delimiterCHAR
+    --delimiter=CHAR
     
 This change the primary delimiter.
 
@@ -487,22 +503,22 @@ This change the secondary delimiter char.
 Example:
 
     /etc/passwd -d:
+
+Currently, CHARs, which are also quotes in Lsql, are not supported.
     
 ### If block
-This block always begins with if. The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /, div, mod,... You must also quote all string, or they can be behaved as numbers.
+This block always begins with if. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
 
-There are also new nonstandard keywords:
-* `A in B` - means that A is substring of B
-* `A.X =>= B.Y` - means that `A` is left outer joined on `B` with condition `A.X == B.Y` - *It can't be negated. Not supported yet.*
+Filtering is done before the aggregation.
 
-You can imagine if statement as where clausule in SQL.
+You can imagine if statement as where clause in SQL.
 
 ### By block
-This statement always begins with `by` and the rest of statement follows the same syntax as Select block. There can be only one By block in the whole command.
+This statement always begins with `by` and the rest of the block is select expression. There can be only one By block in the whole command.
 
-You can imagine by block as the group by clausule in SQL.
+You can imagine by block as the group by clause in SQL.
 
-### Sort
-This block can be at the end of the command. It begins with `sort` keyword and the rest is almost the same as the select block.
+### Sort block
+This block can be at the end of the command. It begins with `sort` keyword and the rest is select expression.
 
-
+You can imagine by sort as the order by clause in SQL.

@@ -50,12 +50,20 @@ stdinFileP = do
   char '-'
   return$ ExoticFileName "-"
 
+
+optionSpaceParser :: Parser Option
+optionSpaceParser = do
+  ret <- optionParser
+  many space
+  return$ ret
+
 unnamedFileP :: Parser FileAssignment
 unnamedFileP = do
   file_name <- stdinFileP <|> exoticFileName <|> wildCards
   many space
-  options <- many$ (try optionParser)
+  options <- many$ (try optionSpaceParser)
   return$ FileAssignment file_name options
+
 
 namedFileP :: Parser FileAssignment
 namedFileP = do

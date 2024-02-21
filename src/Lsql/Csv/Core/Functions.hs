@@ -129,8 +129,9 @@ appendPrintable a0 b0 =
 
 
 unionCols :: [[Printable]] -> [Printable]
-unionCols cols = 
-  foldl1 col2union cols
+unionCols cols 
+  | null cols = []
+  | otherwise = foldl1 col2union cols
 
   where 
     col2union :: [Printable] -> [Printable] -> [Printable]
@@ -530,10 +531,13 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Sum args))) =
 
     doSum :: Printable -> Value
     doSum (ValueP value) = error "You cannot sum constant."
-    doSum (ColumnP (Column _ vals)) = foldl1 (+) vals
+    doSum (ColumnP (Column _ vals)) 
+      | null vals = 0
+      | otherwise = foldl1 (+) vals
 
-evalAggregateFunctions symbol_map (Function (AggregateF (Count args))) =
-  Value$ foldl1 (+)$ map doCount evaled
+evalAggregateFunctions symbol_map (Function (AggregateF (Count args))) 
+  | null evaled = Value$ IntValue 0
+  | otherwise = Value$ foldl1 (+)$ map doCount evaled
 
   where 
     evaled :: [Printable]

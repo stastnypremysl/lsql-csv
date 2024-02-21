@@ -22,7 +22,7 @@ class Boolable a where
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
 
 instance Boolable Value where
-  getBool (IntValue v) = v == 0
+  getBool (IntValue v) = v /= 0
   getBool (DoubleValue _) = error "Double can't be converted to bool."
   getBool (BoolValue b) = b
   getBool (StringValue s)
