@@ -516,7 +516,11 @@ You can imagine if statement as where clause in SQL.
 ### By block
 This statement always begins with `by` and the rest of the block is select expression. There can be only one By block in the whole command.
 
-You can imagine by block as the group by clause in SQL.
+You can imagine by block as the group by clause in SQL. 
+
+There must be present at least one aggregate function in select block, if by block is present. Otherwise behavior is undefined.
+
+If there is an aggregate function present without by block present, aggregation runs over all rows at once.
 
 ### Sort block
 This block can be at the end of the command. It begins with `sort` keyword and the rest is select expression.
