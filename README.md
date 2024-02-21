@@ -4,7 +4,8 @@
 The tool implements a new language LSQL similar to SQL, which is type-less, specifically designed for working with CSV files in shell. 
 
 ## Installation
-It is necessary, you had GHC (`>=8 <9.29`), Parsec (`>=3.1 <3.2`) and Glob (`>=0.10, <0.11`) installed. Run then
+It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10, <0.11`), base (`>=4.9 && <4.17`), text (`>=1.2 && <2.1`), array (`>=0.5 && <0.6`) and containers (`>=0.5 && <0.7`)
+ installed. Run then
 
     make
     sudo make install
@@ -206,7 +207,7 @@ And the output?
 
 #### More complicated...
 
-The previos example don't give much readable output. We can use `group by` to improve it (shortened as `g`).
+The previous example don't give much readable output. We can use `group by` to improve it (shortened as `g`).
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1'
 
@@ -251,7 +252,22 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       REST -> IF_BLOCK, REST
       REST ->
     
-      FROM_BLOCK ~~> SELECT_EXPR  //not really, but similar princips
+      FROM_BLOCK -> FROM_SELECTOR FROM_BLOCK
+      FROM_SELECTOR -> FROM ... FROM //Wildcard and brace expansion
+
+      FROM -> FROM_NAME=FROM_FILE OPTIONS
+      FROM -> FROM_FILE OPTIONS
+
+      OPTIONS -> -dCHAR OPTIONS
+      OPTIONS -> --delimiter=CHAR OPTIONS
+      OPTIONS -> -sCHAR OPTIONS
+      OPTIONS -> --secondary-delimiter=CHAR OPTIONS
+      OPTIONS -> -n OPTIONS
+      OPTIONS -> --named OPTIONS
+      OPTIONS -> -N OPTIONS
+      OPTIONS -> --not-named OPTIONS
+      OPTIONS ->
+
       
       SELECT_BLOCK -> SELECT_EXPR
       BY_BLOCK -> by SELECT_EXPR
@@ -261,13 +277,13 @@ Now, if you understood the examples, is the time to move forward to more abstrac
  
       ARITMETIC_EXPR -> ATOM
       ARITMETIC_EXPR -> ONEARG_FUNCTION(ARITMETIC_EXPR)
-      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_FUNCTION
+      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_EXPR
       ARITMETIC_EXPR -> (ARITMETIC_EXPR)
       
       SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
       SELECT_EXPR ->
       
-      ATOM_SELECTOR ~~> ATOM ... ATOM   // Wildcard and expansion magic
+      ATOM_SELECTOR ~~> ATOM ... ATOM   // Wildcard and brace expansion
       
       ATOM -> CONSTANT
       ATOM -> COL_SYMBOL
@@ -275,8 +291,9 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
 
       // # is not really char:
-      // two atoms can be written without space and will be appended, 
-      // if they can be separated by compiler using exotic chars
+      // two atoms can be written without space and will be (string) appended, 
+      // if they are separated using quote chars:
+      //   left atom must end or right atom must begin with quote char
       ATOM -> ATOM#ATOM     
 
       
@@ -356,7 +373,8 @@ Now, if you understood the examples, is the time to move forward to more abstrac
     -n
     --named
 
-Enables first line naming convension in csv files.
+Enables first line naming convension in csv files. This works only on input files. 
+Output is always without first line column names.
     
     -dCHAR
     --delimiter=CHAR
@@ -366,36 +384,59 @@ Changes default primary delimiter. The default value is ';'.
     -sCHAR
     --secondary-delimiter=CHAR
     
-Changes default default quote char (secondary delimiter). The default value is '"'.
+Changes default quote char (secondary delimiter). The default value is '"'.
 
 ### Datatypes
-There are 4 datatypes considered: Bool, Int, Float, String. 
+There are 4 datatypes considered: Bool, Int, Double, String. 
+Bool is either true/false, Int is at least 30 bit integer, Double double-precision floating point number and String is a ordinary char string.
 
 
-
-### Documantion of language
-We suppose, you have already read everything before this section and you understood it.
-
-Each column have number and may have name. If the source is file and have been given a name XXX by a user and can be addressed by XXX.N or XXX.NAME. It can be also addressed using &M.N syntax, where M is m-th input file or stdio.
-
+### Documentation of language
 Each command is made from blocks separated by comma. There are these types of blocks.
+* From block
+* Select block
+* If block
+* By block
+* Sort block
+
+First block is always from block. If block after first block is without specifier (`if`, `by` or `sort`), then it is select block. Otherwise it is block specified by the specifier.
+
+From block accept specific grammar (as specified in the scratch), select, by and sort block select expression and if block arithmetic expression.
+
+Every source file have a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
+default name, which is given path to the file or `-` in case of stdin in from block.
+
+Each column of a source file have a number and may have name (if named option is enabled for the given source file). 
+
+If the source file with index M (numbering input files from 1) have been given a name XXX, it's columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
+If named option is enabled and a column have name `NAME`, it can be also addressed by &M.NAME or XXX.NAME.
+
+If there is collision in naming (two source file have same name or two columns under the same source file have same name), then the behavior is undefined.
 
 If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 #### Exotic chars
-There are some chars which can't be in symbol names (column names). For simplicity, you can suppose, they are everything but alphanumerical chars excluding `-` and `_`.
+There are some chars which can't be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. The behavior with referencing names containing exotic chars without queotes is undefined.
 
-These chars can be used for fast appending. If two atoms are written without space and can be separated by compiler using the exotic chars, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
+It is possible to reference columns with name with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of column name from the syntax perspective of language - it must be inside the quotes.
+
+#### Quote chars
+There are 3 quotes (\`, " and ') used in Lsql. " and ' are always quoting a string. The \` quote is used for quoting symbol names.
+
+These chars can be used for fast appending. If two atoms are written without space and are separated using the quotes, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
+
+#### Select expression
+
+#### Arithmetic expression
 
 #### Select blocks
-These blocks determine output. They are similar to bash expressions. They are made by statements separeted by whitespaces. These statements are expanded, evaluated, matched to column name and printed in delimitered format.
+These blocks determine output. They are similar to bash expressions. They are made by statements separated by whitespaces. These statements are expanded, evaluated, matched to column name and printed in delimitered format.
 
 Each statement can consist
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
 * Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
 * Aritmetic expression in `$(expr)` format
 * Quotes "anything" to prevent wildcards, expansions and matching
-* Overnaming (alias) in format `NAME=stmt` (NOT SUPPORTED YET)
 * Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there can't be any space after FUNCTION
 
 Examples of select blocks:
