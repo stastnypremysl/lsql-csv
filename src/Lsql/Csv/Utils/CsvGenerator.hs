@@ -1,12 +1,23 @@
+{-|
+Module containing CSV generator for the output.
+
+-}
+
 module Lsql.Csv.Utils.CsvGenerator(csvGenerate) where
+
+
 
 import Lsql.Csv.Core.Tables
 import Lsql.Csv.Core.Functions
 
 import Data.List
 
+-- | This function generates CSV output
+csvGenerate :: Char -- ^ Primary delimiter 
+            -> Char -- ^ Secondary delimiter (quote char)
+            -> [Printable] -- ^ List of columns
+            -> String  
 
-csvGenerate :: Char -> Char -> [Printable] -> String
 csvGenerate sep sec_sep cols =
   concat$ map genLine rows
 

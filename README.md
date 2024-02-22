@@ -372,6 +372,11 @@ Now, if you understood the examples, is the time to move forward to more abstrac
 
 ### Options
 
+    -h
+    --help
+
+Shows short command line help and exits before doing anything else.
+
     -n
     --named
 

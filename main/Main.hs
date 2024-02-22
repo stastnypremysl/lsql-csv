@@ -1,39 +1,25 @@
-import Lsql.Csv.Lang.Args
-import Lsql.Csv.Lang.BlockSeparator
-import Lsql.Csv.Lang.From.Block
-import Lsql.Csv.Lang.BlockChain
-
-import Lsql.Csv.Core.BlockOps
-import Lsql.Csv.Core.Symbols
-import Lsql.Csv.Core.Evaluator
-
-import Lsql.Csv.Utils.CsvGenerator
-
 import System.Environment
 
-run :: Program -> IO String
-run prog = do
-  symbol_map <- getFromSymbols prog from_block
+import Lsql.Csv.Main
+import Lsql.Csv.Lang.Args
 
-  let blocks = parseBlocks rest_blocks$ symbolList symbol_map
-  let evaluated = evaluate symbol_map blocks
-  
-  return$ csvGenerate sep sec_sep evaluated
 
-  where
-    Program command sep sec_sep _ = prog
-    
-    blocks_split :: [String]
-    blocks_split = splitBlocks command
-
-    from_block : rest_blocks = blocks_split
-
+helpCalled :: [String] -> Bool
+helpCalled ("-h" : _) = True
+helpCalled ("--help" : _) = True
+helpCalled (_ : rest) = helpCalled rest
+helpCalled [] = False
 
 main = do
   args <- getArgs
-  if args == [] then do
-    putStr$ "Usage: lsql-csv [OPTIONS] COMMAND\n \
-            \ Details can be found in the documentation.\n"
+  if args == [] || helpCalled args then do
+    putStr$ "Usage: lsql-csv [OPTIONS] COMMAND\n\
+    	    \  -h/--help\t\t\t\tShow this help.\n\
+    	    \  -n/--named\t\t\t\tEnables first line naming convension in csv files.\n\
+	    \  -dCHAR/--delimiter=CHAR\t\tChanges default primary delimiter. The default value is ';'.\n\
+	    \  -sCHAR/--secondary-delimiter=CHAR\tChanges default quote char (secondary delimiter). The default value is '\"'.\n\n\
+            \  Details can be found in the documentation.\n\
+	    \  See: https://github.com/stastnypremysl/lsql-csv/blob/dev/README.md\n"
   else do
     out <- run$ parseArgs args 
     putStr$ out

@@ -1,3 +1,6 @@
+{-|
+A module implementing bracket (braces) expansion.
+-}
 module Lsql.Csv.Utils.BracketExpansion (bracketExpand) where
 
 import Data.List
@@ -53,6 +56,22 @@ afterBracketP = do
   char '}'
   ret <- many$ noneOf ""
   return ret
+
+
+-- | Curly brackets (braces) expand function
+--
+-- Argument is a `String`, which you want to expand. Returns a list of expanded `String`s.
+--
+-- There are given few usage examples:
+--
+-- >>> bracketExpand "car{A,B}"
+-- ["carA","carB"]
+--
+-- >>> bracketExpand "car{1..5}"
+-- ["car1","car2","car3","car4","car5"]
+--
+-- >>> bracketExpand "{car,bus}{0..2}"
+-- ["car0","car1","car2","bus0","bus1","bus2"]
 
 bracketExpand :: String -> [String]
 bracketExpand input =

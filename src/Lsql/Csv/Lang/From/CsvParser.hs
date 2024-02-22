@@ -22,7 +22,9 @@ import Text.Parsec.Text
 import Text.Parsec.Char
 
 -- Csv Index Path Program [Option]
-data Assignment = CoreCsv Int String Program [Option] | NamedCsv String Assignment
+-- | Data structure representing one input file
+data Assignment = 
+  CoreCsv Int String Program [Option] | NamedCsv String Assignment
 
 
 quoteP :: Char -> Parser String
