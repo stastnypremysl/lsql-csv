@@ -8,11 +8,7 @@ all: compile
 
 .PHONY: compile
 compile: build
-	ghc -j`nproc` -i./src --make -O3 -o ./build/lsql-csv ./src/Main.hs
-
-.PHONY: debug
-debug: build
-	ghc -j`nproc` -prof -fprof-auto -fprof-cafs -i./src --make -O3 -o ./build/lsql-csv ./src/Main.hs
+	ghc -j`nproc` -i./src --make -O3 -o ./build/lsql-csv ./main/Main.hs
 
 build:
 	mkdir -p build
