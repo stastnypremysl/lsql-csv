@@ -18,7 +18,7 @@ import Data.List
 class Boolable a where
   getBool :: a -> Bool
 
-
+-- | Representation of data in tables
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
 
 instance Boolable Value where
@@ -173,8 +173,10 @@ instance Show Value where
   show (BoolValue True) = "true"
   show (BoolValue False) = "false"
 
-
-data Column = Column [String] [Value]
+-- | Single column of table
+data Column = Column 
+  [String] -- ^ Names of the column
+  [Value] -- ^ Values of the column
 
 instance Eq Column where
   (Column _ a) == (Column _ b) = a == b
@@ -191,7 +193,11 @@ applyInOp op (Column _ a) (Column _ b) = (Column ["comp"] (map (\(x,y) -> op x y
 applyOp:: (Value -> Value) -> Column -> Column
 applyOp op (Column _ a) = (Column ["comp"] (map op a))
 
-data Table = Table [String] [Column]
+-- | A single table of data
+data Table = 
+  Table 
+  [String] -- ^ Table names 
+  [Column] -- ^ Columns of a table
 
 instance Show Table where
   show (Table _ a) = show a
@@ -213,7 +219,13 @@ columnNames (Table _ cols) =
   zip names cols
 
 
-buildTable :: [String] -> [[String]] -> [[Value]] -> Table
+-- | Makes table out of rows of Value
+buildTable :: 
+       [String] -- ^ Names of the table
+    -> [[String]] -- ^ Names of columns
+    -> [[Value]] -- ^ Rows of the table
+    -> Table -- ^ Result table
+
 buildTable table_names names in_data =
   if in_data /= [] then
     Table table_names columns
@@ -239,6 +251,7 @@ getRows :: [Column] -> [[Value]]
 getRows cols =
   transpose$ map columnValue cols
 
+-- | Cross joins two tables into one.
 crossJoinTable :: Table -> Table -> Table
 crossJoinTable (Table names1 cols1) (Table names2 cols2) =
   buildTable tableName colsNames$

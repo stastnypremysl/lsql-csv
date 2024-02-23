@@ -37,6 +37,7 @@ load_args :: [Arg] -> Program
 load_args args = 
   load_ag (Program "" ';' '"' False) args
 
+-- | Loads additional options to the `Program`
 reloadOpts :: Program -> [Option] -> Program
 reloadOpts pg ops = load_ag pg$ map (Opt) ops
 

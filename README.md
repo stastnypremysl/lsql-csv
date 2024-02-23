@@ -531,3 +531,5 @@ If there is an aggregate function present without by block present, aggregation 
 This block can be at the end of the command. It begins with `sort` keyword and the rest is select expression.
 
 You can imagine by sort as the order by clause in SQL.
+
+There can be only one Sort block in the whole command.
