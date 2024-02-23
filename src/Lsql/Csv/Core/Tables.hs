@@ -3,7 +3,7 @@ module Lsql.Csv.Core.Tables
     Table(Table), Column(Column),
     Value(IntValue, StringValue, DoubleValue, BoolValue), 
 
-    buildTable, crossJoinTable, filterTable, sortTable, byTable, unionTables,
+    buildTable, crossJoinTable, filterTable, sortTable, byTable,
     emptyTable, 
 
     columnNames, columnValue, showColumn,
@@ -271,6 +271,8 @@ crossJoinTable (Table names1 cols1) (Table names2 cols2) =
     rows2 = getRows cols2
 
 
+-- | Filters out rows, where Column is false. 
+-- The rows, where Column is true, are kept.
 filterTable :: Column -> Table -> Table
 filterTable (Column _ if_cols) (Table t_name cols) =
   buildTable t_name cols_name$
@@ -292,6 +294,7 @@ emptyTable (Table t_name cols) = Table t_name
   [Column (columnName col) [] | col <- cols]
 
 
+-- | Sorts the table according to the given columns.
 sortTable :: [Column] -> Table -> Table
 sortTable [] table = table
 
@@ -313,6 +316,9 @@ sortTable s_cols (Table name cols) =
     sorted_rows = map snd sorted_p
 
 
+-- | Splits the table into multiple tables so that
+-- rows of columns at first argument are at each table the same
+-- and number of tables is minimal. (factorization)
 byTable :: [Column] -> Table -> [Table]
 byTable s_cols orig_table =
   map (buildTable name (map columnName orig_cols))
@@ -340,15 +346,4 @@ byTable s_cols orig_table =
     new_rows = map (map snd) grouped_p
 
 
-unionTables :: Table -> [Table] -> Table
-unionTables (Table name orig_cols) tables =
-  buildTable name (map columnName orig_cols)$
-    concat vals
-
-  where
-    getColumn :: Table -> [Column]
-    getColumn (Table _ cols) = cols
-
-    vals :: [[[Value]]]
-    vals = map getRows$ map getColumn tables
-  
+ 
