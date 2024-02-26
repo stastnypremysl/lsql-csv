@@ -4,7 +4,7 @@
 The tool implements a new language LSQL similar to SQL, which is type-less, specifically designed for working with CSV files in shell. 
 
 ## Installation
-It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10, <0.11`), base (`>=4.9 && <4.17`), text (`>=1.2 && <2.1`), array (`>=0.5 && <0.6`) and containers (`>=0.5 && <0.7`)
+It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.17`), text (`>=1.2 <2.1`), array (`>=0.5 <0.6`) and containers (`>=0.5 <0.7`)
  installed. Run then
 
     make

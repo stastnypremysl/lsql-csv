@@ -13,7 +13,10 @@ compile: build
 build:
 	mkdir -p build
 
-latex: build
+docs: build
+	cd build; find ../src | grep .hs$ | xargs haddock --html
+
+latex-docs: build
 	cd build; find ../src | grep .hs$ | xargs haddock --latex
 
 .PHONY: install
