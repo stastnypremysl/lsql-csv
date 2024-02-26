@@ -1,3 +1,6 @@
+{-|
+This module contains definition of Lsql datatypes, their classes and types `Table` and `Column` and functions over them for manipulation of them.
+-}
 module Lsql.Csv.Core.Tables
   (
     Table(Table), Column(Column),
@@ -15,6 +18,7 @@ where
 
 import Data.List
 
+-- | Class for converting a value to Bool
 class Boolable a where
   getBool :: a -> Bool
 
@@ -187,11 +191,16 @@ instance Ord Column where
 instance Show Column where
   show (Column _ a) = show a
 
+
+-- | Function for applying two argument function to two `Column`s
 applyInOp:: (Value -> Value -> Value) -> Column -> Column -> Column
 applyInOp op (Column _ a) (Column _ b) = (Column ["comp"] (map (\(x,y) -> op x y)$ zip a b))
 
+
+-- | Function for applying single argument function to `Column`
 applyOp:: (Value -> Value) -> Column -> Column
 applyOp op (Column _ a) = (Column ["comp"] (map op a))
+
 
 -- | A single table of data
 data Table = 
@@ -202,17 +211,20 @@ data Table =
 instance Show Table where
   show (Table _ a) = show a
 
+-- | Converts column to list of string from its data
 showColumn :: Column -> [String]
 showColumn (Column _ col) =
   map show col
 
-
+-- | Returns all names of the `Column`.
 columnName :: Column -> [String]
 columnName (Column names _ ) = names
 
+-- | Returns all values of the `Column`
 columnValue :: Column -> [Value]
 columnValue (Column _ values ) = values
 
+-- | Returns pairs of names of `Column` and `Column` itself of the table
 columnNames :: Table -> [([String], Column)]
 columnNames (Table _ cols) =
   let names = map columnName cols in
@@ -289,6 +301,7 @@ filterTable (Column _ if_cols) (Table t_name cols) =
     filterRows (False : r_bool) (_ : r_rows) = filterRows r_bool r_rows
     filterRows (True : r_bool) (row : r_rows) = row : (filterRows r_bool r_rows)
 
+-- | Returns table with same metadata as original table, but no data (no rows).
 emptyTable :: Table -> Table
 emptyTable (Table t_name cols) = Table t_name 
   [Column (columnName col) [] | col <- cols]

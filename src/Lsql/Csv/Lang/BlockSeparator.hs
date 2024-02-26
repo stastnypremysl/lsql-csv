@@ -1,3 +1,6 @@
+{-|
+This module contain a preprocessor parser, which splits command into list of strings - one string per one block.
+-}
 module Lsql.Csv.Lang.BlockSeparator (splitBlocks) where
 
 import Text.Parsec
@@ -58,6 +61,7 @@ blocks = do
   last <- block
   return$ rets ++ [last]
   
+-- | Preprocessor parser function, which splits command into list of strings - one string per one block.
 splitBlocks :: String -> [String]
 splitBlocks input =
   case parse blocks "block parser"$ (T.pack input) of

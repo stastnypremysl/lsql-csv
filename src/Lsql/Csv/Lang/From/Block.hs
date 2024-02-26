@@ -1,3 +1,6 @@
+{-|
+This module contains from block parser. It loads initial `SymbolMap`.
+-}
 module Lsql.Csv.Lang.From.Block(getFromSymbols) where 
 
 import Lsql.Csv.Core.Tables
@@ -107,6 +110,7 @@ getOptions :: FileAssignment -> [Option]
 getOptions (NamedFileAssignment _ rest) = getOptions rest
 getOptions (FileAssignment _ options) = options
 
+-- | Loads `SymbolMap` according to `Program` and from block String in second argument.
 getFromSymbols :: Program -> String -> IO SymbolMap
 getFromSymbols prog from_block = do
 

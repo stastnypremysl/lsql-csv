@@ -1,3 +1,6 @@
+{-|
+This module contains the evaluator of lsql-csv program.
+-}
 module Lsql.Csv.Core.Evaluator (evaluate) where
 
 import Lsql.Csv.Core.BlockOps
@@ -13,7 +16,7 @@ filterCols [] = []
 filterCols (ValueP val : rest) = filterCols rest
 filterCols (ColumnP col : rest) = col : filterCols rest
 
-
+-- | Evaluates the program in parsed [`Block`] over the input in `SymbolMap`
 evaluate :: SymbolMap -> [Block] -> [Printable]
 evaluate symbol_map blocks =
   printTable sorted

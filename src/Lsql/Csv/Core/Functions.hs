@@ -1,3 +1,6 @@
+{-|
+This module contains syntactic tree definition and helper functions for its evaluation.
+-}
 module Lsql.Csv.Core.Functions 
   (
     Arg(Symbol, Function, Value), 
@@ -41,12 +44,24 @@ import Lsql.Csv.Core.Symbols
 
 import Data.List
 
-data Function = AritmeticF AritmeticF | AggregateF AggregateF | LogicF LogicF
-data Arg = Function Function | Symbol String | Value Value 
 
+-- | Syntax tree element
+data Arg = 
+    Function Function -- ^ Call of function
+  | Symbol String -- ^ Reference to a column
+  | Value Value -- ^ Constant
+
+-- | Syntax tree element
+data Function = 
+  AritmeticF AritmeticF | -- ^ Arithmetic function
+  AggregateF AggregateF | -- ^ Aggregate function
+  LogicF LogicF -- ^ Logical function
+
+-- | Data type for single `Column` or single `Value`
 data Printable = ColumnP Column | ValueP Value
   deriving (Eq, Ord, Show)
 
+-- | Syntax tree element 
 data AritmeticF = 
   Sin Arg | Cos Arg | Tan Arg | Asin Arg | Acos Arg | Atan Arg|
   Sinh Arg | Cosh Arg | Tanh Arg | Asinh Arg | Acosh Arg | Atanh Arg|
@@ -70,8 +85,10 @@ data AritmeticF =
   Equal Arg Arg | NotEqual Arg Arg | LeftOuterJoin Arg Arg |
   In Arg Arg
 
+-- | Syntax tree element 
 data LogicF = And Arg Arg | Or Arg Arg | Not Arg
   
+-- | Syntax tree element 
 data AggregateF = Cat [Arg] | Sum [Arg] | Avg [Arg] | Count [Arg] | 
   Min [Arg] | Max [Arg]
 
@@ -79,12 +96,15 @@ pShow :: Int -> Printable -> [String]
 pShow n (ValueP v) = take n$ repeat$ show v 
 pShow n (ColumnP c) = take n$ showColumn c
 
+-- | Converts list of `Printable` to list of `String` columns
+-- Useful for generating CSV output
 genStrCols :: [Printable] -> [[String]]
 genStrCols cols = map (pShow n) cols
   where
     n = getPrintableLength cols
 
 
+-- | Converts list of `Printable` to list of `Column`
 getCols :: [Printable] -> [Column]
 getCols printables =
   toCols printables
@@ -97,9 +117,13 @@ getCols printables =
     toCols ((ColumnP c) : rest) = c : (toCols rest)
     toCols ((ValueP v) : rest) = (Column [] (take n$ repeat v)) : (toCols rest)
 
-getTable :: [String] -> [Printable] -> Table
+-- | Converts list of `Printable` to a `Table`
+getTable :: [String] -- ^ Names of table
+         -> [Printable] -- ^ Columns of the table
+         -> Table
 getTable names printables = Table names (getCols printables)
 
+-- | Converts table to list of ColumnP `Printable`s
 printTable :: Table -> [Printable]
 printTable (Table _ cols) = map ColumnP cols
 
@@ -139,11 +163,14 @@ unionCols cols
     col2union (a : rest_a) (b : rest_b) = 
       (a `appendPrintable` b) : (col2union rest_a rest_b)
 
+-- | Unions multiple first lines of lists of [`Printable`]
+-- into one `Printable`
 unionAggCols :: [[Printable]] -> [Printable]
 unionAggCols cols =
   unionCols$ map genOnelineCols cols
 
 
+-- | Function for applying two argument function to two `Printable`s
 applyInOpP :: (Value -> Value -> Value) -> Printable -> Printable -> Printable
 applyInOpP op (ColumnP c1) (ColumnP c2) = 
   ColumnP$ applyInOp op c1 c2
@@ -156,22 +183,27 @@ applyInOpP op (ValueP c1) (ColumnP c2) =
 
 applyInOpP op (ValueP c1) (ValueP c2) = ValueP$ op c1 c2
 
+-- | Function for applying single argument function to `Printable`
 applyOpP :: (Value -> Value) -> Printable -> Printable
 applyOpP op (ColumnP c) = ColumnP$ applyOp op c
 applyOpP op (ValueP c) = ValueP$ op c
 
 
+-- | Appends list of arguments together
 catterate :: [Arg] -> Arg
 catterate args = foldl1 appendArg args
 
+-- | Appends two arguments together
 appendArg :: Arg -> Arg -> Arg
 appendArg a b = Function$ AritmeticF$ Append a b
+
 
 getPrintableLength :: [Printable] -> Int
 getPrintableLength [] = 1
 getPrintableLength ((ValueP p) : rest) = getPrintableLength rest
 getPrintableLength ((ColumnP c) : _ ) = length$ showColumn c
 
+-- | Evaluates all nonagregate functions to `Printable`. Fails on aggregate function.
 eval :: SymbolMap -> Arg -> Printable
 eval symbol_map (Symbol name) = ColumnP$ symbol_map ==> name
 eval _ (Value val) = ValueP$ val
@@ -319,7 +351,8 @@ evalFunction sm (AggregateF _) =
   error$ "Aggregate functions can't be evaluated before grouping. " ++
     "This usually happens, when you call aggregate function from condition."
   
-
+-- | Evaluates all aggregate functions. Normal functions are not evaluated
+-- if not called under other aggregate function.
 evalAggregateFunctions :: SymbolMap -> Arg -> Arg
 
 evalAggregateFunctions symbol_map (Value val) =
@@ -585,7 +618,8 @@ evalAggregateFunctions symbol_map (Function (AggregateF (Max args))) =
 
 --evalAggregateFunctions _ x = x
 
-
+-- | Runs through the syntactic tree and check, whether it contains 
+-- aggregate function.
 containsAggregateF :: Arg -> Bool
 containsAggregateF (Function (AritmeticF (Sin arg))) = containsAggregateF arg
 containsAggregateF (Function (AritmeticF (Cos arg))) = containsAggregateF arg

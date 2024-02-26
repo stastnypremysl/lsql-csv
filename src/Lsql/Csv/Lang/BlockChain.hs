@@ -1,3 +1,6 @@
+{-|
+This module contains a main parser of blocks other then from block.
+-}
 module Lsql.Csv.Lang.BlockChain (parseBlocks) where
 
 import Text.Parsec
@@ -53,7 +56,11 @@ blockP symbol_list =
   (try$ ifBP symbol_list) <|> 
   (selectBP symbol_list)
 
-parseBlocks :: [String] -> [String] -> [Block]
+-- | Function for parsing blocks
+parseBlocks :: [String] -- ^ Blocks to parse
+            -> [String] -- ^ List of all symbol names
+            -> [Block] -- ^ Parsed blocks
+
 parseBlocks [] _ = []
 parseBlocks (input : rest) symbol_list =
   case parse (blockP symbol_list) ("'" ++ input ++ "'" ++ " block")$ 

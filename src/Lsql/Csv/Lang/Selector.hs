@@ -1,3 +1,6 @@
+{-|
+This module implements selector expression and arithmetic expression parsers.
+-}
 module Lsql.Csv.Lang.Selector (selectorP, aritmeticExprP) where
 
 import Text.Parsec
@@ -273,7 +276,7 @@ aritmeticExprGenP n symbol_list =
   aritmeticExprNP (drop (length aritmeticExprGenFP - n) aritmeticExprGenFP)
     symbol_list
 
-
+-- | Arithmetic expression parser.
 aritmeticExprP :: [String] -> Parser Arg
 aritmeticExprP symbol_list = aritmeticExprGenP 5 symbol_list
 
@@ -408,7 +411,7 @@ atomP symbol_list = do
           [selected `appendArg` suffix | suffix <- next]
       
   
-
+-- | Selector expression parser.
 selectorP :: [String] -> Parser [Arg]
 selectorP symbol_list = do
   skipMany space

@@ -1,3 +1,6 @@
+{-|
+This module contains the starting point for lsql-csv evaluation.
+-}
 module Lsql.Csv.Main (run) where
 
 import Lsql.Csv.Lang.Args
@@ -12,6 +15,7 @@ import Lsql.Csv.Core.Evaluator
 import Lsql.Csv.Utils.CsvGenerator
 
 
+-- | A starting point for lsql-csv evaluation. Returns String with output CSV.
 run :: Program -> IO String
 run prog = do
   symbol_map <- getFromSymbols prog from_block

@@ -13,6 +13,9 @@ compile: build
 build:
 	mkdir -p build
 
+latex: build
+	cd build; find ../src | grep .hs$ | xargs haddock --latex
+
 .PHONY: install
 install:
 	mkdir -p $(install_dir)
