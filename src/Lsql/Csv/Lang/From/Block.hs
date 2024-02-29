@@ -1,5 +1,5 @@
 {-|
-This module contains from block parser. It loads initial `SymbolMap`.
+This module contains the from block parser. It loads initial `SymbolMap`.
 -}
 module Lsql.Csv.Lang.From.Block(getFromSymbols) where 
 

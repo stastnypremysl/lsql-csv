@@ -1,8 +1,4 @@
-ifdef DESTDIR
-install_dir=$(DESTDIR)/usr/bin
-else
-install_dir=/usr/local/bin
-endif
+INSTALL_DIR=/usr/local/bin
 
 all: compile
 
@@ -21,8 +17,8 @@ latex-docs: build
 
 .PHONY: install
 install:
-	mkdir -p $(install_dir)
-	cp build/lsql-csv $(install_dir)
+	mkdir -p $(INSTALL_DIR)
+	cp build/lsql-csv $(INSTALL_DIR)
 
 .PHONY: clean
 clean:

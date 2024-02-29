@@ -1,5 +1,5 @@
 {-|
-Module containing CSV generator for the output.
+This module contains CSV generator for the output.
 
 -}
 

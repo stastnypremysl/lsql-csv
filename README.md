@@ -5,21 +5,25 @@ The tool implements a new language LSQL similar to SQL, which is type-less, spec
 
 ## Installation
 It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.17`), text (`>=1.2 <2.1`) and containers (`>=0.5 <0.7`)
- installed. Run then
+ installed. (The package boundaries given are identical to cabal bounderies.) Run then:
 
     make
     sudo make install
     
-Now the lsql-csv is installed in `/usr/local/bin`.
+Now the lsql-csv is installed in `/usr/local/bin`. If you want, you can specify `INSTALL_DIR` like:
 
-If you have installed `cabal`, you can alternatively run
+    sudo make INSTALL_DIR=/custom/install-folder install
+
+This will install the package into `INSTALL_DIR`.
+
+If you have installed `cabal`, you can alternatively run:
 
     cabal install
    
 It will also install the dependencies for you.    
 
 ### Running the unit tests
-If you want to verify, that the package has compiled correctly, it is possible to test it by running
+If you want to verify, that the package has compiled correctly, it is possible to test it by running:
 
     make test
 
@@ -43,20 +47,20 @@ This will print second and first column of csv file on stdin. You can read it li
 
 So, as you can see, the first block is (*and always is*) the from block. There are file names or `-` (stdin) separated by space. The second block is the select block, also separated by space.
 
-For example
+For example:
 
     lsql-csv '-, &1.2 &1.1' <<- EOF
     World;Hello
     EOF
     
-Returns
+It returns:
     
     Hello;World
 
 #### Simple filtering 
     lsql-csv -d: '-, &1.*, if &1.3>=1000' < /etc/passwd
 
-This will print lines of users whose UID >=1000. It can be also written as
+This will print lines of users whose UID >=1000. It can be also written as:
   
     lsql-csv -d: 'p=/etc/passwd, p.*, if p.3 >= 1000'
     
@@ -67,16 +71,16 @@ This will print lines of users whose UID >=1000. It can be also written as
 
 You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
     
-The output might be 
+The output might be:
 
     nobody:x:65534:65534:nobody:/var/empty:/bin/false
     me:x:1000:1000::/home/me:/bin/bash
 
-If you specify delimiter specifically for `/etc/passwd`, the output will be comma delimetered.
+If you specify delimiter specifically for `/etc/passwd`, the output will be comma delimited.
     
     lsql-csv '/etc/passwd -d:, &1.*, if &1.3 >= 1000'
 
-Might return
+It might return:
 
     nobody;x;65534;65534;nobody;/var/empty;/bin/false
     me;x;1000;1000;;/home/me;/bin/bash
@@ -90,14 +94,14 @@ Lets say, I am interested in the default group names of users. We need to join t
     
 What does `/etc/{passwd,group}` mean? Basically, there are two-three types of expressions. Select (and from) expression and arithmetic expression. In all select blocks, you can use expansion and wildcards just like you were in bash.
     
-Finally, the output can be something like this
+Finally, the output can be something like this:
 
     root:root
     bin:bin
     daemon:daemon
     me:me
 
-where first column is name of user and the second column is name of its default group.
+First column is name of user and the second column is name of its default group.
     
 #### Basic grouping
 Let's say, I want do number of users using the same terminal. 
@@ -117,11 +121,11 @@ And the output?
 You can see here the first usage of `by` block, which is equivalent of `group by` in SQL. 
 
 #### Basic sorting
-Let's say, you want to sort your users with UID greater than or equal to 1000 descendingly.
+Lets say, you want to sort your users with UID greater than or equal to 1000 descendingly.
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000, sort &1.3' | tac
 
-The output might look like
+The output might look like:
   
     nobody:x:65534:65534:nobody:/var/empty:/bin/false
     me3:x:1002:1002::/home/me3:/bin/bash
@@ -140,7 +144,7 @@ Let's try it!
 
     lsql-csv -d: 'p=/etc/passwd, "The number of users of "p.7" is "count(p.3)".", by p.7
     
-The output might be
+The output might be:
  
     The number of users of /bin/bash is 7.
     The number of users of /bin/false is 7.
@@ -158,11 +162,11 @@ As you can see, string formatting is sometimes very simple with LSQL.
 So far, we just met all kinds of blocks and only if block accepting arithmetic expression and the other accepting select expression. 
 What if we needed to run arithmetic expression inside select expression. There is a special syntax `$(...)` for it.
 
-For example
+For example:
 
     lsql-csv -d: '/etc/passwd, $(sin(&1.3)^2 + cos(&1.3)^2)'
     
-Returns something like
+It returns something like:
     
     1.0
     1.0
@@ -171,11 +175,11 @@ Returns something like
     ...
     1.0
 
-If we run
+If we run:
     
     lsql-csv -d: '/etc/passwd, $(&1.3 >= 1000), sort $(&1.3 >= 1000)'
 
-we get something like
+We get something like:
     false
     false
     ...
@@ -211,7 +215,7 @@ The previous example don't give much readable output. We can use `group by` to i
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1'
 
-The output will be something like
+The output will be something like:
     
     adm:adm,disk,sys,
     bin:bin,daemon,sys,
@@ -227,7 +231,7 @@ How can we add default groups too?
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1' |
     lsql-csv -d: '- /etc/passwd /etc/group, &1.1 &1.2""&3.1, if &1.1 == &2.1 && &2.4 == &3.3'
     
-This will output something like
+This will output something like:
 
     adm:adm,disk,sys,adm
     bin:bin,daemon,sys,bin
@@ -415,7 +419,7 @@ default name, which is given path to the file or `-` in case of stdin in from bl
 
 Each column of a source file have a number and may have name (if named option is enabled for the given source file). 
 
-If the source file with index M (numbering input files from 1) have been given a name XXX, it's columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
+If the source file with index M (numbering input files from 1) have been given a name XXX, it is columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
 If named option is enabled and a column have name `NAME`, it can be also addressed by &M.NAME or XXX.NAME.
 
 If there is collision in naming (two source file have same name or two columns under the same source file have same name), then the behavior is undefined.
@@ -423,7 +427,7 @@ If there is collision in naming (two source file have same name or two columns u
 If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 #### Exotic chars
-There are some chars which can't be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. 
+There are some chars which cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. 
 The behavior with referencing names containing exotic chars without quotes is undefined.
 
 It is possible to reference columns with name with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of column name from the syntax perspective of language - it must be inside the quotes.
@@ -442,8 +446,8 @@ Every atom selector expression can consist
 * Arithmetic expression in `$(expr)` format
 * Quotes \`anything\` to prevent wildcards and expansions
 * Quotes " or ' to insert string
-* Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there can't be any space after FUNCTION
-* Call of single arg function `ONEARG_FUNCTION(arithmetic expression)` - there can't be any space after FUNCTION
+* Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there cannot be any space after FUNCTION
+* Call of single arg function `ONEARG_FUNCTION(arithmetic expression)` - there cannot be any space after FUNCTION
 * Reference to a column name
 
 Please, keep in mind, that all integers, floats and booleans constants and nonaggregate functions must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
@@ -511,14 +515,14 @@ Example:
 
 Currently, CHARs, which are also quotes in Lsql, are not supported.
     
-### If block
+#### If block
 This block always begins with if. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
 
 Filtering is done before the aggregation.
 
 You can imagine if statement as where clause in SQL.
 
-### By block
+#### By block
 This statement always begins with `by` and the rest of the block is select expression. There can be only one By block in the whole command.
 
 You can imagine by block as the group by clause in SQL. 
@@ -527,7 +531,7 @@ There must be present at least one aggregate function in select block, if by blo
 
 If there is an aggregate function present without by block present, aggregation runs over all rows at once.
 
-### Sort block
+#### Sort block
 This block can be at the end of the command. It begins with `sort` keyword and the rest is select expression.
 
 You can imagine by sort as the order by clause in SQL.

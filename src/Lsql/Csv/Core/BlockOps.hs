@@ -1,5 +1,5 @@
 {-|
-This module contains `Block` definition and functions for getting specific types of blocks from list of `Block`.
+This module contains the `Block` definition and functions for getting specific types of blocks from list of `Block`.
 -}
 
 module Lsql.Csv.Core.BlockOps 

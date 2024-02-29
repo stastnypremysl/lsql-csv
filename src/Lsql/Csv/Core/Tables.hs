@@ -1,5 +1,5 @@
 {-|
-This module contains definition of Lsql datatypes, their classes and types `Table` and `Column` and functions over them for manipulation of them.
+This module contains the definition of Lsql datatypes, their classes and types `Table` and `Column` and functions over them for manipulation of them.
 -}
 module Lsql.Csv.Core.Tables
   (

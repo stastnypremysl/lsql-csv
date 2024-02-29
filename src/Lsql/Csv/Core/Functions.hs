@@ -1,5 +1,5 @@
 {-|
-This module contains syntactic tree definition and helper functions for its evaluation.
+This module contains the syntactic tree definition and helper functions for its evaluation.
 -}
 module Lsql.Csv.Core.Functions 
   (

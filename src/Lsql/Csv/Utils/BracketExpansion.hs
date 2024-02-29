@@ -1,5 +1,5 @@
 {-|
-A module implementing bracket (braces) expansion.
+This module contains curly bracket (braces) expansion implementation.
 -}
 module Lsql.Csv.Utils.BracketExpansion (bracketExpand) where
 

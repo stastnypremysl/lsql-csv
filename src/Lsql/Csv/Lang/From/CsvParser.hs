@@ -1,5 +1,5 @@
 {-|
-This module contains CsvParser called by parseFile, which loads input CSV files.
+This module contains the CsvParser called by parseFile, which loads input CSV files.
 -}
 
 module Lsql.Csv.Lang.From.CsvParser
