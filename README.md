@@ -35,15 +35,19 @@ LSQL, the language of `lsql-csv`, aims to be more lapidary language than SQL. Th
 
 
 ### Examples
-One of the way, how to learn the new programming language is by understanding many concrete examples of its usage. The following examples are written explicitly for the purpose - to learn a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
+One of the way, how to learn the new programming language is by understanding many concrete examples of its usage. The following examples are written explicitly for the purpose - to teach a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
 
-The following examples might be not enough for reader, who don't know SQL or Unix/Linux scripting enough. If this is the case, please consider learning SQL and/or Unix/Linux scripting first before LSQL.
+The following examples might be not enough for reader, who don't know Unix/Linux scripting enough. If this is the case, please consider learning Unix/Linux scripting first before LSQL.
+
+It is also advantageous to know SQL.
+
+The following examples will be about parsing of `/etc/passwd` and parsing of `/etc/group`. You may look at `man 5 passwd` and `man 5 group` to see what columns it contain.
 
 #### Hello World
 
     lsql-csv '-, &1.2 &1.1'
 
-This will print second and first column of csv file on stdin. You can read it like `from stdio S select S.second, S.first`. 
+This will print second (&1.2) and first column (&1.1) of csv file on stdin. If you know SQL, you can read it like `from stdio S select S.second, S.first`. 
 
 So, as you can see, the first block is (*and always is*) the from block. There are file names or `-` (stdin) separated by space. The second block is the select block, also separated by space.
 
@@ -68,8 +72,9 @@ This will print lines of users whose UID >=1000. It can be also written as:
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000'
     
+In previous examples we used overnaming, which allows us to give a data source file `/etc/passwd` give a name `p`.
 
-You can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
+If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
     
 The output might be:
 
@@ -92,7 +97,7 @@ Lets say, I am interested in the default group names of users. We need to join t
 
     lsql-csv -d: '/etc/{passwd,group}, &1.1 &2.1, if &1.4 == &2.3'
     
-What does `/etc/{passwd,group}` mean? Basically, there are two-three types of expressions. Select (and from) expression and arithmetic expression. In all select blocks, you can use expansion and wildcards just like you were in bash.
+What does `/etc/{passwd,group}` mean? Basically, there are three types of expressions. Select, from and arithmetic expression. In all select and from expressions, you can use expansion and wildcards just like in bash.
     
 Finally, the output can be something like this:
 
@@ -104,7 +109,7 @@ Finally, the output can be something like this:
 First column is name of user and the second column is name of its default group.
     
 #### Basic grouping
-Let's say, I want do number of users using the same terminal. 
+Let's say, I want do count users using the same shell. 
 
     lsql-csv -d: 'p=/etc/passwd, p.7 count(p.3), by p.7'
     
@@ -137,7 +142,7 @@ The sort block is the equivalent of `order by` in SQL. The `tac` command print t
 #### About nice outputs
 There is a trick, how to concat two values in select expression: Write them without space.
 
-But how the interpreter know the interpreter knows the ends of the value name or value expression? You must use quotes for it - quotes itself can't be part of value name.
+But how the interpreter knows the ends of the value name or value expression? You must use quotes for it - quotes itself can't be part of value name.
 As an example, let's try to format our basic grouping example.
 
 Let's try it!
@@ -401,6 +406,8 @@ Changes default quote char (secondary delimiter). The default value is '"'.
 There are 4 datatypes considered: Bool, Int, Double, String. 
 Bool is either true/false, Int is at least 30 bit integer, Double double-precision floating point number and String is a ordinary char string.
 
+### Joins
+Joins have always the time complexity O(nm). There is no optimization made, when you put multiple files into from block.
 
 ### Documentation of language
 Each command is made from blocks separated by comma. There are these types of blocks.
