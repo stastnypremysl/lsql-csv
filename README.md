@@ -41,7 +41,7 @@ The following examples might be not enough for reader, who don't know Unix/Linux
 
 It is also advantageous to know SQL.
 
-The following examples will be about parsing of `/etc/passwd` and parsing of `/etc/group`. You may look at `man 5 passwd` and `man 5 group` to see what columns it contain.
+The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. You may look at `man 5 passwd` and `man 5 group` to see what columns it contain.
 
 #### Hello World
 
@@ -74,7 +74,7 @@ This will print lines of users whose UID >=1000. It can be also written as:
     
 In previous examples we used overnaming, which allows us to give a data source file `/etc/passwd` give a name `p`.
 
-If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is much more compressed then standard SQL.
+If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is more compressed then standard SQL.
     
 The output might be:
 
@@ -89,6 +89,53 @@ It might return:
 
     nobody;x;65534;65534;nobody;/var/empty;/bin/false
     me;x;1000;1000;;/home/me;/bin/bash
+
+
+#### Named columns
+Let's suppose a file people.csv:
+   
+    name;age
+    Adam;21
+    Petra;23
+    Karel;25
+
+Now, let's get all the names of people in people.csv:
+
+    lsql-csv -n 'people.csv, &1.name'
+
+The output will be:
+
+    Adam
+    Petra
+    Karel
+
+As you can see, we can reference named columns by a name. If named columns are enabled, each column have two names under &X - the number name &X.Y and actual name &X.NAME.
+
+Now, we can select all columns with wildcard `&1.*`:
+    lsql-csv -n 'people.csv, &1.*'
+
+As the output, we get
+    Adam;21;21;Adam
+    Petra;23;23;Petra
+    Karel;25;25;Karel
+
+The output contains each column twice, because wildcard `&1.*` was evaluated to `&1.name, &1.age, &1.1, &1.2`.
+How to fix it?
+
+    lsql-csv -n 'people.csv, &1.[1-9]*'
+
+The output is now:
+
+    Adam;21
+    Petra;23
+    Karel;25
+
+The command can be also written as
+
+    lsql-csv -n 'people.csv, &1.{1,2}'
+    lsql-csv -n 'people.csv, &1.{1..2}'
+
+The output will be in the both cases still the same.
 
 
 #### Simple join
@@ -246,6 +293,7 @@ This will output something like:
     news:news,news
 
 
+
 ## Usage
 Now, if you understood the examples, is the time to move forward to more abstract description of the language and tool usage.
 
@@ -281,13 +329,13 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       SELECT_BLOCK -> SELECT_EXPR
       BY_BLOCK -> by SELECT_EXPR
       SORT_BLOCK -> sort SELECT_EXPR
-      IF_BLOCK -> if ARITMETIC_EXPR
+      IF_BLOCK -> if ARITHMETIC_EXPR
     
  
-      ARITMETIC_EXPR -> ATOM
-      ARITMETIC_EXPR -> ONEARG_FUNCTION(ARITMETIC_EXPR)
-      ARITMETIC_EXPR -> ARITMETIC_EXPR TWOARG_FUNCTION ARITMETIC_EXPR
-      ARITMETIC_EXPR -> (ARITMETIC_EXPR)
+      ARITHMETIC_EXPR -> ATOM
+      ARITHMETIC_EXPR -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
+      ARITHMETIC_EXPR -> ARITHMETIC_EXPR TWOARG_FUNCTION ARITHMETIC_EXPR
+      ARITHMETIC_EXPR -> (ARITHMETIC_EXPR)
       
       SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
       SELECT_EXPR ->
@@ -296,9 +344,9 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       
       ATOM -> CONSTANT
       ATOM -> COL_SYMBOL
-      ATOM -> $(ARITMETIC_EXPR)
+      ATOM -> $(ARITHMETIC_EXPR)
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
-      ATOM -> ONEARG_FUNCTION(SELECT_EXPR)
+      ATOM -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
 
       // # is not really char:
       // two atoms can be written without space and will be (string) appended, 
@@ -434,8 +482,8 @@ If there is collision in naming (two source file have same name or two columns u
 If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 #### Exotic chars
-There are some chars which cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-` and `_`. 
-The behavior with referencing names containing exotic chars without quotes is undefined.
+There are some chars which cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-`, `.`, `&` and `_`. 
+Referencing names containing exotic chars without quotes is unsupported.
 
 It is possible to reference columns with name with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of column name from the syntax perspective of language - it must be inside the quotes.
 

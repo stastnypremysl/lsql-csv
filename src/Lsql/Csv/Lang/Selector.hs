@@ -297,7 +297,7 @@ exoticAtomP = do
   char '`'
   return$ Symbol ret
 
-nonAtomChars = "\n `\",'$()<>="
+nonAtomChars = "\n `\"'$()<>="
 
 oneRegularAtomP :: Parser Arg
 oneRegularAtomP = do
