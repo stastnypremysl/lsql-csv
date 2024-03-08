@@ -54,12 +54,12 @@ So, as you can see, the first block is (*and always is*) the from block. There a
 For example:
 
     lsql-csv '-, &1.2 &1.1' <<- EOF
-    World;Hello
+    World,Hello
     EOF
     
 It returns:
     
-    Hello;World
+    Hello,World
 
 #### Simple filtering 
     lsql-csv -d: '-, &1.*, if &1.3>=1000' < /etc/passwd
@@ -87,17 +87,17 @@ If you specify delimiter specifically for `/etc/passwd`, the output will be comm
 
 It might return:
 
-    nobody;x;65534;65534;nobody;/var/empty;/bin/false
-    me;x;1000;1000;;/home/me;/bin/bash
+    nobody,x,65534,65534,nobody,/var/empty,/bin/false
+    me,x,1000,1000,,/home/me,/bin/bash
 
 
 #### Named columns
 Let's suppose a file people.csv:
    
-    name;age
-    Adam;21
-    Petra;23
-    Karel;25
+    name,age
+    Adam,21
+    Petra,23
+    Karel,25
 
 Now, let's get all the names of people in people.csv:
 
@@ -115,9 +115,9 @@ Now, we can select all columns with wildcard `&1.*`:
     lsql-csv -n 'people.csv, &1.*'
 
 As the output, we get
-    Adam;21;21;Adam
-    Petra;23;23;Petra
-    Karel;25;25;Karel
+    Adam,21,21,Adam
+    Petra,23,23,Petra
+    Karel,25,25,Karel
 
 The output contains each column twice, because wildcard `&1.*` was evaluated to `&1.name, &1.age, &1.1, &1.2`.
 How to fix it?
@@ -126,9 +126,9 @@ How to fix it?
 
 The output is now:
 
-    Adam;21
-    Petra;23
-    Karel;25
+    Adam,21
+    Petra,23
+    Karel,25
 
 The command can be also written as
 
@@ -443,7 +443,7 @@ Output is always without first line column names.
     -dCHAR
     --delimiter=CHAR
 
-Changes default primary delimiter. The default value is ';'.
+Changes default primary delimiter. The default value is ','.
 
     -sCHAR
     --secondary-delimiter=CHAR
@@ -540,7 +540,7 @@ This will select `/etc/passwd` and `/etc/group` file. They can be addressed ethe
 
 If `filename` is put inside \` quotes, no wildcard or expansion logic will apply to it.
 
-You can also add custom attributes to files in formats `FILE -a "xyz" --attribute="z" -a;`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
+You can also add custom attributes to files in formats `FILE -a "xyz" --attribute="z" -a`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
 
 ##### Possible attributes
     

@@ -108,7 +108,20 @@ readValue val
       [(_, "")] -> True
       _         -> False
 
- 
+check_square_data :: [[a]] -> [[a]]
+check_square_data [] = []
+check_square_data (x : rest) = x : check_square_data_n 2 (length x) rest
+  
+check_square_data_n :: Int -> Int -> [[a]] -> [[a]]
+check_square_data_n _ _ [] = []
+check_square_data_n line_number n (x : rest) = 
+  if length x == n then 
+    x : check_square_data_n (line_number+1) n rest
+  else
+    error$ "Invalid CSV file. Bad number of columns at line " ++ show line_number ++ 
+      ". Expected " ++ show n ++ ". Got " ++ show (length x) ++ "."
+
+
 buildTableFromIn :: [String] -> Bool -> [[String]] -> Table
 buildTableFromIn table_names named in_str =
   buildTable table_names expanded_names in_data  
@@ -124,10 +137,13 @@ buildTableFromIn table_names named in_str =
       |named = map (\(x,y) -> [x,y]) (zip (head in_str)$ map show [1..])
       |otherwise = map (map show) $ group [1..]
     
+    c_in_str :: [[String]]
+    c_in_str = check_square_data in_str
+
     in_data :: [[Value]]
     in_data
-      |named = map (map readValue)$ tail in_str
-      |otherwise = map (map readValue)$ in_str
+      |named = map (map readValue)$ tail c_in_str
+      |otherwise = map (map readValue)$ c_in_str
 
 -- | Parses CSV file described in given `Assignment`
 parseFile :: Assignment -> IO Table

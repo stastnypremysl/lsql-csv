@@ -16,7 +16,7 @@ main = do
     putStr$ "Usage: lsql-csv [OPTIONS] COMMAND\n\
     	    \  -h/--help\t\t\t\tShow this help.\n\
     	    \  -n/--named\t\t\t\tEnables first line naming convension in csv files.\n\
-	    \  -dCHAR/--delimiter=CHAR\t\tChanges default primary delimiter. The default value is ';'.\n\
+	    \  -dCHAR/--delimiter=CHAR\t\tChanges default primary delimiter. The default value is ','.\n\
 	    \  -sCHAR/--secondary-delimiter=CHAR\tChanges default quote char (secondary delimiter). The default value is '\"'.\n\n\
             \  Details can be found in the documentation.\n\
 	    \  See: https://github.com/stastnypremysl/lsql-csv/blob/dev/README.md\n"

@@ -32,10 +32,16 @@ csvGenerate sep sec_sep cols =
 
     genCell :: String -> String
     genCell input 
-      | any (==sep) input = [sec_sep] ++ (doubleSecSep input) ++ [sec_sep]
+      | any (==sep) input = quoted_input
+      | any (==sec_sep) input = quoted_input
+      | any (=='\n') input = quoted_input
+
       | otherwise = input
 
       where 
+        quoted_input :: String
+        quoted_input = [sec_sep] ++ (doubleSecSep input) ++ [sec_sep]
+
         doubleSecSep :: String -> String
         doubleSecSep [] = []
         doubleSecSep (a : rest)

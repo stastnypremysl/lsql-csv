@@ -35,7 +35,7 @@ load_ag (Program a1 a2 a3 a4) (Opt (Named c) : rest) = load_ag (Program a1 a2 a3
 
 load_args :: [Arg] -> Program
 load_args args = 
-  load_ag (Program "" ';' '"' False) args
+  load_ag (Program "" ',' '"' False) args
 
 -- | Loads additional options to the `Program`
 reloadOpts :: Program -> [Option] -> Program

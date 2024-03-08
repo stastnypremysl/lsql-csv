@@ -5,12 +5,12 @@ result_file=$(mktemp)
 trap "rm $in_file $result_file" EXIT
 
 cat >$in_file <<- EOF
-name;"weird!name";"huhuhaha"
-1;2;3
+name,"weird!name","huhuhaha"
+1,2,3
 EOF
 
 cat >$result_file <<- EOF
-1;2;3
+1,2,3
 EOF
 
 
