@@ -43,7 +43,7 @@ It is also advantageous to know SQL.
 
 The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. To make example reading more comfortable, we have added `/etc/passwd` and `/etc/group` columns description from man pages to the text.
 
-/etc/passwd have following columns:
+`/etc/passwd` have following columns:
 * login name
 * optional encrypted password
 * numerical user ID
@@ -52,7 +52,7 @@ The following examples will be mainly about parsing of `/etc/passwd` and parsing
 * user home directory
 * optional user command interpreter
 
-/etc/group have following columns:
+`/etc/group` have following columns:
 * group name
 * password
 * numerical group ID
