@@ -41,7 +41,7 @@ The following examples might be not enough for reader, who don't know Unix/Linux
 
 It is also advantageous to know SQL.
 
-The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. To make example reading more comfortable, we have added /etc/passwd and /etc/group columns description from man pages to the text.
+The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. To make example reading more comfortable, we have added `/etc/passwd` and `/etc/group` columns description from man pages to the text.
 
 /etc/passwd have following columns:
 * login name
