@@ -115,6 +115,7 @@ Now, we can select all columns with wildcard `&1.*`:
     lsql-csv -n 'people.csv, &1.*'
 
 As the output, we get
+
     Adam,21,21,Adam
     Petra,23,23,Petra
     Karel,25,25,Karel
