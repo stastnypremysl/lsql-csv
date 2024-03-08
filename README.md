@@ -41,7 +41,22 @@ The following examples might be not enough for reader, who don't know Unix/Linux
 
 It is also advantageous to know SQL.
 
-The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. You may look at `man 5 passwd` and `man 5 group` to see what columns it contain.
+The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. To make example reading more comfortable, we have added /etc/passwd and /etc/group columns description from man pages to the text.
+
+/etc/passwd have following columns:
+* login name
+* optional encrypted password
+* numerical user ID
+* numerical group ID
+* user name or comment field
+* user home directory
+* optional user command interpreter
+
+/etc/group have following columns:
+* group name
+* password
+* numerical group ID
+* user list
 
 #### Hello World
 
@@ -99,7 +114,7 @@ Let's suppose a file people.csv:
     Petra,23
     Karel,25
 
-Now, let's get all the names of people in people.csv:
+Now, let's get all the names of people in people.csv using the `-n` named switch:
 
     lsql-csv -n 'people.csv, &1.name'
 
@@ -109,7 +124,8 @@ The output will be:
     Petra
     Karel
 
-As you can see, we can reference named columns by a name. If named columns are enabled, each column have two names under &X - the number name &X.Y and actual name &X.NAME.
+As you can see, we can reference named columns by a name. Named switch `-n` enables first line headers.
+If named columns are enabled, each column have two names under &X - the number name &X.Y and actual name &X.NAME.
 
 Now, we can select all columns with wildcard `&1.*`:
 
