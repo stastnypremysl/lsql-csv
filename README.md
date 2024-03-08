@@ -112,6 +112,7 @@ The output will be:
 As you can see, we can reference named columns by a name. If named columns are enabled, each column have two names under &X - the number name &X.Y and actual name &X.NAME.
 
 Now, we can select all columns with wildcard `&1.*`:
+
     lsql-csv -n 'people.csv, &1.*'
 
 As the output, we get
