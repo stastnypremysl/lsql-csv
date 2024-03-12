@@ -186,7 +186,7 @@ lessP symbol_list arg =
 moreP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen More) ">" symbol_list arg
 notEqualP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen More) "!=" symbol_list arg
+  try$ twoArgInFP 4 (aritmeticF2Gen NotEqual) "!=" symbol_list arg
 equalP symbol_list arg = 
   try$ twoArgInFP 4 (aritmeticF2Gen Equal) "==" symbol_list arg
 
@@ -301,12 +301,18 @@ nonAtomChars = "\n `\"'$()<>="
 
 oneRegularAtomP :: Parser Arg
 oneRegularAtomP = do
-  atom <- many1$ noneOf nonAtomChars
-  return$ Symbol atom
+  atom <- many1$ noneOf$ nonAtomChars ++ "[]*,{}^+-!/|"
+  return$ atomParse atom
+
+atomParse :: String -> Arg
+atomParse "e" = Value$ DoubleValue$ exp 1
+atomParse "pi" = Value$ DoubleValue pi
+atomParse "true" = Value$ BoolValue$ True
+atomParse "false" = Value$ BoolValue$ False
+atomParse x = Symbol x
 
 constantP :: Parser Arg
 constantP = stringConstantP <|>
-  (try$ trueConstantP) <|> (try$ falseConstantP) <|>
   (try$ doubleConstantP) <|> (try$ intConstantP) <|> 
  (try$ minusDoubleConstantP) <|> (try$ minusIntConstantP) 
 
@@ -320,7 +326,7 @@ selectAtomP symbol_list = do
   expr <- many1$ noneOf nonAtomChars
   let symbols = concat$ map (globMatching symbol_list)$ bracketExpand expr
 
-  return$ map Symbol symbols
+  return$ map atomParse symbols
 
 minusIntConstantP :: Parser Arg
 minusIntConstantP = do
@@ -358,16 +364,6 @@ stringConstantP = do
   
   return$ Value$ StringValue ret
 
-trueConstantP :: Parser Arg
-trueConstantP = do
-  string "true"
-  return$ Value$ BoolValue$ True
-
-falseConstantP :: Parser Arg
-falseConstantP = do
-  string "false"
-  return$ Value$ BoolValue$ False
- 
 atomP :: [String] -> Parser [Arg]
 atomP symbol_list = do
   skipMany space

@@ -99,8 +99,18 @@ wildcardExpand (FileAssignment (ExoticFileName s) _) = do
   return [s]
 
 wildcardExpand (FileAssignment (WildCards wcs) _) = do
-  resolved <- mapM glob wcs
+  resolved <- mapM custGlob wcs
   return$ concat resolved
+
+  where
+    custGlob :: String -> IO [String]
+    custGlob x = do
+      ret <- glob x
+
+      if ret /= [] then
+        return ret
+      else 
+        return [x]
 
 getNames :: FileAssignment -> [String]
 getNames (NamedFileAssignment name rest) = name : getNames rest

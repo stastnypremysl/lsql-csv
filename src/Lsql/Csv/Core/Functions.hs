@@ -127,6 +127,7 @@ getTable names printables = Table names (getCols printables)
 printTable :: Table -> [Printable]
 printTable (Table _ cols) = map ColumnP cols
 
+
 genOnelineCols :: [Printable] -> [Printable]
 genOnelineCols [] = []
 
@@ -135,9 +136,11 @@ genOnelineCols (ColumnP (Column _ (val : _)) : rest) =
 
 genOnelineCols ((ValueP val) : rest) = (ValueP val) : (genOnelineCols rest)
 
+
 printableColumnnide :: Printable -> Printable
 printableColumnnide (ValueP p) = ColumnP$ Column [] [p]
 printableColumnnide p = p
+
 
 appendPrintable :: Printable -> Printable -> Printable
 appendPrintable a0 b0 =
@@ -162,6 +165,7 @@ unionCols cols
     col2union [] [] = []
     col2union (a : rest_a) (b : rest_b) = 
       (a `appendPrintable` b) : (col2union rest_a rest_b)
+
 
 -- | Unions multiple first lines of lists of [`Printable`]
 -- into one `Printable`

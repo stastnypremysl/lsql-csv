@@ -4,7 +4,7 @@
 The tool implements a new language LSQL similar to SQL, which is type-less, specifically designed for working with CSV files in shell. 
 
 ## Installation
-It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.17`), text (`>=1.2 <2.1`) and containers (`>=0.5 <0.7`)
+It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.17`), text (`>=1.2 <1.3`) and containers (`>=0.5 <0.7`)
  installed. (The package boundaries given are identical to cabal bounderies.) Run then:
 
     make
@@ -354,14 +354,23 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ARITHMETIC_EXPR -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
       ARITHMETIC_EXPR -> ARITHMETIC_EXPR TWOARG_FUNCTION ARITHMETIC_EXPR
       ARITHMETIC_EXPR -> (ARITHMETIC_EXPR)
+      // Logical negation
+      ARITHMETIC_EXPR -> ! ARITHMETIC_EXPR
+      ARITHMETIC_EXPR -> - ARITHMETIC_EXPR
       
       SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
       SELECT_EXPR ->
       
       ATOM_SELECTOR ~~> ATOM ... ATOM   // Wildcard and brace expansion
       
+      // eg. 1.0, "text", 1
       ATOM -> CONSTANT
-      ATOM -> COL_SYMBOL
+      // eg. &1.1
+      ATOM -> COLUMN_NAME
+      ATOM -> pi
+      ATOM -> e
+      ATOM -> true
+      ATOM -> false
       ATOM -> $(ARITHMETIC_EXPR)
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
       ATOM -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
@@ -380,6 +389,7 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       AGGREGATE_FUNCTION -> min
       AGGREGATE_FUNCTION -> avg
       
+      //All trigonometric functions in radian
       ONEARG_FUNCTION -> sin
       ONEARG_FUNCTION -> cos
       ONEARG_FUNCTION -> tan
@@ -399,6 +409,7 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ONEARG_FUNCTION -> exp
       ONEARG_FUNCTION -> sqrt
       
+      //The length of the string
       ONEARG_FUNCTION -> size
       ONEARG_FUNCTION -> to_string
       
@@ -406,7 +417,6 @@ Now, if you understood the examples, is the time to move forward to more abstrac
       ONEARG_FUNCTION -> abs
       ONEARG_FUNCTION -> signum
       
-      ONEARG_FUNCTION -> round
       ONEARG_FUNCTION -> truncate
       ONEARG_FUNCTION -> ceiling
       ONEARG_FUNCTION -> floor
@@ -501,6 +511,7 @@ If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exot
 
 #### Exotic chars
 There are some chars which cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-`, `.`, `&` and `_`. 
+Also first char of a symbol name must be non-numerical to not be considered as an exotic char.
 Referencing names containing exotic chars without quotes is unsupported.
 
 It is possible to reference columns with name with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of column name from the syntax perspective of language - it must be inside the quotes.

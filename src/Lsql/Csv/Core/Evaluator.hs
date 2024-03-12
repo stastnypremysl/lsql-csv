@@ -11,10 +11,6 @@ import Lsql.Csv.Core.Tables
 import Data.List
 
 
-filterCols :: [Printable] -> [Column]
-filterCols [] = []
-filterCols (ValueP val : rest) = filterCols rest
-filterCols (ColumnP col : rest) = col : filterCols rest
 
 -- | Evaluates the program in parsed [`Block`] over the input in `SymbolMap`
 evaluate :: SymbolMap -> [Block] -> [Printable]
