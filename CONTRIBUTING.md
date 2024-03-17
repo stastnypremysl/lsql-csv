@@ -1,1 +1,1 @@
-Any reasonable contribution is welcome! Feel free to send pull requests.
+Any reasonable contributions is welcome! Feel free to send pull requests.
