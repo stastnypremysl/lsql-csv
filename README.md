@@ -542,7 +542,7 @@ These chars can be used for fast appending. If two atoms are written without spa
 #### Constants
 There are 3 types of constants. String, Double and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
 
-# TWOARG_FUNCTION operator precedence
+#### TWOARG_FUNCTION operator precedence
 The following list outlines the precedence and associativity of lsql-csv infix operators. The lower precedence number, the higher priority.
 * 1: `in`, `**`, `^`
 * 2: `*`, `/`, `div`, `quot`, `rem`, `mod`, `gcd`, `lcm`
