@@ -339,22 +339,22 @@ Output is always without first line column names.
     -dCHAR
     --delimiter=CHAR
 
-Changes default primary delimiter. The default value is ','.
+Changes default primary delimiter. The default value is `,`.
 
     -sCHAR
     --secondary-delimiter=CHAR
     
-Changes default quote char (secondary delimiter). The default value is ".
+Changes default quote char (secondary delimiter). The default value is `"`.
 
 ### Datatypes
-There are 4 datatypes considered: Bool, Int, Double, String. 
-Bool is either true/false, Int is at least 30 bit integer, Double double-precision floating point number and String is a ordinary char string.
+There are 4 datatypes considered: `Bool`, `Int`, `Double`, `String`. 
+`Bool` is either true/false, `Int` is at least 30 bit integer, `Double` double-precision floating point number and `String` is a ordinary char string.
 
 During CSV data parsing there is always selected the most concrete datatype possible. 
-* Bool, if true or false
-* Int, if `[0-9]+` matches
-* Double, if `[0-9]+.[0-9]+(e[0-9]+)?` matches
-* String, if non of above matches
+* `Bool`, if `true` or `false`
+* `Int`, if `[0-9]+` matches
+* `Double`, if `[0-9]+.[0-9]+(e[0-9]+)?` matches
+* `String`, if none of above matches
 
 ### Joins
 Join mean, that you put multiple input files into from block.
