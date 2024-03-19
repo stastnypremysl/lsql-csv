@@ -481,11 +481,19 @@ Joins have always the time complexity O(nm). There is no optimization made based
       TWOARG_FUNCTION -> ^     //natural power
       TWOARG_FUNCTION -> /
       
+      // Integer division truncated towards minus infinity
+      // (x div y)*y + (x mod y) == x
       TWOARG_FUNCTION -> div
+      TWOARG_FUNCTION -> mod
+      
+      //Integer division truncated towards 0
+      // (x quot y)*y + (x rem y) == x  
       TWOARG_FUNCTION -> quot
       TWOARG_FUNCTION -> rem
-      TWOARG_FUNCTION -> mod
+
+      // greatest common divisor
       TWOARG_FUNCTION -> gcd
+      // least common multiple
       TWOARG_FUNCTION -> lcm
       
       TWOARG_FUNCTION -> ++    //append
@@ -519,12 +527,10 @@ default name, which is given path to the file or `-` in case of stdin in from bl
 
 Each column of a source file have a number and may have name (if named option is enabled for the given source file). 
 
-If the source file with index M (numbering input files from 1) have been given a name XXX, it is columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
+If the source file with index M (numbering input files from 1) have been given a name XXX, its columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
 If named option is enabled and a column have name `NAME`, it can be also addressed by &M.NAME or XXX.NAME.
 
 If there is collision in naming (two source file have same name or two columns under the same source file have same name), then the behavior is undefined.
-
-If you want to write exotic identifiers/names, put them in \`EXOTIC NAME\`. Exotic names are names, which contains exotic characters.
 
 
 #### Exotic chars
@@ -537,7 +543,7 @@ It is possible to reference columns with name with exotic chars using \` quote -
 #### Quote chars
 There are 3 quotes (\`, " and ') used in Lsql. " and ' are always quoting a string. The \` quote is used for quoting symbol names.
 
-These chars can be used for fast appending. If two atoms are written without space and are separated using the quotes, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
+These chars can be used for fast appending. If two atoms inside SELECT_EXPR are written without space and are separated using the quotes, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
 
 #### Constants
 There are 3 types of constants. String, Double and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
@@ -552,7 +558,7 @@ The following list outlines the precedence and associativity of lsql-csv infix o
 
 
 #### Select expression
-They are similar to bash expressions. They are made by atom selector expressions separated by whitespaces. These expressions are expanded, evaluated and matched to column name, aggregate functions or arithmetic expressions.
+They are similar to bash expressions. They are made by atom selector expressions separated by whitespaces. These expressions are expanded, evaluated and matched to column name, constant, aggregate functions or arithmetic expressions.
 
 Every atom selector expression can consist
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
@@ -562,14 +568,17 @@ Every atom selector expression can consist
 * Quotes " or ' to insert string
 * Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there cannot be any space after FUNCTION
 * Call of single arg function `ONEARG_FUNCTION(arithmetic expression)` - there cannot be any space after FUNCTION
+* Constants
 * Reference to a column name
 
-Please, keep in mind, that all integers, floats and booleans constants and nonaggregate functions must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
+If you want to concatenate strings without cat, you can write `a.1","a.2`.
+
+Please, keep in mind, that TWOARG_FUNCTION functions must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
 
 #### Arithmetic expression
-The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /, div, mod,... You must also quote all string, or they can be behaved as numbers, booleans or matched to column names.
+The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /,... You must also quote all string, or they can be behaved as numbers, booleans or matched to column names.
 
-The only significant difference with awk are two args functions, which are called like `5 mod 2`. 
+The significant difference with awk are two args functions, which are called like `5 mod 2`. 
 
 #### Select blocks
 These blocks determine output. They accept select expression and are evaluated and printed in delimitered format. 
@@ -586,7 +595,6 @@ This will print column 3, 4, 5 and 6 from first file.
     
 This will print 6th, 5th, 4th of all files which name begins with ax.
 
-If you want to concatenate strings without cat, you can write `a.1","a.2`.
 
 #### From blocks
 There must be exactly one from block in the beginning of the command. The block can contain any files (and stdio in `-` format). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
@@ -599,7 +607,7 @@ This will select `/etc/passwd` and `/etc/group` file. They can be addressed ethe
 
 If `filename` is put inside \` quotes, no wildcard or expansion logic will apply to it.
 
-You can also add custom attributes to files in formats `FILE -a "xyz" --attribute="z" -a`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
+You can also add custom attributes to files in format `FILE -aX --attribute=X -b`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
 
 ##### Possible attributes
     
@@ -627,17 +635,20 @@ Example:
 
     /etc/passwd -d:
 
-Currently, CHARs, which are also quotes in Lsql, are not supported.
+Currently, comma and CHARs, which are also quotes in Lsql, are not supported.
     
 #### If block
 This block always begins with if. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
+Rows with true are printed or aggregated, rows with false are skipped.
 
 Filtering is done before the aggregation.
 
-You can imagine if statement as where clause in SQL.
+You can imagine if block as where clause in SQL.
 
 #### By block
 This statement always begins with `by` and the rest of the block is select expression. There can be only one By block in the whole command.
+
+The by block is used to group the resulting set by the given atoms.
 
 You can imagine by block as the group by clause in SQL. 
 
@@ -648,6 +659,8 @@ If there is an aggregate function present without by block present, aggregation 
 #### Sort block
 This block can be at the end of the command. It begins with `sort` keyword and the rest is select expression.
 
-You can imagine by sort as the order by clause in SQL.
+The sort block determines the order of final output - given atoms are sorted in ascending order.
+
+You can imagine sort block as the order by clause in SQL.
 
 There can be only one Sort block in the whole command.
