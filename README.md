@@ -636,7 +636,7 @@ Example:
 Currently, comma and CHARs, which are also quotes in Lsql, are not supported.
     
 #### If block
-This block always begins with `if`. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
+This block always begins with `if`. They accept arithmetic expression, which should be convertable to bool - either string `false`/`true`, int (`0` `false`, anything else `true`) or bool. 
 Rows with true are printed or aggregated, rows with false are skipped.
 
 Filtering is done before the aggregation.
