@@ -400,7 +400,7 @@ Joins have always the time complexity O(nm). There is no optimization made based
  
       ARITHMETIC_EXPR -> ATOM
       ARITHMETIC_EXPR -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
-      ARITHMETIC_EXPR -> ARITHMETIC_EXPR TWOARG_FUNCTION ARITHMETIC_EXPR
+      ARITHMETIC_EXPR -> ARITHMETIC_EXPR OPERATOR ARITHMETIC_EXPR
       ARITHMETIC_EXPR -> (ARITHMETIC_EXPR)
       // Logical negation
       ARITHMETIC_EXPR -> ! ARITHMETIC_EXPR
@@ -474,42 +474,42 @@ Joins have always the time complexity O(nm). There is no optimization made based
       ONEARG_FUNCTION -> odd
       
       // A in B means A is a substring of B
-      TWOARG_FUNCTION -> in
+      OPERATOR -> in
       
-      TWOARG_FUNCTION -> *
-      TWOARG_FUNCTION -> **    //general power
-      TWOARG_FUNCTION -> ^     //natural power
-      TWOARG_FUNCTION -> /
+      OPERATOR -> *
+      OPERATOR -> **    //general power
+      OPERATOR -> ^     //natural power
+      OPERATOR -> /
       
       // Integer division truncated towards minus infinity
       // (x div y)*y + (x mod y) == x
-      TWOARG_FUNCTION -> div
-      TWOARG_FUNCTION -> mod
+      OPERATOR -> div
+      OPERATOR -> mod
       
       //Integer division truncated towards 0
       // (x quot y)*y + (x rem y) == x  
-      TWOARG_FUNCTION -> quot
-      TWOARG_FUNCTION -> rem
+      OPERATOR -> quot
+      OPERATOR -> rem
 
       // greatest common divisor
-      TWOARG_FUNCTION -> gcd
+      OPERATOR -> gcd
       // least common multiple
-      TWOARG_FUNCTION -> lcm
+      OPERATOR -> lcm
       
-      TWOARG_FUNCTION -> ++    //append
+      OPERATOR -> ++    //append
       
-      TWOARG_FUNCTION -> +
-      TWOARG_FUNCTION -> -
+      OPERATOR -> +
+      OPERATOR -> -
       
-      TWOARG_FUNCTION -> <=
-      TWOARG_FUNCTION -> >=
-      TWOARG_FUNCTION -> <
-      TWOARG_FUNCTION -> >
-      TWOARG_FUNCTION -> !=
-      TWOARG_FUNCTION -> ==
+      OPERATOR -> <=
+      OPERATOR -> >=
+      OPERATOR -> <
+      OPERATOR -> >
+      OPERATOR -> !=
+      OPERATOR -> ==
       
-      TWOARG_FUNCTION -> ||
-      TWOARG_FUNCTION -> &&
+      OPERATOR -> ||
+      OPERATOR -> &&
 
 Each command is made from blocks separated by comma. There are these types of blocks.
 * From block
@@ -548,7 +548,7 @@ These chars can be used for fast appending. If two atoms inside SELECT_EXPR are 
 #### Constants
 There are 3 types of constants. String, Double and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
 
-#### TWOARG_FUNCTION operator precedence
+#### Operator precedence
 The following list outlines the precedence and associativity of lsql-csv infix operators. The lower precedence number, the higher priority.
 * 1: `in`, `**`, `^`
 * 2: `*`, `/`, `div`, `quot`, `rem`, `mod`, `gcd`, `lcm`
@@ -573,7 +573,7 @@ Every atom selector expression can consist
 
 If you want to concatenate strings without cat, you can write `a.1","a.2`.
 
-Please, keep in mind, that TWOARG_FUNCTION functions must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
+Please, keep in mind, that operators must be put inside arithmetic expression, or they will be matched to a column name or aggregate function.
 
 #### Arithmetic expression
 The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /,... You must also quote all string, or they can be behaved as numbers, booleans or matched to column names.
