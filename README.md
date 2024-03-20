@@ -520,7 +520,7 @@ Each command is made from blocks separated by comma. There are these types of bl
 
 First block is always from block. If block after first block is without specifier (`if`, `by` or `sort`), then it is select block. Otherwise it is block specified by the specifier.
 
-From block accept specific grammar (as specified in the grammar description), select, by and sort block select expression (SELECT_EXPR in the grammar) and if block arithmetic expression (ARITHMETIC_EXPR in the grammar).
+From block accept specific grammar (as specified in the grammar description), select, by and sort block select expression (`SELECT_EXPR` in the grammar) and if block arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
 
 Every source file have a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
 default name, which is given path to the file or `-` in case of stdin in from block.
@@ -578,8 +578,6 @@ Please, keep in mind, that TWOARG_FUNCTION functions must be put inside arithmet
 #### Arithmetic expression
 The statement uses classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /,... You must also quote all string, or they can be behaved as numbers, booleans or matched to column names.
 
-The significant difference with awk are two args functions, which are called like `5 mod 2`. 
-
 #### Select blocks
 These blocks determine output. They accept select expression and are evaluated and printed in delimitered format. 
 
@@ -597,7 +595,7 @@ This will print 6th, 5th, 4th of all files which name begins with ax.
 
 
 #### From blocks
-There must be exactly one from block in the beginning of the command. The block can contain any files (and stdio in `-` format). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
+There must be exactly one from block in the beginning of the command. The block can contain any files (and `-` specifies standard input). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there are more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
 
 Example:
 
@@ -638,7 +636,7 @@ Example:
 Currently, comma and CHARs, which are also quotes in Lsql, are not supported.
     
 #### If block
-This block always begins with if. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
+This block always begins with `if`. They accept arithmetic expression, which should be convertable to bool - either string "false"/"true", int (0 false, anything else true) or bool. 
 Rows with true are printed or aggregated, rows with false are skipped.
 
 Filtering is done before the aggregation.
