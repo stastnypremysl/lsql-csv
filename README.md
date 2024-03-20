@@ -520,14 +520,14 @@ Each command is made from blocks separated by comma. There are these types of bl
 
 First block is always from block. If block after first block is without specifier (`if`, `by` or `sort`), then it is select block. Otherwise it is block specified by the specifier.
 
-From block accept specific grammar (as specified in the grammar description), select, by and sort block select expression and if block arithmetic expression.
+From block accept specific grammar (as specified in the grammar description), select, by and sort block select expression (SELECT_EXPR in the grammar) and if block arithmetic expression (ARITHMETIC_EXPR in the grammar).
 
 Every source file have a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
 default name, which is given path to the file or `-` in case of stdin in from block.
 
 Each column of a source file have a number and may have name (if named option is enabled for the given source file). 
 
-If the source file with index M (numbering input files from 1) have been given a name XXX, its columns can be addressed by &M.N, XXX.N, where N is the index of column (numbering columns from 1). 
+If the source file with index M (numbering input files from 1) have been given a name XXX, its columns can be addressed by &M.N or XXX.N, where N is the index of column (numbering columns from 1). 
 If named option is enabled and a column have name `NAME`, it can be also addressed by &M.NAME or XXX.NAME.
 
 If there is collision in naming (two source file have same name or two columns under the same source file have same name), then the behavior is undefined.
