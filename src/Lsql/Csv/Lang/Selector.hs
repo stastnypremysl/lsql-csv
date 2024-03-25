@@ -1,7 +1,7 @@
 {-|
 This module implements selector expression and arithmetic expression parsers.
 -}
-module Lsql.Csv.Lang.Selector (selectorP, aritmeticExprP) where
+module Lsql.Csv.Lang.Selector (selectorP, arithmeticExprP) where
 
 import Text.Parsec
 import Text.Parsec.Prim
@@ -46,45 +46,45 @@ oneArgFP :: (Arg -> Arg) -> String -> [String] -> Parser Arg
 oneArgFP constructor name symbol_list = do
   string name
   char '('
-  ret <- aritmeticExprP symbol_list
+  ret <- arithmeticExprP symbol_list
   char ')'
 
   return$ constructor$ ret
 
-aritmeticFGen :: (Arg -> AritmeticF) -> Arg -> Arg
-aritmeticFGen fun arg = Function$ AritmeticF$ fun arg
+arithmeticFGen :: (Arg -> AritmeticF) -> Arg -> Arg
+arithmeticFGen fun arg = Function$ AritmeticF$ fun arg
 
-sinP symbol_list = try$ oneArgFP (aritmeticFGen Sin) "sin" symbol_list
-cosP symbol_list = try$ oneArgFP (aritmeticFGen Cos) "cos" symbol_list
-tanP symbol_list = try$ oneArgFP (aritmeticFGen Tan) "tan" symbol_list
-asinP symbol_list = try$ oneArgFP (aritmeticFGen Asin) "asin" symbol_list
-acosP symbol_list = try$ oneArgFP (aritmeticFGen Acos) "acos" symbol_list
-atanP symbol_list = try$ oneArgFP (aritmeticFGen Atan) "atan" symbol_list
+sinP symbol_list = try$ oneArgFP (arithmeticFGen Sin) "sin" symbol_list
+cosP symbol_list = try$ oneArgFP (arithmeticFGen Cos) "cos" symbol_list
+tanP symbol_list = try$ oneArgFP (arithmeticFGen Tan) "tan" symbol_list
+asinP symbol_list = try$ oneArgFP (arithmeticFGen Asin) "asin" symbol_list
+acosP symbol_list = try$ oneArgFP (arithmeticFGen Acos) "acos" symbol_list
+atanP symbol_list = try$ oneArgFP (arithmeticFGen Atan) "atan" symbol_list
 
-sinhP symbol_list = try$ oneArgFP (aritmeticFGen Sinh) "sinh" symbol_list
-coshP symbol_list = try$ oneArgFP (aritmeticFGen Cosh) "cosh" symbol_list
-tanhP symbol_list = try$ oneArgFP (aritmeticFGen Tanh) "tanh" symbol_list
-asinhP symbol_list = try$ oneArgFP (aritmeticFGen Asinh) "asinh" symbol_list
-acoshP symbol_list = try$ oneArgFP (aritmeticFGen Acosh) "acosh" symbol_list
-atanhP symbol_list = try$ oneArgFP (aritmeticFGen Atanh) "atanh" symbol_list
+sinhP symbol_list = try$ oneArgFP (arithmeticFGen Sinh) "sinh" symbol_list
+coshP symbol_list = try$ oneArgFP (arithmeticFGen Cosh) "cosh" symbol_list
+tanhP symbol_list = try$ oneArgFP (arithmeticFGen Tanh) "tanh" symbol_list
+asinhP symbol_list = try$ oneArgFP (arithmeticFGen Asinh) "asinh" symbol_list
+acoshP symbol_list = try$ oneArgFP (arithmeticFGen Acosh) "acosh" symbol_list
+atanhP symbol_list = try$ oneArgFP (arithmeticFGen Atanh) "atanh" symbol_list
 
-expP symbol_list = try$ oneArgFP (aritmeticFGen Exp) "exp" symbol_list
-sqrtP symbol_list = try$ oneArgFP (aritmeticFGen Sqrt) "sqrt" symbol_list
+expP symbol_list = try$ oneArgFP (arithmeticFGen Exp) "exp" symbol_list
+sqrtP symbol_list = try$ oneArgFP (arithmeticFGen Sqrt) "sqrt" symbol_list
 
-sizeP symbol_list = try$ oneArgFP (aritmeticFGen Size) "size" symbol_list
-toStringP symbol_list = try$ oneArgFP (aritmeticFGen ToString) "to_string" symbol_list
+sizeP symbol_list = try$ oneArgFP (arithmeticFGen Size) "size" symbol_list
+toStringP symbol_list = try$ oneArgFP (arithmeticFGen ToString) "to_string" symbol_list
 
-negateP symbol_list = try$ oneArgFP (aritmeticFGen Negate) "negate" symbol_list
-absP symbol_list = try$ oneArgFP (aritmeticFGen Abs) "abs" symbol_list
-signumP symbol_list = try$ oneArgFP (aritmeticFGen Signum) "signum" symbol_list
+negateP symbol_list = try$ oneArgFP (arithmeticFGen Negate) "negate" symbol_list
+absP symbol_list = try$ oneArgFP (arithmeticFGen Abs) "abs" symbol_list
+signumP symbol_list = try$ oneArgFP (arithmeticFGen Signum) "signum" symbol_list
 
-roundP symbol_list = try$ oneArgFP (aritmeticFGen Round) "round" symbol_list
-truncateP symbol_list = try$ oneArgFP (aritmeticFGen Truncate) "truncate" symbol_list
-ceilingP symbol_list = try$ oneArgFP (aritmeticFGen Ceiling) "ceiling" symbol_list
-floorP symbol_list = try$ oneArgFP (aritmeticFGen Floor) "floor" symbol_list
+roundP symbol_list = try$ oneArgFP (arithmeticFGen Round) "round" symbol_list
+truncateP symbol_list = try$ oneArgFP (arithmeticFGen Truncate) "truncate" symbol_list
+ceilingP symbol_list = try$ oneArgFP (arithmeticFGen Ceiling) "ceiling" symbol_list
+floorP symbol_list = try$ oneArgFP (arithmeticFGen Floor) "floor" symbol_list
 
-evenP symbol_list = try$ oneArgFP (aritmeticFGen Even) "even" symbol_list
-oddP symbol_list = try$ oneArgFP (aritmeticFGen Odd) "odd" symbol_list
+evenP symbol_list = try$ oneArgFP (arithmeticFGen Even) "even" symbol_list
+oddP symbol_list = try$ oneArgFP (arithmeticFGen Odd) "odd" symbol_list
 
 
 oneArgFunctionsP :: [String] -> Parser Arg
@@ -111,19 +111,19 @@ notP :: [String] -> Parser Arg
 notP symbol_list = do
   char '!'
   skipMany space
-  ret <- aritmeticExprP symbol_list
+  ret <- arithmeticExprP symbol_list
   return$ Function$ LogicF$ Not ret
 
 minusSP :: [String] -> Parser Arg
 minusSP symbol_list = do
   char '-'
   skipMany space
-  ret <- aritmeticExprP symbol_list
+  ret <- arithmeticExprP symbol_list
   return$ Function$ AritmeticF$ MinusS ret
 
 
-aritmeticF2Gen :: (Arg -> Arg -> AritmeticF) -> Arg -> Arg -> Arg
-aritmeticF2Gen fun arg1 arg2 = Function$ AritmeticF$ fun arg1 arg2
+arithmeticF2Gen :: (Arg -> Arg -> AritmeticF) -> Arg -> Arg -> Arg
+arithmeticF2Gen fun arg1 arg2 = Function$ AritmeticF$ fun arg1 arg2
 
 logicF2Gen :: (Arg -> Arg -> LogicF) -> Arg -> Arg -> Arg
 logicF2Gen fun arg1 arg2 = Function$ LogicF$ fun arg1 arg2
@@ -132,63 +132,63 @@ twoArgInFP :: Int -> (Arg -> Arg -> Arg) -> String -> [String] -> Arg -> Parser 
 twoArgInFP level constructor op_name symbol_list arg1 = do
   skipMany space
   string op_name
-  arg2 <- aritmeticExprGenP level symbol_list
+  arg2 <- arithmeticExprGenP level symbol_list
 
   return$ constructor arg1 arg2
 
 inP symbol_list arg = 
-  try$ twoArgInFP 1 (aritmeticF2Gen In) "in" symbol_list arg
+  try$ twoArgInFP 1 (arithmeticF2Gen In) "in" symbol_list arg
 
 powerP symbol_list arg = 
-  try$ twoArgInFP 1 (aritmeticF2Gen Power) "**" symbol_list arg
+  try$ twoArgInFP 1 (arithmeticF2Gen Power) "**" symbol_list arg
 
 naturalPowerP symbol_list arg = 
-  try$ twoArgInFP 1 (aritmeticF2Gen NaturalPower) "^" symbol_list arg
+  try$ twoArgInFP 1 (arithmeticF2Gen NaturalPower) "^" symbol_list arg
 
 multiplyP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Multiply) "*" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Multiply) "*" symbol_list arg
 divideP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Divide) "/" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Divide) "/" symbol_list arg
 
 divP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Div) "div" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Div) "div" symbol_list arg
 
 quotP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Quot) "quot" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Quot) "quot" symbol_list arg
 
 remP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Rem) "rem" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Rem) "rem" symbol_list arg
 
 modP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Mod) "mod" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Mod) "mod" symbol_list arg
 
 gcdP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Gcd) "gcd" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Gcd) "gcd" symbol_list arg
 
 lcmP symbol_list arg = 
-  try$ twoArgInFP 2 (aritmeticF2Gen Lcm) "lcm" symbol_list arg
+  try$ twoArgInFP 2 (arithmeticF2Gen Lcm) "lcm" symbol_list arg
 
 appendP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen Append) "++" symbol_list arg
+  try$ twoArgInFP 3 (arithmeticF2Gen Append) "++" symbol_list arg
 plusP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen Plus) "+" symbol_list arg
+  try$ twoArgInFP 3 (arithmeticF2Gen Plus) "+" symbol_list arg
 minusP symbol_list arg = 
-  try$ twoArgInFP 3 (aritmeticF2Gen Minus) "-" symbol_list arg
+  try$ twoArgInFP 3 (arithmeticF2Gen Minus) "-" symbol_list arg
 
 lessOrEqualP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen LessOrEqual) "<=" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen LessOrEqual) "<=" symbol_list arg
 
 moreOrEqualP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen MoreOrEqual) ">=" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen MoreOrEqual) ">=" symbol_list arg
 
 lessP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen Less) "<" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen Less) "<" symbol_list arg
 moreP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen More) ">" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen More) ">" symbol_list arg
 notEqualP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen NotEqual) "!=" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen NotEqual) "!=" symbol_list arg
 equalP symbol_list arg = 
-  try$ twoArgInFP 4 (aritmeticF2Gen Equal) "==" symbol_list arg
+  try$ twoArgInFP 4 (arithmeticF2Gen Equal) "==" symbol_list arg
 
 orP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen Or) "||" symbol_list arg
 andP symbol_list arg = try$ twoArgInFP 5 (logicF2Gen And) "&&" symbol_list arg
@@ -225,7 +225,7 @@ twoArgInFunctions5P symbol_list arg =
 bracketAritmeticExprP :: [String] -> Parser Arg
 bracketAritmeticExprP symbol_list = do
   char '('
-  ret <- aritmeticExprP symbol_list
+  ret <- arithmeticExprP symbol_list
   char ')'
   return$ ret
 
@@ -249,11 +249,11 @@ nonRecAritmeticExpr symbol_list = do
   skipMany space
   return ret
 
-aritmeticExprNP :: [[String] -> Arg -> Parser Arg] -> [String] -> Parser Arg
-aritmeticExprNP [] symbol_list = nonRecAritmeticExpr symbol_list
+arithmeticExprNP :: [[String] -> Arg -> Parser Arg] -> [String] -> Parser Arg
+arithmeticExprNP [] symbol_list = nonRecAritmeticExpr symbol_list
 
-aritmeticExprNP (funGen : rest) symbol_list = do 
-  pre <- aritmeticExprNP rest symbol_list
+arithmeticExprNP (funGen : rest) symbol_list = do 
+  pre <- arithmeticExprNP rest symbol_list
   ret <- recP pre
   return$ ret
 
@@ -268,17 +268,17 @@ aritmeticExprNP (funGen : rest) symbol_list = do
           return$ rec_ret
         Nothing -> return accu
 
-aritmeticExprGenFP =  [twoArgInFunctions5P, twoArgInFunctions4P,
+arithmeticExprGenFP =  [twoArgInFunctions5P, twoArgInFunctions4P,
     twoArgInFunctions3P, twoArgInFunctions2P, twoArgInFunctions1P]
 
-aritmeticExprGenP :: Int -> [String] -> Parser Arg
-aritmeticExprGenP n symbol_list =
-  aritmeticExprNP (drop (length aritmeticExprGenFP - n) aritmeticExprGenFP)
+arithmeticExprGenP :: Int -> [String] -> Parser Arg
+arithmeticExprGenP n symbol_list =
+  arithmeticExprNP (drop (length arithmeticExprGenFP - n) arithmeticExprGenFP)
     symbol_list
 
 -- | Arithmetic expression parser.
-aritmeticExprP :: [String] -> Parser Arg
-aritmeticExprP symbol_list = aritmeticExprGenP 5 symbol_list
+arithmeticExprP :: [String] -> Parser Arg
+arithmeticExprP symbol_list = arithmeticExprGenP 5 symbol_list
 
 globMatching :: [String] -> String -> [String]
 globMatching symbols expr = 

@@ -27,7 +27,7 @@ ifBP symbol_list = do
   skipMany space
   string "if"
   skipMany1 space
-  ret <- aritmeticExprP symbol_list
+  ret <- arithmeticExprP symbol_list
   skipMany space
   return$ If ret
 

@@ -19,7 +19,7 @@ main = do
 	    \  -dCHAR/--delimiter=CHAR\t\tChanges default primary delimiter. The default value is ','.\n\
 	    \  -sCHAR/--secondary-delimiter=CHAR\tChanges default quote char (secondary delimiter). The default value is '\"'.\n\n\
             \  Details can be found in the documentation.\n\
-	    \  See: https://github.com/stastnypremysl/lsql-csv/blob/dev/README.md\n"
+	    \  See: https://github.com/stastnypremysl/lsql-csv/blob/master/README.md\n"
   else do
     out <- run$ parseArgs args 
     putStr$ out
