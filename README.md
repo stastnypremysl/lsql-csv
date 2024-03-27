@@ -592,7 +592,7 @@ This will print columns 3, 4, 5, and 6 from the first file.
 
     ax*.{6..4} 
     
-This will print the 6th, 5th, and 4th of all files whosev name begins with ax.
+This will print the 6th, 5th, and 4th of all files whose name begins with ax.
 
 
 #### From blocks
