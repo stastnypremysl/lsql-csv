@@ -1,7 +1,7 @@
 # lsql-csv
-`lsql-csv` is a tool for CSV files data querying from the shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
+`lsql-csv` is a tool for CSV file data querying from the shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
 
-The tool implements a new language LSQL similar to SQL, which is type-less, specifically designed for working with CSV files in shell. 
+The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in shell. 
 
 ## Installation
 It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.17`), text (`>=1.2 <1.3`) and containers (`>=0.5 <0.7`)
@@ -23,7 +23,7 @@ If you have installed `cabal`, you can alternatively run:
 It will also install the dependencies for you.    
 
 ### Running the unit tests
-If you want to verify, that the package has compiled correctly, it is possible to test it by running:
+If you want to verify, that the package has been compiled correctly, it is possible to test it by running:
 
     make test
 
@@ -31,7 +31,7 @@ This will run all unit tests for you.
 
 
 ## lsql-csv - quick introduction 
-LSQL, the language of `lsql-csv`, aims to be a more lapidary language than SQL. Its design purpose is to enable it's user to quickly write simple queries directly to the terminal - it's design purpose is therefore different from SQL, where the readability of queries is more taken into account than in LSQL.
+LSQL, the language of `lsql-csv`, aims to be a more lapidary language than SQL. Its design purpose is to enable its user to quickly write simple queries directly to the terminal - its design purpose is therefore different from SQL, where the readability of queries is more taken into account than in LSQL.
 
 
 ### Examples
@@ -43,20 +43,20 @@ It is also advantageous to know SQL.
 
 The following examples will be mainly about parsing of `/etc/passwd` and parsing of `/etc/group`. To make example reading more comfortable, we have added `/etc/passwd` and `/etc/group` column descriptions from man pages to the text.
 
-`/etc/passwd` has the following columns:
-* login name
-* optional encrypted password
-* numerical user ID
-* numerical group ID
-* user name or comment field
-* user home directory
-* optional user command interpreter
+File `/etc/passwd` has the following columns:
+* login name;
+* optional encrypted password;
+* numerical user ID;
+* numerical group ID;
+* user name or comment field;
+* user home directory;
+* optional user command interpreter.
 
-`/etc/group` has the following columns:
-* group name
-* password
-* numerical group ID
-* user list
+File `/etc/group` has the following columns:
+* group name;
+* password;
+* numerical group ID;
+* user list.
 
 #### Hello World
 
@@ -96,7 +96,7 @@ The output might be:
     nobody:x:65534:65534:nobody:/var/empty:/bin/false
     me:x:1000:1000::/home/me:/bin/bash
 
-If you specify delimiter specifically for `/etc/passwd`, the output will be comma delimited.
+If you specify delimiter specifically for `/etc/passwd`, the output will be a comma delimited.
     
     lsql-csv '/etc/passwd -d:, &1.*, if &1.3 >= 1000'
 
@@ -137,7 +137,7 @@ As the output, we get
     Petra,23,23,Petra
     Karel,25,25,Karel
 
-The output contains each column twice, because wildcard `&1.*` was evaluated to `&1.1, &1.2, &1.age, &1.name`.
+The output contains each column twice because wildcard `&1.*` was evaluated to `&1.1, &1.2, &1.age, &1.name`.
 How to fix it?
 
     lsql-csv -n 'people.csv, &1.[1-9]*'
@@ -158,7 +158,7 @@ The output will be in both cases still the same.
 
 #### Simple join
 
-Lets say, I am interested in the default group names of users. We need to join to tables: `/etc/passwd` and `/etc/group`. Let's do it.
+Let's say, I am interested in the default group names of users. We need to join to tables: `/etc/passwd` and `/etc/group`. Let's do it.
 
     lsql-csv -d: '/etc/{passwd,group}, &1.1 &2.1, if &1.4 == &2.3'
     
@@ -171,7 +171,7 @@ Finally, the output can be something like this:
     daemon:daemon
     me:me
 
-The first column is the name of an user and the second column is the name of its default group.
+The first column is the name of a user and the second column is the name of its default group.
     
 #### Basic grouping
 Let's say, I want to count users using the same shell. 
@@ -191,7 +191,7 @@ And the output?
 You can see here the first usage of `by` block, which is equivalent of `group by` in SQL. 
 
 #### Basic sorting
-Lets say, you want to sort your users with UID greater than or equal to 1000 ascendingly.
+Let's say, you want to sort your users with UID greater than or equal to 1000 ascendingly.
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000, sort &1.3'
 
@@ -234,7 +234,7 @@ As you can see, string formatting is sometimes very simple with LSQL.
 
 #### Arithmetic expression
 
-So far, we just met all kinds of blocks and only if block accepts an arithmetic expression and the other accepts a select expression. 
+So far, we just met all kinds of blocks, and only if block accepts an arithmetic expression and the other accepts a select expression. 
 What if we needed to run an arithmetic expression inside a select expression? There is a special syntax `$(...)` for it.
 
 For example:
@@ -271,7 +271,7 @@ Let's see more complicated examples.
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
-This will print all pairs user and its group excluding the default group. You can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
+This will print all pairs of user and its group excluding the default group. If you know SQL, you can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
 
 How does `in` work? It's one of the basic string level "consist". If A is a substring of B, then `A in B` is true. Otherwise, it is false.
 
@@ -287,7 +287,7 @@ And the output?
 
 #### More complicated...
 
-The previous example doesn't give a very readable output. We can use `group by` to improve it (shortened as `g`).
+The previous example doesn't give a very readable output. We can use `group by` to improve it (shortened as `by`).
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 cat(g.1","), if p.1 in g.4, by p.1'
 
@@ -317,8 +317,8 @@ This will output something like:
     news:news,news
 
 The first part of the command is the same as in the previous example. The second part inner joins the output
-of the first part with `/etc/passwd` on username and `/etc/group` on default GID number and prints
-the output of the first part with added default group name.
+of the first part with `/etc/passwd` on the username and `/etc/group` on the default GID number and prints
+the output of the first part with an added default group name.
 
 ## Usage
 Now, if you understand the examples, it is time to move forward to a more abstract description of the language and tool usage.
@@ -350,11 +350,11 @@ Changes default quote char (secondary delimiter). The default value is `"`.
 There are 4 datatypes considered: `Bool`, `Int`, `Double`, `String`. 
 `Bool` is either true/false, `Int` is at least a 30-bit integer, `Double` double-precision floating point number, and `String` is an ordinary char string.
 
-During CSV data parsing, there is always selected the most concrete datatype possible. 
-* `Bool`, if `true` or `false`
-* `Int`, if `[0-9]+` matches
-* `Double`, if `[0-9]+.[0-9]+(e[0-9]+)?` matches
-* `String`, if none of above matches
+During CSV data parsing, the following logic of datatype selection is used: 
+* `Bool`, if `true` or `false`;
+* `Int`, if `[0-9]+` matches;
+* `Double`, if `[0-9]+.[0-9]+(e[0-9]+)?` matches;
+* `String`, if none of the above matches.
 
 ### Joins
 Join means, that you put multiple input files into from block.
@@ -519,12 +519,12 @@ Each command is made from blocks separated by a comma. There are these types of 
 * By block
 * Sort block
 
-The first block is always from block. If the block after the first block is without a specifier (`if`, `by` or `sort`), then it is a select block. Otherwise it is a block specified by the specifier.
+The first block is always from block. If the block after the first block is without a specifier (`if`, `by`, or `sort`), then it is a select block. Otherwise, it is a block specified by the specifier.
 
 From block accept specific grammar (as specified in the grammar description), select, by, and sort block select expression (`SELECT_EXPR` in the grammar) and if block arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
 
 Every source file has a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
-default name, which is given path to the file or `-` in case of stdin in from block.
+default name, which is given the path to the file or `-` in case of stdin in from block.
 
 Each column of a source file has a number and may have a name (if the named option is enabled for the given source file). 
 
@@ -544,10 +544,10 @@ It is possible to reference columns with names with exotic chars using \` quote 
 #### Quote chars
 There are 3 quotes (\`, " and ') used in Lsql. " and ' are always quoting a string. The \` quote is used for quoting symbol names.
 
-These chars can be used for fast appending. If two atoms inside SELECT_EXPR are written without space and are separated using the quotes, they will be appended. For example `abc"abc"` means: append column abc to the string abc.
+These chars can be used for fast appending. If two atoms inside SELECT_EXPR are written without space and are separated using the quotes, they will be appended. For example, `abc"abc"` means: append column abc to the string abc.
 
 #### Constants
-There are 3 types of constants. String, Double and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
+There are 3 types of constants. String, Double, and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
 
 #### Operator precedence
 The following list outlines the precedence and associativity of lsql-csv infix operators. The lower the precedence number, the higher the priority.
@@ -561,7 +561,7 @@ The following list outlines the precedence and associativity of lsql-csv infix o
 #### Select expression
 They are similar to bash expressions. They are made by atom selector expressions separated by whitespaces. These expressions are expanded, evaluated, and matched to column names, constants, aggregate functions, or arithmetic expressions.
 
-Every atom selector expression can consist
+Every atom selector expression can consist:
 * Wildcard (Each wildcard will be expanded to multiple statements during processing)
 * Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
 * Arithmetic expression in `$(expr)` format
@@ -637,7 +637,7 @@ Example:
 Currently, commas and CHARs, which are also quotes in Lsql, are not supported as delimiters.
     
 #### If block
-This block always begins with `if`. They accept arithmetic expressions, which should be convertible to Bool - either String `false`/`true`, Int (`0` `false`, anything else `true`) or Bool. 
+This block always begins with `if`. They accept arithmetic expressions, which should be convertible to Bool - either String `false`/`true`, Int (`0` `false`, anything else `true`), or Bool. 
 Rows with true are printed or aggregated, and rows with false are skipped.
 
 Filtering is done before the aggregation.
@@ -656,7 +656,7 @@ There must be at least one aggregate function in the select block if by block is
 If there is an aggregate function present without by block present, aggregation runs over all rows at once.
 
 #### Sort block
-This block can be at the end of the command. It begins with `sort` keyword and the rest is a select expression.
+This block can be at the end of the command. It begins with the `sort` keyword and the rest is a select expression.
 
 The sort block determines the order of the final output - given atoms are sorted in ascending order.
 
