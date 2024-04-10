@@ -549,13 +549,15 @@ These chars can be used for fast appending. If two atoms inside SELECT_EXPR are 
 #### Constants
 There are 3 types of constants. String, Double, and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
 
-#### Operator precedence
+#### Operator precedence and associativity
 The following list outlines the precedence and associativity of lsql-csv infix operators. The lower the precedence number, the higher the priority.
 * 1: `in`, `**`, `^`
 * 2: `*`, `/`, `div`, `quot`, `rem`, `mod`, `gcd`, `lcm`
 * 3: `++`, `+`, `-`
 * 4: `<=`, `>=`, `<`, `>`, `!=`, `==`
 * 5: `||`, `&&`
+
+All operators are right-to-left associative.
 
 
 #### Select expression
@@ -577,7 +579,7 @@ If you want to concatenate strings without `++` operator, you can write: `a.1","
 Please, keep in mind, that operators must be put inside arithmetic expressions, or they will be matched to a column name or aggregate function.
 
 #### Arithmetic expression
-The statement uses mainly classical awk logic. You can use keywords >, <, <=, >=, ==, ||, &&, +, -, \*, /,... 
+The statement uses mainly classical awk logic. You can use keywords `>`, `<`, `<=`, `>=`, `==`, `||`, `&&`, `+`, `-`, `*`, `/`... 
 
 #### Select blocks
 These blocks determine output. They accept select expressions and are evaluated and printed in a delimitered format. 
@@ -596,7 +598,7 @@ This will print the 6th, 5th, and 4th of all files whose name begins with ax.
 
 
 #### From blocks
-There must be exactly one from block at the beginning of the command. The block can contain any files (and `-` specifies standard input). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion,...). You can also overname the file using `NAME=stmt`. If there is more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2,...)`.
+There must be exactly one from block at the beginning of the command. The block can contain any files (and `-` specifies standard input). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion...). You can also overname the file using `NAME=stmt`. If there is more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2...)`.
 
 Example:
 
