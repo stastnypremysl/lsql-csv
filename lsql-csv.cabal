@@ -71,7 +71,7 @@ executable lsql-csv
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends: lsql-csv, base >=4.9 && <4.17
+  build-depends: lsql-csv, base >=4.9 && <4.20
 
   -- Directories containing source files.
   hs-source-dirs:      main
