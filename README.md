@@ -22,6 +22,10 @@ If you have installed `cabal`, you can alternatively run:
    
 It will also install the dependencies for you.    
 
+The package is also published at https://hackage.haskell.org/package/lsql-csv in Hackage public repository. You can therefore also install it directly without repository cloned with:
+
+    cabal install lsql-csv
+
 ### Running the unit tests
 If you want to verify, that the package has been compiled correctly, it is possible to test it by running:
 
