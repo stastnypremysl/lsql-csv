@@ -1,5 +1,8 @@
 # Revision history for lsql-csv
 
+## 0.1.0.3
+* Improved cabal package description
+
 ## 0.1.0.2
 * Fixed problem in lsql-csv.cabal base upper bound dependency
 

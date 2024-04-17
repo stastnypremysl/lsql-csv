@@ -10,7 +10,7 @@ name:                lsql-csv
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.0.2
+version:             0.1.0.3
 
 -- A short (one-line) description of the package.
 synopsis:            A tool for CSV files data querying from the shell with short queries. 
@@ -89,5 +89,5 @@ source-repository head
 source-repository this
     type: git
     location: https://github.com/stastnypremysl/lsql-csv
-    tag: 0.1.0.2
+    tag: v0.1.0.3
   
