@@ -1,7 +1,7 @@
 # lsql-csv
 `lsql-csv` is a tool for CSV file data querying from the shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
 
-The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in shell. 
+The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. 
 
 ## Installation
 It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.20`), text (`>=1.2 <1.3`) and containers (`>=0.5 <0.7`)
@@ -22,7 +22,7 @@ If you have installed `cabal`, you can alternatively run:
    
 It will also install the dependencies for you.    
 
-The package is also published at https://hackage.haskell.org/package/lsql-csv in Hackage public repository. You can therefore also install it directly without repository cloned with:
+The package is also published at https://hackage.haskell.org/package/lsql-csv in the Hackage public repository. You can therefore also install it directly without the repository cloned with:
 
     cabal install lsql-csv
 
@@ -41,7 +41,7 @@ LSQL, the language of `lsql-csv`, aims to be a more lapidary language than SQL. 
 ### Examples
 One way to learn a new programming language is by understanding concrete examples of its usage. The following examples are written explicitly for the purpose of teaching a reader, how to use the tool `lsql-csv` by showing him many examples of its usage. 
 
-The following examples might not be enough for readers, who don't know Unix/Linux scripting enough. If this is the case, please consider learning Unix/Linux scripting first before LSQL.
+The following examples might not be enough for readers, who don't know enough Unix/Linux scripting. If this is the case, please consider learning Unix/Linux scripting first before LSQL.
 
 It is also advantageous to know SQL.
 
@@ -66,7 +66,7 @@ File `/etc/group` has the following columns:
 
     lsql-csv '-, &1.2 &1.1'
 
-This will print the second (`&1.2`) and the first column (`&1.1`) of csv file on stdin. If you know SQL, you can read it like `from stdio S select S.second, S.first`. 
+This will print the second (`&1.2`) and the first column (`&1.1`) of the CSV file on stdin. If you know SQL, you can read it like `from stdio S select S.second, S.first`. 
 
 Commands are split by commas into blocks. The first block is (*and always is*) the from block. There are file names or `-` (stdin) separated by space. The second block is the select block, also separated by space.
 
@@ -93,7 +93,7 @@ This will print lines of users whose UID >=1000. It can also be written as:
     
 The `-d:` optional argument means the primary delimiter is `:`. In previous examples we used overnaming, which allows us to give a data source file `/etc/passwd` a name `p`.
 
-If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, lsql style is more compressed than standard SQL.
+If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, the lsql style is more compressed than standard SQL.
     
 The output might be:
 
@@ -162,11 +162,11 @@ The output will be in both cases still the same.
 
 #### Simple join
 
-Let's say, I am interested in the default group names of users. We need to join to tables: `/etc/passwd` and `/etc/group`. Let's do it.
+Let's say, I am interested in the default group names of users. We need to join tables `/etc/passwd` and `/etc/group`. Let's do it.
 
     lsql-csv -d: '/etc/{passwd,group}, &1.1 &2.1, if &1.4 == &2.3'
     
-What does `/etc/{passwd,group}` mean? Basically, there are three types of expressions. Select, from and arithmetic expression. In all select and from expressions, you can use expansion and wildcards just like in bash.
+What does `/etc/{passwd,group}` mean? Basically, there are three types of expressions. Select, from, and arithmetic expression. In all select and from expressions, you can use expansion and wildcards just like in bash.
     
 Finally, the output can be something like this:
 
@@ -192,10 +192,10 @@ And the output?
     /sbin/nologin:46
     /sbin/shutdown:1
     
-You can see here the first usage of `by` block, which is equivalent of `group by` in SQL. 
+You can see here the first usage of `by` block, which is equivalent to `group by` in SQL. 
 
 #### Basic sorting
-Let's say, you want to sort your users with UID greater than or equal to 1000 ascendingly.
+Let's say, you want to sort your users by UID with UID greater than or equal to 1000 ascendingly.
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000, sort &1.3'
 
@@ -275,7 +275,7 @@ Let's see more complicated examples.
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
-This will print all pairs of user and its group excluding the default group. If you know SQL, you can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
+This will print all pairs of users and its group excluding the default group. If you know SQL, you can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
 
 How does `in` work? It's one of the basic string level "consist". If A is a substring of B, then `A in B` is true. Otherwise, it is false.
 
@@ -337,7 +337,7 @@ Shows short command line help and exits before doing anything else.
     -n
     --named
 
-Enables first-line naming convention in csv files. This works only on input files. 
+Enables first-line naming convention in CSV files. This works only on input files. 
 Output is always without first-line column names.
     
     -dCHAR
@@ -351,7 +351,7 @@ Changes default primary delimiter. The default value is `,`.
 Changes default quote char (secondary delimiter). The default value is `"`.
 
 ### Datatypes
-There are 4 datatypes considered: `Bool`, `Int`, `Double`, `String`. 
+There are 4 datatypes considered: `Bool`, `Int`, `Double` and `String`. 
 `Bool` is either true/false, `Int` is at least a 30-bit integer, `Double` double-precision floating point number, and `String` is an ordinary char string.
 
 During CSV data parsing, the following logic of datatype selection is used: 
@@ -415,9 +415,9 @@ Joins always have the time complexity O(nm). There is no optimization made based
       
       ATOM_SELECTOR ~~> ATOM ... ATOM //Wildcard and brace expansion
       
-      // eg. 1.0, "text", 'text', 1
+      // e.g. 1.0, "text", 'text', 1
       ATOM -> CONSTANT
-      // eg. &1.1
+      // e.g. &1.1
       ATOM -> COLUMN_NAME
       ATOM -> pi
       ATOM -> e
@@ -525,7 +525,7 @@ Each command is made from blocks separated by a comma. There are these types of 
 
 The first block is always from block. If the block after the first block is without a specifier (`if`, `by`, or `sort`), then it is a select block. Otherwise, it is a block specified by the specifier.
 
-From block accept specific grammar (as specified in the grammar description), select, by, and sort block select expression (`SELECT_EXPR` in the grammar) and if block arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
+From block accept specific grammar (as specified in the grammar description), select, by, and sort block select expression (`SELECT_EXPR` in the grammar), and if block arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
 
 Every source file has a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
 default name, which is given the path to the file or `-` in case of stdin in from block.
@@ -539,7 +539,7 @@ If there is a collision in naming (two source files have the same name or two co
 
 
 #### Exotic chars
-There are some chars that cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-`, `.`, `&` and `_`. 
+Some chars cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-`, `.`, `&`, and `_`. 
 Also first char of a symbol name must be non-numerical to not be considered as an exotic char.
 Referencing names containing exotic chars without quotes is unsupported.
 
@@ -619,7 +619,7 @@ You can also add custom attributes to files in the format `FILE -aX --attribute=
     -n
     --named
 
-It means that csv file has the first line with the names of the columns
+It means that the CSV file has the first line with the names of the columns
 
     -N
     --not-named
