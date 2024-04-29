@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+
+passwd_f=$tmp_folder/passwd_f
+group_f=$tmp_folder/group_f
+
+cat >$passwd_f <<EOF
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/bin/false
+daemon:x:2:2:daemon:/sbin:/bin/false
+lp:x:4:7:lp:/var/spool/lpd:/bin/false
+halt:x:7:0:halt:/sbin:/sbin/halt
+EOF
+
+cat >$group_f <<EOF
+root:x:0:root,halt
+lp:x:7:lp
+wheel:x:10:root,halt
+floppy:x:11:root
+tape:x:26:root
+EOF
+
+
+cat >$correct_out_f <<EOF
+root:root
+root:wheel
+root:floppy
+root:tape
+lp:lp
+halt:root
+halt:wheel
+EOF
+
+
+run_test -d: "p=$passwd_f g=$group_f, p.1 g.1, if p.1 in g.4"
+

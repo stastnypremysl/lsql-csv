@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+1
+2
+3
+4
+5
+EOF
+
+cat >$correct_out_f <<EOF
+5
+EOF
+
+run_test '-, count(&1.1)'
+

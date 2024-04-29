@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+true,true
+true,false
+false,true
+false,false
+EOF
+
+cat >$correct_out_f <<EOF
+true
+false
+false
+false
+EOF
+
+run_test '-, $(&1.1 && &1.2)'
+
+
+
+

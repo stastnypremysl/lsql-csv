@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+a
+bb
+c
+ddd
+ee
+EOF
+
+cat >$correct_out_f <<EOF
+a
+bb
+c
+ddd
+ee
+EOF
+
+run_test '-, to_string(&1.1)'
+
+
+
+

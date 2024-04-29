@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+1,1
+2,2
+2,4
+6,4
+9,5
+9,3
+16,4
+EOF
+
+cat >$correct_out_f <<EOF
+1
+2
+2
+2
+1
+3
+4
+EOF
+
+run_test 'in=-, $(&1.1 gcd &1.2)'
+
+
+
+

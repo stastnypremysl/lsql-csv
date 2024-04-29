@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+
+passwd_f=$tmp_folder/passwd_f
+group_f=$tmp_folder/group_f
+
+cat >$passwd_f <<EOF
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/bin/false
+daemon:x:2:2:daemon:/sbin:/bin/false
+me:x:1000:1000::/home/me:/bin/bash
+EOF
+
+cat >$group_f <<EOF
+root:x:0:root
+bin:x:1:root,bin,daemon
+daemon:x:2:root,bin,daemon
+me:x:1000:
+EOF
+
+
+cat >$correct_out_f <<EOF
+root:root
+bin:bin
+daemon:daemon
+me:me
+EOF
+
+
+run_test -d: "$passwd_f $group_f, &1.1 &2.1, if &1.4 == &2.3"
+

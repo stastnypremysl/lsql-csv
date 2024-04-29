@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+5
+4
+3
+2
+1
+0
+-1
+-2
+-3
+-4
+-5
+EOF
+
+cat >$correct_out_f <<EOF
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+EOF
+
+run_test '-, $((&1.1 div 2)*2 + &1.1 mod 2 == &1.1)'
+
+
+
+

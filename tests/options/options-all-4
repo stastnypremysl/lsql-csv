@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+
+left_f=$tmp_folder/left_f
+right_f=$tmp_folder/right_f
+
+cat >$left_f <<EOF
+id;value
+1;A
+2;B
+3;C
+4;D
+EOF
+
+cat >$right_f <<EOF
+id:value
+4:d
+3:c
+2:b
+1:a
+EOF
+
+
+cat >$correct_out_f <<EOF
+A,a
+B,b
+C,c
+D,d
+EOF
+
+
+run_test "left=$left_f -d; --named -s@ right=$right_f -d: -n --secondary-delimiter=@, &1.2 &2.2, if left.1 == right.1"
+

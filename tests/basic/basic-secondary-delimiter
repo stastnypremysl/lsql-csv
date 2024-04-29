@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+city,population,id,city_ascii,lat,lng,country,iso2,iso3,admin_name,capital
+Tokyo,35676000,1392685764,Tokyo,35.685,139.7514,Japan,JP,JPN,'Tōk,yō',primary
+EOF
+
+cp $in_f $correct_out_f
+
+run_test -d, -s"'" '-,&*.{1..11}'
+
+

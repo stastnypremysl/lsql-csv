@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+1
+5
+4
+8
+EOF
+
+cat >$correct_out_f <<EOF
+18
+EOF
+
+run_test '-, sum(&1.1)'
+
+
+
+

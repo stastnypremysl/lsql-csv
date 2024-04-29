@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$correct_out_f <<EOF
+falsebc
+EOF
+
+run_test '-, $("abc" in "a" ++ "bc")'
+
+

@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+3
+2
+1
+0
+-1
+-2
+-3
+EOF
+
+cat >$correct_out_f <<EOF
+false
+true
+false
+true
+false
+true
+false
+EOF
+
+run_test '-, even(&1.1)'
+
+
+
+

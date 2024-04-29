@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+
+left_f=$tmp_folder/left_f
+mid_f=$tmp_folder/mid_f
+right_f=$tmp_folder/right_f
+
+cat >$left_f <<EOF
+1,A
+2,B
+3,C
+4,D
+EOF
+
+cat >$mid_f <<EOF
+4,d
+3,c
+2,b
+1,a
+EOF
+
+cat >$right_f <<EOF
+4,Dd
+3,Cc
+2,Bb
+1,Aa
+EOF
+
+cat >$correct_out_f <<EOF
+A,a,Aa
+B,b,Bb
+C,c,Cc
+D,d,Dd
+EOF
+
+
+run_test "left=$left_f mid=$mid_f right=$right_f, &1.2 &2.2 &3.2, if left.1 == mid.1 && mid.1 == right.1"
+

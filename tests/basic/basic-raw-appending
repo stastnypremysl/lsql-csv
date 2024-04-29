@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+ABC,abc,D
+A,b,C
+1,2,3
+1.0,2.0,3.0
+A,true,1
+1.0,false,A
+EOF
+
+cat >$correct_out_f <<EOF
+ABC abc D
+A b C
+1 2 3
+1.0 2.0 3.0
+A true 1
+1.0 false A
+EOF
+
+run_test '-, &1.1" "&1.2" "&1.3'
+
+
+
+
+
+

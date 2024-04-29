@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+__abc__
+__ab__
+abc
+__abc
+abc__
+__ac__
+__aaa__
+__aac__
+EOF
+
+cat >$correct_out_f <<EOF
+true
+false
+true
+true
+true
+false
+false
+false
+EOF
+
+run_test '-, $("abc" in &1.1)'
+
+
+
+

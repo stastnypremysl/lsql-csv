@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+blablable
+World,Hello
+EOF
+
+cat >$correct_out_f <<EOF
+17
+EOF
+
+run_test '-, $(5*5-2*2^2)'
+
+
+
+
+
+

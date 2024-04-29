@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$tmp_f <<EOF
+Adam;21
+Petra;23
+Karel;25
+EOF
+
+cat >$correct_out_f <<EOF
+Adam
+Petra
+Karel
+EOF
+
+run_test --delimiter=';' "in=$tmp_f, in.1"
+

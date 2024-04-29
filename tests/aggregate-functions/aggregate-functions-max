@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+2
+5
+3
+1
+4
+EOF
+
+cat >$correct_out_f <<EOF
+5
+EOF
+
+run_test '-, max(&1.1)'
+
+
+
+

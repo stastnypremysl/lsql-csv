@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$correct_out_f <<EOF
+4
+EOF
+
+run_test '-, $(5 mod 2 + 3)'
+
+
+
+
