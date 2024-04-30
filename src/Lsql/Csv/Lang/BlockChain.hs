@@ -1,5 +1,5 @@
 {-|
-This module contains a main parser of blocks other then the from block.
+This module contains the main parser of blocks other than the from block.
 -}
 module Lsql.Csv.Lang.BlockChain (parseBlocks) where
 
@@ -56,10 +56,10 @@ blockP symbol_list =
   (try$ ifBP symbol_list) <|> 
   (selectBP symbol_list)
 
--- | Function for parsing blocks
-parseBlocks :: [String] -- ^ Blocks to parse
-            -> [String] -- ^ List of all symbol names
-            -> [Block] -- ^ Parsed blocks
+-- | A function for parsing blocks other than the from block.
+parseBlocks :: [String] -- ^ The blocks to parse
+            -> [String] -- ^ The list of all symbol names
+            -> [Block] -- ^ The parsed blocks
 
 parseBlocks [] _ = []
 parseBlocks (input : rest) symbol_list =

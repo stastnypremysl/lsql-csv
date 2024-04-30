@@ -1,5 +1,5 @@
 {-|
-This module implements a common `Option` type and its parsers for from blocks and command line optional arguments.
+This module implements the common `Option` type for from blocks and command-line optional arguments representation, and its parsers.
 -}
 module Lsql.Csv.Lang.Options (optionParser, 
   Option(Delimiter, SecondaryDelimiter, Quote, Named)) where
@@ -24,7 +24,7 @@ delOp opt = do
   c <- char_option_p
   return c
 
--- | Option datatype for representing from block and command line optional arguments.
+-- | The `Option` datatype for representing from block and command-line optional arguments.
 data Option = Delimiter Char | SecondaryDelimiter Char | Quote Char | Named Bool
 
 primaryDelOp = do
@@ -48,6 +48,6 @@ nameOp = do
   r <- (try$ namedOp) <|> notNamedOp
   return $ Named r
 
--- | Option parser monad for parsing from block and command line optional arguments.
+-- | The `Option` parser monad for parsing from block and command-line optional arguments.
 optionParser :: Parser Option
 optionParser = (try primaryDelOp) <|> (try secondaryDelOp) <|> nameOp

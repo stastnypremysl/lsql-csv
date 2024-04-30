@@ -1,5 +1,5 @@
 {-|
-A module for command line argument parsing.
+A module for command-line argument parsing.
 -}
 module Lsql.Csv.Lang.Args (Program(Program), parseArgs, reloadOpts) where
 
@@ -14,11 +14,11 @@ import Text.Parsec.Char
 import Data.List
 import qualified Data.Text as T
 
--- | A data type representing all arguments for one run of lsql-csv
+-- | A datatype representing all arguments for one run of the lsql-csv
 data Program = Program 
-  String -- ^ LSQL command
-  Char -- ^ Primary delimiter
-  Char -- ^ Secondary delimiter (quote)
+  String -- ^ A lsql-csv command
+  Char -- ^ A primary delimiter
+  Char -- ^ A secondary delimiter (quote)
   Bool -- ^ First line naming
   deriving (Show)
 
@@ -37,7 +37,7 @@ load_args :: [Arg] -> Program
 load_args args = 
   load_ag (Program "" ',' '"' False) args
 
--- | Loads additional options to the `Program`
+-- | Loads additional options to a `Program`.
 reloadOpts :: Program -> [Option] -> Program
 reloadOpts pg ops = load_ag pg$ map (Opt) ops
 
@@ -64,7 +64,7 @@ fullP = do
   cmd <- argCmdP
   return$ ags ++ [cmd]
 
--- | Parses given arguments to `Program` representation
+-- | Parses given arguments to a `Program` representation.
 parseArgs :: [String] -> Program
 parseArgs args = 
   let input = unwords args in

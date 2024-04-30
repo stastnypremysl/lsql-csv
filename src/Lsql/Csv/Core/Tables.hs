@@ -1,5 +1,5 @@
 {-|
-This module contains the definition of Lsql datatypes, their classes, and types `Table` and `Column` and functions over them for manipulation of them.
+This module contains the definition of `Value`, `Table`, and `Column`, classes over them, and functions for manipulation of them.
 -}
 module Lsql.Csv.Core.Tables
   (
@@ -18,11 +18,11 @@ where
 
 import Data.List
 
--- | Class for converting a value to Bool
+-- | Class for converting a value to a `Bool`
 class Boolable a where
   getBool :: a -> Bool
 
--- | Representation of data in tables
+-- | The representation of data in `Table`s
 data Value = IntValue Int | StringValue String | DoubleValue Double | BoolValue Bool
 
 instance Boolable Value where
@@ -177,10 +177,10 @@ instance Show Value where
   show (BoolValue True) = "true"
   show (BoolValue False) = "false"
 
--- | Single column of table
+-- | A single column of a table
 data Column = Column 
-  [String] -- ^ Names of the column
-  [Value] -- ^ Values of the column
+  [String] -- ^ The names of the column
+  [Value] -- ^ The values of the column
 
 instance Eq Column where
   (Column _ a) == (Column _ b) = a == b
@@ -192,12 +192,12 @@ instance Show Column where
   show (Column _ a) = show a
 
 
--- | Function for applying two argument function to two `Column`s
+-- | A function for applying a two-argument function to two `Column`s
 applyInOp:: (Value -> Value -> Value) -> Column -> Column -> Column
 applyInOp op (Column _ a) (Column _ b) = (Column ["comp"] (map (\(x,y) -> op x y)$ zip a b))
 
 
--- | Function for applying single argument function to `Column`
+-- | A function for applying a single argument function to a `Column`
 applyOp:: (Value -> Value) -> Column -> Column
 applyOp op (Column _ a) = (Column ["comp"] (map op a))
 
@@ -205,38 +205,38 @@ applyOp op (Column _ a) = (Column ["comp"] (map op a))
 -- | A single table of data
 data Table = 
   Table 
-  [String] -- ^ Table names 
-  [Column] -- ^ Columns of a table
+  [String] -- ^ The table names 
+  [Column] -- ^ The columns of the table
 
 instance Show Table where
   show (Table _ a) = show a
 
--- | Converts column to list of string from its data
+-- | Converts `Column` to the list of `String` from its data.
 showColumn :: Column -> [String]
 showColumn (Column _ col) =
   map show col
 
--- | Returns all names of the `Column`.
+-- | Returns all names of a `Column`.
 columnName :: Column -> [String]
 columnName (Column names _ ) = names
 
--- | Returns all values of the `Column`
+-- | Returns all values of a `Column`.
 columnValue :: Column -> [Value]
 columnValue (Column _ values ) = values
 
--- | Returns pairs of names of `Column` and `Column` itself of the table
+-- | Returns pairs of names of `Column` and `Column` itself of the table.
 columnNames :: Table -> [([String], Column)]
 columnNames (Table _ cols) =
   let names = map columnName cols in
   zip names cols
 
 
--- | Makes table out of rows of Value
+-- | Makes a table out of rows of `Value`.
 buildTable :: 
-       [String] -- ^ Names of the table
-    -> [[String]] -- ^ Names of columns
-    -> [[Value]] -- ^ Rows of the table
-    -> Table -- ^ Result table
+       [String] -- ^ The names of the table
+    -> [[String]] -- ^ The names of the columns
+    -> [[Value]] -- ^ The rows of the table
+    -> Table -- ^ The result table
 
 buildTable table_names names in_data =
   if in_data /= [] then
@@ -263,7 +263,7 @@ getRows :: [Column] -> [[Value]]
 getRows cols =
   transpose$ map columnValue cols
 
--- | Cross joins two tables into one.
+-- | Cross joins two `Table`s into one.
 crossJoinTable :: Table -> Table -> Table
 crossJoinTable (Table names1 cols1) (Table names2 cols2) =
   buildTable tableName colsNames$
@@ -283,8 +283,8 @@ crossJoinTable (Table names1 cols1) (Table names2 cols2) =
     rows2 = getRows cols2
 
 
--- | Filters out rows, where Column is false. 
--- The rows, where Column is true, are kept.
+-- | Filters out rows, where the `Column` is `False`. 
+-- The rows, where the `Column` is `True`, are kept.
 filterTable :: Column -> Table -> Table
 filterTable (Column _ if_cols) (Table t_name cols) =
   buildTable t_name cols_name$
@@ -301,13 +301,13 @@ filterTable (Column _ if_cols) (Table t_name cols) =
     filterRows (False : r_bool) (_ : r_rows) = filterRows r_bool r_rows
     filterRows (True : r_bool) (row : r_rows) = row : (filterRows r_bool r_rows)
 
--- | Returns table with same metadata as original table, but no data (no rows).
+-- | Returns `Table` with same metadata as the original `Table`, but no data (no rows).
 emptyTable :: Table -> Table
 emptyTable (Table t_name cols) = Table t_name 
   [Column (columnName col) [] | col <- cols]
 
 
--- | Sorts the table according to the given columns.
+-- | Sorts a `Table` according to given `Column`s.
 sortTable :: [Column] -> Table -> Table
 sortTable [] table = table
 
@@ -329,9 +329,9 @@ sortTable s_cols (Table name cols) =
     sorted_rows = map snd sorted_p
 
 
--- | Splits the table into multiple tables so that
--- rows of columns at first argument are at each table the same
--- and number of tables is minimal. (factorization)
+-- | Splits a `Table` into multiple `Table`s so that
+-- rows of `Column`s at first argument are at each `Table` the same
+-- and the number of `Table`s is minimal. (factorization)
 byTable :: [Column] -> Table -> [Table]
 byTable s_cols orig_table =
   map (buildTable name (map columnName orig_cols))

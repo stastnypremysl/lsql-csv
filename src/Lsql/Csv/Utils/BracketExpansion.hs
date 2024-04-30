@@ -1,5 +1,5 @@
 {-|
-This module contains curly bracket (braces) expansion implementation.
+This module contains the curly bracket (braces) expansion implementation.
 -}
 module Lsql.Csv.Utils.BracketExpansion (bracketExpand) where
 
@@ -58,11 +58,11 @@ afterBracketP = do
   return ret
 
 
--- | Curly brackets (braces) expand function
+-- | The curly brackets (braces) expand function
 --
--- Argument is a `String`, which you want to expand. Returns a list of expanded `String`s.
+-- The argument is a `String`, which you want to expand. Returns a list of expanded `String`s.
 --
--- There are given few usage examples:
+-- There are given a few usage examples:
 --
 -- >>> bracketExpand "car{A,B}"
 -- ["carA","carB"]

@@ -1,5 +1,5 @@
 {-|
-This module contains the evaluator of lsql-csv program.
+This module contains the evaluator of a lsql-csv program.
 -}
 module Lsql.Csv.Core.Evaluator (evaluate) where
 
@@ -12,7 +12,7 @@ import Data.List
 
 
 
--- | Evaluates the program in parsed [`Block`] over the input in `SymbolMap`
+-- | Evaluates the program in parsed [`Block`] over the input in `SymbolMap`.
 evaluate :: SymbolMap -> [Block] -> [Printable]
 evaluate symbol_map blocks =
   printTable sorted

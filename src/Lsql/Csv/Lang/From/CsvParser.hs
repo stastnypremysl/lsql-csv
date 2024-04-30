@@ -1,5 +1,5 @@
 {-|
-This module contains the CsvParser called by parseFile, which loads input CSV files.
+This module contains the CsvParser called by the `parseFile`, which loads input CSV files.
 -}
 
 module Lsql.Csv.Lang.From.CsvParser
@@ -26,20 +26,20 @@ import Text.Parsec.Text
 import Text.Parsec.Char
 
 -- Csv Index Path Program [Option]
--- | Data structure representing one input file
+-- | A data structure representing one input file
 data Assignment = 
-  -- | Input file without any assign names
+  -- | An input file without any assigned names
   CoreCsv 
-    Int -- ^ Index of a file (indexing from 1)
-    String -- ^ Path to a file
-    Program -- ^ Potentially altered `Program` for given CSV file
-    [Option] -- ^ Parsed additional `Option` for given CSV file
+    Int -- ^ The index of the file (indexing from 1)
+    String -- ^ The path to the file
+    Program -- ^ A potentially altered `Program` for the given CSV file
+    [Option] -- ^ Parsed additional `Option`s for the given CSV file
     |
 
-  -- | Input file with assign name
+  -- | An input file with an assigned name
   NamedCsv 
-    String -- ^ Assign name
-    Assignment -- ^ The rest of assignment
+    String -- ^ The assign name
+    Assignment -- ^ The rest of the assignment
 
 
 quoteP :: Char -> Parser String
@@ -145,7 +145,7 @@ buildTableFromIn table_names named in_str =
       |named = map (map readValue)$ tail c_in_str
       |otherwise = map (map readValue)$ c_in_str
 
--- | Parses CSV file described in given `Assignment`
+-- | Parses CSV file described in the given `Assignment`.
 parseFile :: Assignment -> IO Table
 parseFile assignment = do
   file_content <- load_input

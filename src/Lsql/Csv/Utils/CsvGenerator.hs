@@ -1,5 +1,5 @@
 {-|
-This module contains CSV generator for the output.
+This module contains the CSV generator for the output.
 
 -}
 
@@ -12,10 +12,10 @@ import Lsql.Csv.Core.Functions
 
 import Data.List
 
--- | This function generates CSV output
-csvGenerate :: Char -- ^ Primary delimiter 
-            -> Char -- ^ Secondary delimiter (quote char)
-            -> [Printable] -- ^ List of columns
+-- | This function generates the CSV output.
+csvGenerate :: Char -- ^ The primary delimiter 
+            -> Char -- ^ The secondary delimiter (quote char)
+            -> [Printable] -- ^ The list of columns
             -> String  
 
 csvGenerate sep sec_sep cols =

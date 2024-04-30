@@ -120,7 +120,7 @@ getOptions :: FileAssignment -> [Option]
 getOptions (NamedFileAssignment _ rest) = getOptions rest
 getOptions (FileAssignment _ options) = options
 
--- | Loads `SymbolMap` according to `Program` and from block String in second argument.
+-- | Loads `SymbolMap` according to a `Program` and a from block `String` in the second argument.
 getFromSymbols :: Program -> String -> IO SymbolMap
 getFromSymbols prog from_block = do
 
