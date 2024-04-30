@@ -1,4 +1,10 @@
 # Revision history for lsql-csv
+## 0.1.0.4
+* added more tests
+* improved spelling of the documentation
+* command-line help text grammar fix
+* the cabal package description grammar fix
+* the `README.md` grammar fix
 
 ## 0.1.0.3
 * Improved cabal package description
