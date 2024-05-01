@@ -1,4 +1,9 @@
 # Revision history for lsql-csv
+## 0.1.0.5
+* text package upper bound changed to 2.2
+* containers package upper bound changed to 0.8
+* fixed dependencies in README.md
+
 ## 0.1.0.4
 * added more tests
 * improved spelling of the documentation
