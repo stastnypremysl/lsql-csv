@@ -4,7 +4,7 @@
 The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. 
 
 ## Installation
-It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.20`), text (`>=1.2 <1.3`) and containers (`>=0.5 <0.7`)
+It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.20`), text (`>=1.2 <2.2`) and containers (`>=0.5 <0.8`)
  installed. (The package boundaries given are identical to cabal boundaries.) Run then:
 
     make
