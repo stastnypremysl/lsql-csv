@@ -24,17 +24,17 @@ install:
 clean:
 	git clean -Xf; rm -r ./build
 
-.PHONY: test
-test: compile tests-basic tests-example tests-functions tests-options tests-blocks
-	echo -e "\033[1mAll tests succedded.\033[0m"
 
+
+.PHONY: test
+test: compile tests-basic tests-example tests-options tests-blocks tests-functions
+	echo -e "\033[1mAll tests succedded.\033[0m"
 
 
 .PHONY: tests-basic
 tests-basic: $(wildcard ./tests/basic/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mBasic tests succedded.\033[0m"
-
 
 .PHONY: tests-example
 tests-example: $(wildcard ./tests/example/*)
@@ -52,22 +52,18 @@ tests-blocks: $(wildcard ./tests/blocks/*)
 	echo -e "\033[1mBlocks tests succedded.\033[0m"
 
 
-
 .PHONY: tests-functions
 tests-functions: tests-onearg-functions tests-aggregate-functions tests-operators
-
 
 .PHONY: tests-aggregate-functions
 tests-aggregate-functions: $(wildcard ./tests/aggregate-functions/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mAggregate functions tests succedded.\033[0m"
 
-
 .PHONY: tests-onearg-functions
 tests-onearg-functions: $(wildcard ./tests/onearg-functions/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mOnearg functions tests succedded.\033[0m"
-
 
 .PHONY: tests-operators
 tests-operators: $(wildcard ./tests/operators/*)
