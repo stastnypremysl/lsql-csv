@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$in_f <<EOF
+name,"weird!name","huhuhaha"
+EOF
+
+cat >$correct_out_f <<EOF
+EOF
+
+run_test -n 'in=-,&1.name `in.weird!name` in.3'
+
