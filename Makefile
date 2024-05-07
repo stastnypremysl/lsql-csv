@@ -27,46 +27,46 @@ clean:
 
 
 .PHONY: test
-test: compile tests-basic tests-example tests-options tests-blocks tests-functions
+test: compile test-basics test-examples test-options test-blocks test-functions
 	echo -e "\033[1mAll tests succedded.\033[0m"
 
 
-.PHONY: tests-basic
-tests-basic: $(wildcard ./tests/basic/*)
+.PHONY: test-basics
+test-basics: $(wildcard ./tests/basics/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
-	echo -e "\033[1mBasic tests succedded.\033[0m"
+	echo -e "\033[1mBasics tests succedded.\033[0m"
 
-.PHONY: tests-example
-tests-example: $(wildcard ./tests/example/*)
+.PHONY: test-examples
+test-examples: $(wildcard ./tests/examples/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
-	echo -e "\033[1mExample tests succedded.\033[0m"
+	echo -e "\033[1mExamples tests succedded.\033[0m"
 
-.PHONY: tests-options
-tests-options: $(wildcard ./tests/options/*)
+.PHONY: test-options
+test-options: $(wildcard ./tests/options/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mOptions tests succedded.\033[0m"
 
-.PHONY: tests-blocks
-tests-blocks: $(wildcard ./tests/blocks/*)
+.PHONY: test-blocks
+test-blocks: $(wildcard ./tests/blocks/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mBlocks tests succedded.\033[0m"
 
 
-.PHONY: tests-functions
-tests-functions: tests-onearg-functions tests-aggregate-functions tests-operators
+.PHONY: test-functions
+test-functions: test-onearg-functions test-aggregate-functions test-operators
 
-.PHONY: tests-aggregate-functions
-tests-aggregate-functions: $(wildcard ./tests/aggregate-functions/*)
+.PHONY: test-aggregate-functions
+test-aggregate-functions: $(wildcard ./tests/aggregate-functions/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mAggregate functions tests succedded.\033[0m"
 
-.PHONY: tests-onearg-functions
-tests-onearg-functions: $(wildcard ./tests/onearg-functions/*)
+.PHONY: test-onearg-functions
+test-onearg-functions: $(wildcard ./tests/onearg-functions/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mOnearg functions tests succedded.\033[0m"
 
-.PHONY: tests-operators
-tests-operators: $(wildcard ./tests/operators/*)
+.PHONY: test-operators
+test-operators: $(wildcard ./tests/operators/*)
 	echo $? | tr ' ' '\n' | xargs -I{} bash -c "{}"
 	echo -e "\033[1mOperators tests succedded.\033[0m"
 
