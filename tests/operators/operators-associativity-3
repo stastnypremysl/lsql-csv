@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. $(dirname $0)/../testlib.sh
+
+cat >$correct_out_f <<EOF
+2
+EOF
+
+run_test '-, $(2^1^2)'
+
+
+
+
