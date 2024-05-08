@@ -1,4 +1,4 @@
-# lsql-csv
+# `lsql-csv`
 `lsql-csv` is a tool for CSV file data querying from a shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
 
 The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. LSQL aims to be a more lapidary language than SQL. Its design purpose is to enable its user to quickly write simple queries directly
@@ -11,7 +11,7 @@ It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <
     make
     sudo make install
     
-Now the lsql-csv is installed in `/usr/local/bin`. If you want, you can specify `INSTALL_DIR` like:
+Now the `lsql-csv` is installed in `/usr/local/bin`. If you want, you can specify `INSTALL_DIR` like:
 
     sudo make INSTALL_DIR=/custom/install-folder install
 
@@ -35,7 +35,7 @@ If you want to verify, that the package has been compiled correctly, it is possi
 This will run all tests for you.
 
 
-## lsql-csv - quick introduction 
+## `lsql-csv` - quick introduction 
 
 
 ### Examples
@@ -284,7 +284,7 @@ Let's see more complicated examples.
 This will print all pairs of users and its group excluding the default group. 
 If you know SQL, you can read it as `SELECT P.1, G.1 FROM /etc/passwd P, /etc/group G WHERE G.4 LIKE '%' + P.1 + '%';` with operator `LIKE` case-sensitive and columns named by their column number.
 
-How does `in` work? It's one of the basic string level "consist". If A is a substring of B, then `A in B` is `true`. Otherwise, it is `false`.
+How does `in` work? It's one of the basic string level "consist". If some string `A` is a substring of `B`, then `A in B` is `true`. Otherwise, it is `false`.
 
 And the output?
 
@@ -349,8 +349,10 @@ Shows a short command line help and exits before doing anything else.
     -n
     --named
 
-Enables the first-line naming convention in CSV files - first-line with column
-names. This works only on input files. Output is always without first-line column
+Enables the first-line naming convention in CSV files. 
+With this option, the first lines of CSV files will be interpreted as a list of column names.
+
+This works only on input files. Output is always without first-line column
 names.
     
     -dCHAR
@@ -639,11 +641,18 @@ The following list outlines the precedence of the `lsql-csv` infix operators. Th
 Select expressions are in the grammar description as `SELECT_EXPR`.
 They are similar to the `bash` expressions. They are made by atom selector expressions (`ATOM_SELECTOR`) separated by whitespaces. 
 These expressions are wildcard and brace expanded to atoms (`ATOM`) and are further processed as they were separated by whitespace.
+(In `bash` brace expansion is a mechanism by which arbitrary strings are generated. For example, `a{b,c,d}e` is expanded to `abe ace ade`, see [the `bash` reference manual](https://www.gnu.org/software/bash/manual/bash.html) for details.)
 
 Wildcards and brace expansion expressions are only evaluated and expanded in unquoted parts of the atom selector expression,
 which aren’t part of an inner arithmetic expression.
 
-Every atom selector expression can consist:
+For example, if we have an LSQL command with symbol names `&1.1` and `&1.2`, then
+* the atom selector expression `&1.{1,2}` will be expanded to `&1.1` and `&1.2`;
+* the atom selector expression `&1.*` will be expanded to `&1.1` and `&1.2`;
+* the atom selector expression `` `&1.*` `` will be expanded to `` `&1.*` ``;
+* the atom selector expression `"&1.*"` will be expanded to `"&1.*"`;
+* the atom selector expression `$(&?.1)` will be expanded to `$(&?.1)`;
+* the atom selector expression `&*$(&1.1)` will be expanded to `&1.1$(&1.1)` and `&1.2$(&1.1)`.
 
 
 Every atom selector expression can consist:
@@ -666,6 +675,8 @@ Arithmetic expressions are in the grammar description as `ARITHMETIC_EXPR`.
 
 The expressions use mainly the classical `awk` style of expressions.
 You can use here operators `OPERATOR` keywords `>`, `<`, `<=`, `>=`, `==`, `||`, `&&`, `+`, `-`, `*`, `/`... 
+
+Wildcards and brace expansion expressions are not evaluated inside the arithmetic expression.
 
 #### Select blocks
 Select blocks are referred in the grammar description as `SELECT_BLOCK`.
@@ -719,7 +730,9 @@ This will select `/etc/passwd` and set its assign name to `passwd`. It can be ad
     -n
     --named
 
-Enables the first-line naming convention for an input CSV file---first-line with column names.
+Enables the first-line naming convention for an input CSV file.
+With this option, the first line of a CSV file will be interpreted as a list of column names.
+
 
     -N
     --not-named
