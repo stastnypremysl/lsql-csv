@@ -7,7 +7,7 @@ version:             0.1.0.5
 synopsis:            A tool for CSV files data querying from the shell with short queries. 
 
 -- A longer description of the package.
-description:         lsql-csv is a tool for small CSV file data querying from a shell with short queries. It makes it possible to work with small CSV files like with a read-only relational databases. The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell.
+description:         lsql-csv is a tool for small CSV file data querying from a shell with short queries. It makes it possible to work with small CSV files like with a read-only relational databases. The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. LSQL aims to be a more lapidary language than SQL. Its design purpose is to enable its user to quickly write simple queries directly to the terminal.
 
 homepage:            https://github.com/stastnypremysl/lsql-csv/
 bug-reports:         https://github.com/stastnypremysl/lsql-csv/issues
