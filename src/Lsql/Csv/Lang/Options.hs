@@ -1,5 +1,5 @@
 {-|
-This module implements the common `Option` type for from blocks and command-line optional arguments representation, and its parsers.
+This module implements the common `Option` type for the from block custom attributes representation and for the command-line optional arguments representation, and its parsers.
 -}
 module Lsql.Csv.Lang.Options (optionParser, 
   Option(Delimiter, SecondaryDelimiter, Quote, Named)) where

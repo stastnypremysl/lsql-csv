@@ -1,5 +1,5 @@
 {-|
-This module contains the starting point for a lsql-csv evaluation.
+This module contains the starting point for an lsql-csv evaluation.
 -}
 module Lsql.Csv.Main (run) where
 

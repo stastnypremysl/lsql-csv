@@ -1,5 +1,5 @@
 {-|
-This module contains the definition of `Value`, `Table`, and `Column`, classes over them, and functions for manipulation of them.
+This module contains the definition of `Value`, `Table`, and `Column`, class instancies over them, functions for manipulation of them, and `Boolable` class definition.
 -}
 module Lsql.Csv.Core.Tables
   (

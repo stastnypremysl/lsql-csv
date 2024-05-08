@@ -1,5 +1,5 @@
 {-|
-This module contains the `Block` definition representing a command block and functions for getting a specific type of blocks from a list of `Block`.
+This module contains the `Block` definition representing an LSQL command block and functions for getting a specific type of block from a list of `Block`.
 -}
 
 module Lsql.Csv.Core.BlockOps 

@@ -1,5 +1,5 @@
 {-|
-This module contains the preprocessor parser, which splits a command into a list of `String`s - one `String` per block.
+This module contains the preprocessor parser, which splits an LSQL command into a list of `String`s - one `String` per block.
 -}
 module Lsql.Csv.Lang.BlockSeparator (splitBlocks) where
 

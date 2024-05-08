@@ -1,5 +1,5 @@
 {-|
-This module contains the main parser of blocks other than the from block.
+This module contains the main parser of the blocks other than the from block.
 -}
 module Lsql.Csv.Lang.BlockChain (parseBlocks) where
 

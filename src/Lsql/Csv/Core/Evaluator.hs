@@ -1,5 +1,5 @@
 {-|
-This module contains the evaluator of a lsql-csv program.
+This module contains the evaluator of an lsql-csv command.
 -}
 module Lsql.Csv.Core.Evaluator (evaluate) where
 

@@ -1,5 +1,6 @@
 {-|
-This module contains the definition of `Symbol`, `SymbolMap`, and helper functions.
+This module contains the definition of `Symbol`, `SymbolMap`, and helper functions for working with them. 
+`SymbolMap` is one of the representations of input data.
 -}
 module Lsql.Csv.Core.Symbols
   (
