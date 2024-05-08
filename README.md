@@ -1,11 +1,12 @@
 # lsql-csv
-`lsql-csv` is a tool for CSV file data querying from the shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
+`lsql-csv` is a tool for CSV file data querying from a shell with short queries. It makes it possible to work with small CSV files like with a read-only relational database.
 
-The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. 
+The tool implements a new language LSQL similar to SQL, specifically designed for working with CSV files in a shell. LSQL aims to be a more lapidary language than SQL. Its design purpose is to enable its user to quickly write simple queries directly
+  to the terminal - its design purpose is therefore different from SQL, where the readability of queries is more taken into account than in LSQL.
 
 ## Installation
 It is necessary, you had GHC (`>=8 <9.29`) and Haskell packages Parsec (`>=3.1 <3.2`), Glob (`>=0.10 <0.11`), base (`>=4.9 <4.20`), text (`>=1.2 <2.2`) and containers (`>=0.5 <0.8`)
- installed. (The package boundaries given are identical to cabal boundaries.) Run then:
+ installed. (The package boundaries given are identical to the boundaries in Cabal package file.) For a build and an installation run:
 
     make
     sudo make install
@@ -20,7 +21,7 @@ If you have installed `cabal`, you can alternatively run:
 
     cabal install
    
-It will also install the dependencies for you.    
+It will also install the Haskell package dependencies for you.    
 
 The package is also published at https://hackage.haskell.org/package/lsql-csv in the Hackage public repository. You can therefore also install it directly without the repository cloned with:
 
@@ -31,11 +32,10 @@ If you want to verify, that the package has been compiled correctly, it is possi
 
     make test
 
-This will run all unit tests for you.
+This will run all tests for you.
 
 
 ## lsql-csv - quick introduction 
-LSQL, the language of `lsql-csv`, aims to be a more lapidary language than SQL. Its design purpose is to enable its user to quickly write simple queries directly to the terminal - its design purpose is therefore different from SQL, where the readability of queries is more taken into account than in LSQL.
 
 
 ### Examples
@@ -60,15 +60,16 @@ File `/etc/group` has the following columns:
 * group name;
 * password;
 * numerical group ID;
-* user list.
+* user list separated by commas.
 
 #### Hello World
 
     lsql-csv '-, &1.2 &1.1'
 
-This will print the second (`&1.2`) and the first column (`&1.1`) of the CSV file on stdin. If you know SQL, you can read it like `from stdio S select S.second, S.first`. 
+This will print the second (`&1.2`) and the first column (`&1.1`) of a CSV file on the standard input. If you know SQL, you can read it like `SELECT S.second, S.first FROM stdio S;`. 
 
-Commands are split by commas into blocks. The first block is (*and always is*) the from block. There are file names or `-` (stdin) separated by space. The second block is the select block, also separated by space.
+Commands are split by commas into blocks. The first block is (*and always is*) the from block. There are file names or `-` (the standard input) separated by whitespaces. 
+The second block in the example is the select block, also separated by whitespaces.
 
 For example:
 
@@ -81,9 +82,9 @@ It returns:
     Hello,World
 
 #### Simple filtering 
-    lsql-csv -d: '-, &1.*, if &1.3>=1000' < /etc/passwd
+    lsql-csv -d: '-, &1.*, if &1.3 >= 1000' </etc/passwd
 
-This will print lines of users whose UID >=1000. It can also be written as:
+This will print lines of users whose `UID >= 1000`. It can also be written as:
   
     lsql-csv -d: 'p=/etc/passwd, p.*, if p.3 >= 1000'
     
@@ -91,9 +92,9 @@ This will print lines of users whose UID >=1000. It can also be written as:
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000'
     
-The `-d:` optional argument means the primary delimiter is `:`. In previous examples we used overnaming, which allows us to give a data source file `/etc/passwd` a name `p`.
+The `-d:` optional argument means the primary delimiter is `:`. In the few examples we used overnaming, which allows us to give a data source file `/etc/passwd` a name `p`.
 
-If you know SQL, you can read it as `from /etc/passwd P select * where P.UID >= 1000`. As you can see, the lsql style is more compressed than standard SQL.
+If you know SQL, you can read it as `SELECT * FROM /etc/passwd P WHERE P.UID >= 1000;`. As you can see, the LSQL style is more compressed than standard SQL.
     
 The output might be:
 
@@ -109,16 +110,19 @@ It might return:
     nobody,x,65534,65534,nobody,/var/empty,/bin/false
     me,x,1000,1000,,/home/me,/bin/bash
 
+This happens because the default global delimiter, which is used for the output generation, is a comma.
+The global delimiter changes by usage of the command-line optional argument, but remains unchanged by the usage of the attribute inside the from block.
+
 
 #### Named columns
-Let's suppose we have a file people.csv:
+Let's suppose we have a file `people.csv`:
    
     name,age
     Adam,21
     Petra,23
     Karel,25
 
-Now, let's get all the names of people in people.csv using the `-n` named switch:
+Now, let's get all the names of people in `people.csv` using the `-n` named optional argument:
 
     lsql-csv -n 'people.csv, &1.name'
 
@@ -128,20 +132,20 @@ The output will be:
     Petra
     Karel
 
-As you can see, we can reference named columns by a name. Named switch `-n` enables first-line headers.
-If named columns are enabled, each column has two names under &X - the number name &X.Y and the actual name &X.NAME.
+As you can see, we can reference named columns by the name. The named optional argument `-n` enables first-line headers.
+If first-line headers are enabled by the argument, each column has two names under `&X` - the number name `&X.Y` and the actual name `&X.NAME`.
 
-Now, we can select all columns with wildcard `&1.*`:
+Now, we can select all columns with a wildcard `&1.*`:
 
     lsql-csv -n 'people.csv, &1.*'
 
-As the output, we get
+As the output, we get:
 
     Adam,21,21,Adam
     Petra,23,23,Petra
     Karel,25,25,Karel
 
-The output contains each column twice because wildcard `&1.*` was evaluated to `&1.1, &1.2, &1.age, &1.name`.
+The output contains each column twice because the wildcard `&1.*` was evaluated to `&1.1, &1.2, &1.age, &1.name`.
 How to fix it?
 
     lsql-csv -n 'people.csv, &1.[1-9]*'
@@ -156,8 +160,9 @@ The command can also be written as
 
     lsql-csv -n 'people.csv, &1.{1,2}'
     lsql-csv -n 'people.csv, &1.{1..2}'
+    lsql-csv 'people.csv -n, &1.{1..2}'
 
-The output will be in both cases still the same.
+The output will be in all cases still the same.
 
 
 #### Simple join
@@ -166,7 +171,8 @@ Let's say, I am interested in the default group names of users. We need to join 
 
     lsql-csv -d: '/etc/{passwd,group}, &1.1 &2.1, if &1.4 == &2.3'
     
-What does `/etc/{passwd,group}` mean? Basically, there are three types of expressions. Select, from, and arithmetic expression. In all select and from expressions, you can use expansion and wildcards just like in bash.
+What does `/etc/{passwd,group}` mean? Basically, there are three types of expressions. The select, the from, and the arithmetic expression. 
+In all select and from expressions, you can use the curly expansion and wildcards just like in `bash`.
     
 Finally, the output can be something like this:
 
@@ -192,10 +198,10 @@ And the output?
     /sbin/nologin:46
     /sbin/shutdown:1
     
-You can see here the first usage of `by` block, which is equivalent to `group by` in SQL. 
+You can see here the first usage of the by block, which is equivalent to `GROUP BY` in SQL. 
 
 #### Basic sorting
-Let's say, you want to sort your users by UID with UID greater than or equal to 1000 ascendingly.
+Let's say, you want to sort your users by `UID` with `UID` greater than or equal to 1000 ascendingly.
 
     lsql-csv -d: '/etc/passwd, &1.*, if &1.3 >= 1000, sort &1.3'
 
@@ -206,7 +212,7 @@ The output might look like:
     me3:x:1002:1002::/home/me3:/bin/bash
     nobody:x:65534:65534:nobody:/var/empty:/bin/false
 
-The sort block is the equivalent of `order by` in SQL.
+The sort block is the equivalent of `ORDER BY` in SQL.
 
 If we wanted descendingly sorted output, we might create a pipe to the `tac` command - the `tac` command prints the lines in reverse order:
     
@@ -214,12 +220,12 @@ If we wanted descendingly sorted output, we might create a pipe to the `tac` com
 
     
 #### About nice outputs
-There is a trick, how to concatenate two values in a select expression: Write them without space.
+There is a trick, how to concatenate two values in the select expression: Write them without space.
 
-But how does the interpreter know the ends of the value name or value expression? You must use quotes for it - quotes themselves can't be part of the value name.
+But how will the interpreter know the ends of the values in a command? If the interpreter sees a char, that can't be part of the currently parsed value, it tries to parse it as a new value concatenated to the current one.
+You can use quotes for it - quotes themselves can't be part of most value types like the column name or numerical constant.
+
 As an example, let's try to format our basic grouping example.
-
-Let's try it!
 
     lsql-csv -d: 'p=/etc/passwd, "The number of users of "p.7" is "count(p.3)".", by p.7
     
@@ -238,8 +244,8 @@ As you can see, string formatting is sometimes very simple with LSQL.
 
 #### Arithmetic expression
 
-So far, we just met all kinds of blocks, and only if block accepts an arithmetic expression and the other accepts a select expression. 
-What if we needed to run an arithmetic expression inside a select expression? There is a special syntax `$(...)` for it.
+So far, we just met all kinds of blocks, and only the if block accepts the arithmetic expression, and the other accepts the select expression. 
+What if we needed to run the arithmetic expression inside the select expression? There is a special syntax `$(...)` for it.
 
 For example:
 
@@ -275,9 +281,10 @@ Let's see more complicated examples.
 
     lsql-csv -d: 'p=/etc/passwd g=/etc/group, p.1 g.1, if p.1 in g.4'
     
-This will print all pairs of users and its group excluding the default group. If you know SQL, you can read it as `from /etc/passwd P, /etc/group G select P.1, G.1 where P.1 in G.4`.
+This will print all pairs of users and its group excluding the default group. 
+If you know SQL, you can read it as `SELECT P.1, G.1 FROM /etc/passwd P, /etc/group G WHERE G.4 LIKE '%' + P.1 + '%';` with operator `LIKE` case-sensitive and columns named by their column number.
 
-How does `in` work? It's one of the basic string level "consist". If A is a substring of B, then `A in B` is true. Otherwise, it is false.
+How does `in` work? It's one of the basic string level "consist". If A is a substring of B, then `A in B` is `true`. Otherwise, it is `false`.
 
 And the output?
 
@@ -288,6 +295,8 @@ And the output?
     lp:lp
     halt:root
     halt:wheel
+
+The example will work under the condition, that there isn’t any username, which is an infix of any other username.
 
 #### More complicated...
 
@@ -304,7 +313,7 @@ The output will be something like:
     mythtv:audio,cdrom,tty,video,
     news:news,
     
-It groups all non-default groups of a user to one line and concatenates it delimited by ",". 
+It groups all non-default groups of a user to a one line and concatenates it delimited by `,`. 
 
 How can we add default groups too?
 
@@ -324,6 +333,9 @@ The first part of the command is the same as in the previous example. The second
 of the first part with `/etc/passwd` on the username and `/etc/group` on the default GID number and prints
 the output of the first part with an added default group name.
 
+The examples will also work under the condition, that there isn’t any username,
+which is an infix of any other username.
+
 ## Usage
 Now, if you understand the examples, it is time to move forward to a more abstract description of the language and tool usage.
 
@@ -332,67 +344,91 @@ Now, if you understand the examples, it is time to move forward to a more abstra
     -h
     --help
 
-Shows short command line help and exits before doing anything else.
+Shows a short command line help and exits before doing anything else.
 
     -n
     --named
 
-Enables first-line naming convention in CSV files. This works only on input files. 
-Output is always without first-line column names.
+Enables the first-line naming convention in CSV files - first-line with column
+names. This works only on input files. Output is always without first-line column
+names.
     
     -dCHAR
     --delimiter=CHAR
 
-Changes default primary delimiter. The default value is `,`.
+Changes the default primary delimiter. The default value is `,`.
 
     -sCHAR
     --secondary-delimiter=CHAR
     
-Changes default quote char (secondary delimiter). The default value is `"`.
+Changes the default quote char (secondary delimiter). The default value is `"`.
 
 ### Datatypes
-There are 4 datatypes considered: `Bool`, `Int`, `Double` and `String`. 
-`Bool` is either true/false, `Int` is at least a 30-bit integer, `Double` double-precision floating point number, and `String` is an ordinary char string.
+There are 4 datatypes considered: `Bool`, `Int`, `Double`, and `String`. 
+`Bool` is either `true`/`false`, `Int` is at least a 30-bit integer, `Double` is a double-precision floating point number, and `String` is an ordinary char string.
 
 During CSV data parsing, the following logic of datatype selection is used: 
 * `Bool`, if `true` or `false`;
-* `Int`, if `[0-9]+` matches;
-* `Double`, if `[0-9]+.[0-9]+(e[0-9]+)?` matches;
+* `Int`, if the POSIX ERE `[0-9]+` fully matches;
+* `Double`, if the POSIX ERE `[0-9]+\.[0-9]+(e[0-9]+)?` fully matches;
 * `String`, if none of the above matches.
 
 ### Joins
-Join means, that you put multiple input files into from block.
+Join means, that you put multiple input files into the from block.
 
-Joins always have the time complexity O(nm). There is no optimization made based on if conditions when you put multiple files into from block.
+Joins always have the time complexity O(nm). 
+There is no optimization made based on if conditions when you put multiple files into the from block.
 
 ### Documentation of language
 
     lsql-csv [OPTIONS] COMMAND
     
-    Description of the grammar
+    Description of the grammar:
     
       COMMAND -> FROM_BLOCK, REST
+
     
       REST -> SELECT_BLOCK, REST
       REST -> BY_BLOCK, REST
       REST -> SORT_BLOCK, REST
       REST -> IF_BLOCK, REST
-      REST ->
-    
-      FROM_BLOCK -> FROM_SELECTOR FROM_BLOCK
-      FROM_SELECTOR ~~> FROM ... FROM //Wildcard and brace expansion
+      REST -> LAST_BLOCK
+        
+      LAST_BLOCK -> SELECT_BLOCK   
+      LAST_BLOCK -> BY_BLOCK
+      LAST_BLOCK -> SORT_BLOCK
+      LAST_BLOCK -> IF_BLOCK
 
-      FROM -> FROM_NAME=FROM_FILE OPTIONS
-      FROM -> FROM_FILE OPTIONS
+    
+      FROM_BLOCK -> FROM_EXPR
+
+      FROM_EXPR -> FROM_SELECTOR FROM_EXPR
+      FROM_EXPR -> FROM_SELECTOR
+
+      // Wildcard and brace expansion
+      FROM_SELECTOR ~~> FROM ... FROM 
+
+
+      // Standard input
+      FROM -> ASSIGN_NAME=- OPTIONS
+      FROM -> - OPTIONS
+  
+      FROM -> ASSIGN_NAME=FILE_PATH OPTIONS
+      FROM -> FILE_PATH OPTIONS
+
 
       OPTIONS -> -dCHAR OPTIONS
       OPTIONS -> --delimiter=CHAR OPTIONS
+
       OPTIONS -> -sCHAR OPTIONS
       OPTIONS -> --secondary-delimiter=CHAR OPTIONS
+
       OPTIONS -> -n OPTIONS
       OPTIONS -> --named OPTIONS
+
       OPTIONS -> -N OPTIONS
       OPTIONS -> --not-named OPTIONS
+
       OPTIONS ->
 
       
@@ -403,47 +439,67 @@ Joins always have the time complexity O(nm). There is no optimization made based
     
  
       ARITHMETIC_EXPR -> ATOM
-      ARITHMETIC_EXPR -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
+
       ARITHMETIC_EXPR -> ARITHMETIC_EXPR OPERATOR ARITHMETIC_EXPR
       ARITHMETIC_EXPR -> (ARITHMETIC_EXPR)
+
       // Logical negation
       ARITHMETIC_EXPR -> ! ARITHMETIC_EXPR
+      // Number negation
       ARITHMETIC_EXPR -> - ARITHMETIC_EXPR
       
+
       SELECT_EXPR -> ATOM_SELECTOR SELECT_EXPR
-      SELECT_EXPR ->
+      SELECT_EXPR -> ATOM_SELECTOR
       
-      ATOM_SELECTOR ~~> ATOM ... ATOM //Wildcard and brace expansion
+      // Wildcard and brace expansion
+      ATOM_SELECTOR ~~> ATOM ... ATOM 
       
-      // e.g. 1.0, "text", 'text', 1
-      ATOM -> CONSTANT
-      // e.g. &1.1
-      ATOM -> COLUMN_NAME
+
       ATOM -> pi
       ATOM -> e
       ATOM -> true
       ATOM -> false
+
+      // e.g. 1.0, "text", 'text', 1
+      ATOM -> CONSTANT
+      // e.g. &1.1
+      ATOM -> SYMBOL_NAME
+
       ATOM -> $(ARITHMETIC_EXPR)
       ATOM -> AGGREGATE_FUNCTION(SELECT_EXPR)
       ATOM -> ONEARG_FUNCTION(ARITHMETIC_EXPR)
 
-      // # is not really char:
-      // two atoms can be written without space 
-      // and will be (string) appended, 
-      // if they are separated using quote chars:
-      //   left atom must end or right atom must begin with quote char
-      // This rule doesn't apply inside ARITHMETIC_EXPR
+
+      // # is not a char:       
+      // Two atoms can be written without whitespace   
+      // and their values will be String appended    
+      // if the right atom begins with a char, 
+      // which can't be a part of the left atom.     
+      //
+      // E.g. if the left atom is a number constant, 
+      // and the right atom is a String constant 
+      // beginning with a quote char,
+      // the left atom value will be converted to the String 
+      // and prepended to the right atom value.
+      //
+      // This rule doesn't apply inside ARITHMETIC_EXPR 
       ATOM ~~> ATOM#ATOM     
 
       
+      // Converts all values to the String type and appends them.
       AGGREGATE_FUNCTION -> cat
-      AGGREGATE_FUNCTION -> sum
+
+      // Returns the number of values.
       AGGREGATE_FUNCTION -> count
-      AGGREGATE_FUNCTION -> max
+
       AGGREGATE_FUNCTION -> min
+      AGGREGATE_FUNCTION -> max
+      AGGREGATE_FUNCTION -> sum
       AGGREGATE_FUNCTION -> avg
       
-      //All trigonometric functions in radian
+
+      // All trigonometric functions are in radians.
       ONEARG_FUNCTION -> sin
       ONEARG_FUNCTION -> cos
       ONEARG_FUNCTION -> tan
@@ -463,8 +519,9 @@ Joins always have the time complexity O(nm). There is no optimization made based
       ONEARG_FUNCTION -> exp
       ONEARG_FUNCTION -> sqrt
       
-      //The length of the string
+      // Converts a value to the String type and returns its length.
       ONEARG_FUNCTION -> size
+
       ONEARG_FUNCTION -> to_string
       
       ONEARG_FUNCTION -> negate
@@ -477,31 +534,36 @@ Joins always have the time complexity O(nm). There is no optimization made based
       
       ONEARG_FUNCTION -> even
       ONEARG_FUNCTION -> odd
+
       
-      // A in B means A is a substring of B
+      // A in B means A is a substring of B.
       OPERATOR -> in
       
       OPERATOR -> *
-      OPERATOR -> **    //general power
-      OPERATOR -> ^     //natural power
       OPERATOR -> /
+
+      // General power
+      OPERATOR -> **    
+      // Natural power
+      OPERATOR -> ^     
       
       // Integer division truncated towards minus infinity
       // (x div y)*y + (x mod y) == x
       OPERATOR -> div
       OPERATOR -> mod
       
-      //Integer division truncated towards 0
+      // Integer division truncated towards 0
       // (x quot y)*y + (x rem y) == x  
       OPERATOR -> quot
       OPERATOR -> rem
 
-      // greatest common divisor
+      // Greatest common divisor
       OPERATOR -> gcd
-      // least common multiple
+      // Least common multiple
       OPERATOR -> lcm
       
-      OPERATOR -> ++    //append
+      // String append
+      OPERATOR -> ++    
       
       OPERATOR -> +
       OPERATOR -> -
@@ -523,149 +585,203 @@ Each command is made from blocks separated by a comma. There are these types of 
 * By block
 * Sort block
 
-The first block is always from block. If the block after the first block is without a specifier (`if`, `by`, or `sort`), then it is a select block. Otherwise, it is a block specified by the specifier.
+The first block is always the from block. If the block after the first block is without a specifier (`if`, `by`, or `sort`), then it is the select block. Otherwise, it is a block specified by the specifier.
 
-From block accept specific grammar (as specified in the grammar description), select, by, and sort block select expression (`SELECT_EXPR` in the grammar), and if block arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
+The from block accepts a specific grammar (as specified in the grammar description), the select, the by, and the sort block accept the select expression (`SELECT_EXPR` in the grammar), 
+and the if block accepts the arithmetic expression (`ARITHMETIC_EXPR` in the grammar).
 
-Every source file has a number and may have multiple names - assign name, the name given to the source file by `ASSIGN_NAME=FILE_PATH` syntax in from block, and 
-default name, which is given the path to the file or `-` in case of stdin in from block.
+Every source data file has a reference number based on its position in the from block and may have multiple names - the assign name, the name given to the source data file by `ASSIGN_NAME=FILE_PATH` syntax in the from block, and 
+the default name, which is given by the path to the file or `-` in the case of the standard input in the from block.
 
-Each column of a source file has a number and may have a name (if the named option is enabled for the given source file). 
+Each column of a source data file has a reference number based on its position in it and may have a name (if the named option is enabled for the given source file). 
 
-If the source file with index M (numbering input files from 1) has been given a name XXX, its columns can be addressed by &M.N or XXX.N, where N is the index of column (numbering columns from 1). 
-If the named option is enabled and a column has the name `NAME`, it can also be addressed by &M.NAME or XXX.NAME.
+If a source data file with the reference number `M` (numbering input files from 1) has a name `XXX`, its columns can be addressed by `&M.N` or `XXX.N`, where `N` is the reference number of a column (numbering columns from 1). 
+If the named option is enabled for the input file and a column has the name `NAME`, it can also be addressed by `&M.NAME` or `XXX.NAME`.
 
-If there is a collision in naming (two source files have the same name or two columns under the same source file have the same name), then the behavior is undefined.
+We call the address a symbol name - `SYMBOL_NAME` in the grammar description.
+
+If there is a collision in naming (some symbol name addresses more than one column), then the behavior is undefined.
 
 
 #### Exotic chars
-Some chars cannot be in symbol names (column names). For simplicity, we can suppose, they are everything but alphanumerical chars excluding `-`, `.`, `&`, and `_`. 
-Also first char of a symbol name must be non-numerical to not be considered as an exotic char.
-Referencing names containing exotic chars without quotes is unsupported.
+Some chars cannot be in unquoted symbol names - exotic chars. For simplicity, we can suppose, they are all non-alphanumerical chars excluding `-`, `.`, `&`, and `_`. 
+Also the first char of a symbol name must be non-numerical and must not be `-` or `.` to not be considered as an exotic char.
 
-It is possible to reference columns with names with exotic chars using \` quote - like \`EXOTIC NAME\`. The source file name is always part of the column name from the syntax perspective of language - it must be inside the quotes.
+It is possible to use a symbol name with exotic chars using \` quote - like \`EXOTIC SYMBOL NAME\`. 
 
 #### Quote chars
-There are 3 quotes (\`, " and ') used in Lsql. " and ' are always quoting a string. The \` quote is used for quoting symbol names.
+There are 3 quote chars (\`, " and ') used in LSQL. " and ' are always quoting a `String`. The \` quote char is used for quoting symbol names.
 
-These chars can be used for fast appending. If two atoms inside SELECT_EXPR are written without space and are separated using the quotes, they will be appended. For example, `abc"abc"` means: append column abc to the string abc.
+These chars can be used for `String` appending. If two atoms inside SELECT_EXPR are written consecutively without whitespace and the left atom ends by a quote char or the right begins by a quote char, 
+they will be converted to the `String` and will be `String` appended. 
+For example, `&1.1"abc"` means: convert the value of `&1.1` to the `String` and append it to the `String` constant `abc`.
 
 #### Constants
-There are 3 types of constants. String, Double, and Int. Everything quoted in " or ' is always String constant. Numbers without `[0-9]+` are considered Int constant and numbers `[0-9]+.[0-9]+` Double constant.
+Constants are in the grammar description as `CONSTANT`. In the following section, we speak only about these constants and not about built-in constant values like `pi` or `true`.
 
-#### Operator precedence and associativity
-The following list outlines the precedence and associativity of lsql-csv infix operators. The lower the precedence number, the higher the priority.
+There are 3 datatypes of constants. `String`, `Double`, and `Int`. 
+Every string quoted in " chars or ' chars in an LSQL command is always tokenized as a `String` constant. 
+Numbers fully matching the POSIX ERE `[0-9]+` are considered `Int` constants and numbers fully matching the POSIX ERE `[0-9]+\.[0-9]+` `Double` constants.
+
+#### Operator associativity and precedence
+All operators are right-to-left associative.
+
+The following list outlines the precedence of the `lsql-csv` infix operators. The lower the precedence number, the higher the priority.
 * 1: `in`, `**`, `^`
 * 2: `*`, `/`, `div`, `quot`, `rem`, `mod`, `gcd`, `lcm`
 * 3: `++`, `+`, `-`
 * 4: `<=`, `>=`, `<`, `>`, `!=`, `==`
 * 5: `||`, `&&`
 
-All operators are right-to-left associative.
 
 
 #### Select expression
-They are similar to bash expressions. They are made by atom selector expressions separated by whitespaces. These expressions are expanded, evaluated, and matched to column names, constants, aggregate functions, or arithmetic expressions.
+Select expressions are in the grammar description as `SELECT_EXPR`.
+They are similar to the `bash` expressions. They are made by atom selector expressions (`ATOM_SELECTOR`) separated by whitespaces. 
+These expressions are wildcard and brace expanded to atoms (`ATOM`) and are further processed as they were separated by whitespace.
+
+Wildcards and brace expansion expressions are only evaluated and expanded in unquoted parts of the atom selector expression,
+which aren’t part of an inner arithmetic expression.
 
 Every atom selector expression can consist:
-* Wildcard (Each wildcard will be expanded to multiple statements during processing)
-* Bash brace expansion (e.g. {22..25} -> 22 23 24 25)
-* Arithmetic expression in `$(expr)` format
-* Quotes \`anything\` to prevent wildcards and expansions
-* Quotes " or ' to insert string
-* Call of aggregate function `AGGREGATE_FUNCTION(next select block)` - there cannot be any space after FUNCTION
-* Call of single arg function `ONEARG_FUNCTION(arithmetic expression)` - there cannot be any space after FUNCTION
-* Constants
-* Reference to a column name
+
+
+Every atom selector expression can consist:
+* A wildcard (Each wildcard is expanded against the symbol name list. If no symbol name matching the wildcard is found, the wildcard is expanded to itself.);
+* A `bash` brace expansion expression (e.g. `{22..25}` -> `22 23 24 25`);
+* An arithmetic expression in `$(expr)` format;
+* A call of an aggregate function `AGGREGATE_FUNCTION(SELECT_EXPR)` - there cannot be any space after `FUNCTION`;
+* A call of a one-argument function `ONEARG_FUNCTION(ARITHMETIC_EXPR)` — there cannot be any space after `FUNCTION`;
+* A constant;
+* A symbol name;
+* A built-in constant value;
+* A reference to a column name.
 
 If you want to concatenate strings without `++` operator, you can write: `a.1","a.2`.
 
 Please, keep in mind, that operators must be put inside arithmetic expressions, or they will be matched to a column name or aggregate function.
 
 #### Arithmetic expression
-The statement uses mainly classical awk logic. You can use keywords `>`, `<`, `<=`, `>=`, `==`, `||`, `&&`, `+`, `-`, `*`, `/`... 
+Arithmetic expressions are in the grammar description as `ARITHMETIC_EXPR`.
+
+The expressions use mainly the classical `awk` style of expressions.
+You can use here operators `OPERATOR` keywords `>`, `<`, `<=`, `>=`, `==`, `||`, `&&`, `+`, `-`, `*`, `/`... 
 
 #### Select blocks
-These blocks determine output. They accept select expressions and are evaluated and printed in a delimitered format. 
+Select blocks are referred in the grammar description as `SELECT_BLOCK`.
+These blocks determine the output. They accept the select expression.
 
-Every select block must contain at least one reference to the column name, or the behavior is undefined.
+There must be at least one select block in an LSQL command, which refers to at least one symbol name, or the behavior is undefined.
 
 Examples of select blocks:
 
     &1.[3-6]
 
-This will print columns 3, 4, 5, and 6 from the first file.
+This will print the 3rd, 4th, 5th, and 6th columns from the first file if the first file has at least 6 columns. 
 
-    ax*.{6..4} 
-    
-This will print the 6th, 5th, and 4th of all files whose name begins with ax.
+    ax*.{6..4}
+
+This will print the 6th, the 5th, and the 4th columns from all files whose name begins with ax if the files have at least 6 columns.
+
 
 
 #### From blocks
-There must be exactly one from block at the beginning of the command. The block can contain any files (and `-` specifies standard input). You can use any syntax you would otherwise use in bash to select these files (wildcards, expansion...). You can also overname the file using `NAME=stmt`. If there is more than 1 matching of stmt, the files will be named `(NAME, NAME1, NAME2...)`.
+These blocks are in the grammar description as `FROM_BLOCK`.
+There must be exactly one from block at the beginning of an LSQL command. 
 
-Example:
+The from block contains input file paths (or `-` in the case of the standard input), and optionally their assign name `ASSIGN_NAME`. 
+
+You can use the wildcards and the curly bracket expansion as you were in the `bash` to refer input files. 
+If there is a wildcard with an assign name `NAME` matching more than one input file, the input files will be given assign names `NAME`, `NAME1`, `NAME2`...
+If there is a wildcard, that matches to no file, it is expanded to itself. 
+
+If `FILE_PATH` is put inside \` quotes, no wildcard or expansion logic applies to it.
+
+You can also add custom attributes to input files in the format `FILE_PATH -aX --attribute=X -b`. The attributes will be applied to all files which will be matched against `FILE_PATH`.
+The custom attributes are referred to as `OPTIONS` in the grammar description.
+
+Examples:
 
     /etc/{passwd,group}
-    
+
+
 This will select `/etc/passwd` and `/etc/group` files. They can be addressed either as `&1` or `/etc/passwd`, and `&2` or `/etc/group`.
 
-If `filename` is put inside \` quotes, no wildcard or expansion logic will apply to it.
+    passwd=/etc/passwd
 
-You can also add custom attributes to files in the format `FILE -aX --attribute=X -b`. The attributes will be applied to all files which will be matched using `FILE` bash expression.
+This will select `/etc/passwd` and set its assign name to `passwd`. It can be addressed as `&1`, `passwd`, or `/etc/passwd`.
+
+
+
 
 ##### Possible attributes
     
     -n
     --named
 
-It means that the CSV file has the first line with the names of the columns
+Enables the first-line naming convention for an input CSV file---first-line with column names.
 
     -N
     --not-named
 
-You can also set the exact opposite. This can be useful if you change the default behavior.
+You can also set the exact opposite to an input file. This can be useful if you change the default behavior.
 
     -dCHAR
     --delimiter=CHAR
     
-This changes the primary delimiter.
+This changes the primary delimiter of an input file.
 
     -sCHAR
     --secondary-delimiter=CHAR
     
-This changes the secondary delimiter char.
+This changes the secondary delimiter of an input file.
 
 Example:
 
     /etc/passwd -d:
 
-Currently, commas and CHARs, which are also quotes in Lsql, are not supported as delimiters.
-    
-#### If block
-This block always begins with `if`. They accept arithmetic expressions, which should be convertible to Bool - either String `false`/`true`, Int (`0` `false`, anything else `true`), or Bool. 
-Rows with true are printed or aggregated, and rows with false are skipped.
+This will select `/etc/passwd` and set its delimiter to `:`.
+
+Currently, commas and `CHAR`s, which are also quotes in LSQL, are not supported as a delimiter or a secondary delimiter in `FILE_PATH` custom attributes.
+
+
+#### If blocks
+These blocks are in the grammar description as `IF_BLOCK`.
+They always begin with the `if` keyword.        
+They accept arithmetic expressions, which should be convertible to `Bool`: 
+either `String` `false`/`true`, `Int` `0` `false`, anything else `true`), or `Bool`. 
+
+Rows with the arithmetic expression converted to `Bool` `true` are printed or aggregated, and
+rows with the arithmetic expression converted to `Bool` `false` are skipped.
 
 Filtering is done before the aggregation.
 
-You can imagine if block as where clause in SQL.
+You can imagine the if block as the `WHERE` clause in SQL.
 
-#### By block
-This statement always begins with `by` and the rest of the block is a select expression. There can be only one By block in the whole command.
 
-The by block is used to group the resulting set by the given atoms.
+#### By blocks
+By blocks are referred in the grammar description as `BY_BLOCK`.
+These blocks always begin with the `by` keyword. They accept the select expression.
 
-You can imagine by block as the group by clause in SQL. 
+There can be only one by block in a whole LSQL command.
 
-There must be at least one aggregate function in the select block if by block is present. Otherwise, behavior is undefined.
+The by block is used to group the resulting set by the given atoms for the evaluation by an aggregate function.
+The by block is similar to the `GROUP BY` clause in SQL.
 
-If there is an aggregate function present without by block present, aggregation runs over all rows at once.
+There must be at least one aggregate function in the select block if the by block is present. Otherwise, the behavior is undefined.
 
-#### Sort block
-This block can be at the end of the command. It begins with the `sort` keyword and the rest is a select expression.
+If there is an aggregate function present without the by block present in an LSQL command, the aggregate function runs over all rows at once.
+
+
+#### Sort blocks
+These blocks are in the grammar description as `SORT_BLOCK`.
+It begins with the `sort` keyword. They accept the select expression.
 
 The sort block determines the order of the final output - given atoms are sorted in ascending order.
+If there is more than one atom in the sort block (`A`, `B`, `C`...), the data is first sorted by `A` 
+and in the case of ties, the atoms (`B`, `C`...) are used to further refine the order of the final output.
 
-You can imagine a sort block as the order by clause in SQL.
+You can imagine the sort block as the `ORDER BY` clause in SQL.
 
-There can be only one Sort block in the whole command.
+There can be only one sort block in the whole command.
+
