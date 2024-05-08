@@ -1,4 +1,21 @@
 # Revision history for lsql-csv
+## 0.1.0.6
+### docs
+* changed the package description in lsql-csv.cabal
+* improved the README.md documentation
+* improved the Haddock documentation
+
+
+### test
+* added associativity unit tests
+* unified the unit test naming convention
+* added more basic unit tests
+
+### chore
+* Makefile reformatted
+* lsql-csv.cabal reformatted
+
+
 ## 0.1.0.5
 * text package upper bound changed to 2.2
 * containers package upper bound changed to 0.8
