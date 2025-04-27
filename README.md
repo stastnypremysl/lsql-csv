@@ -27,7 +27,7 @@ The package is also published at https://hackage.haskell.org/package/lsql-csv in
 
     cabal install lsql-csv
 
-### Running the unit tests
+### Running the integration tests
 If you want to verify, that the package has been compiled correctly, it is possible to test it by running:
 
     make test
